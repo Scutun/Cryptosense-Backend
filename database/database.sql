@@ -10,16 +10,27 @@ CREATE TABLE IF NOT EXISTS tags (
     name VARCHAR(255) UNIQUE NOT NULL
 );
 
+-- таблица словарь фотографий
+CREATE TABLE IF NOT EXISTS photos (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) UNIQUE NOT NULL
+);
+
 -- таблица пользователей
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     surname VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
     nickname VARCHAR(255) UNIQUE NOT NULL,
-    photo TEXT,
-    perutation BIGINT,
-    admin BOOLEAN DEFAULT FALSE
+    perutation BIGINT DEFAULT 0,
+    registration_date DATE NOT NULL,
+    photo_id INTEGER DEFAULT 1,
+    admin BOOLEAN DEFAULT FALSE,
+    activated BOOLEAN DEFAULT FALSE,
+
+    FOREIGN KEY (photo_id) REFERENCES photos(id) ON DELETE SET NULL
 );
 
 -- таблица всех курсов
@@ -57,11 +68,11 @@ CREATE TABLE IF NOT EXISTS user_courses (
     id SERIAL PRIMARY KEY,
     active BOOLEAN DEFAULT TRUE,
 
-    users INT NOT NULL,
-    courses INT NOT NULL,
+    user_id INT NOT NULL,
+    course_id INT NOT NULL,
 
-    FOREIGN KEY (users) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (courses) REFERENCES courses(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
 );
 
 -- таблица коментариев
