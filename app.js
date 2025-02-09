@@ -16,6 +16,10 @@ const swaggerDocument = yaml.load(fs.readFileSync('./docs/swagger_example.yaml',
 
 app.use('/api/swagger/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
+app.get('/server', (req, res) => {
+    res.send('Server is running')
+})
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`)
     console.log(`Documentation is available on http://localhost:${PORT}/api/swagger/docs`)
