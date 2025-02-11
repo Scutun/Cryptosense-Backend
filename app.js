@@ -1,6 +1,7 @@
 require('dotenv').config()
 require('./db')
 
+const userRoutes = require('../cryptosense_backend/routes/users.router')
 const express = require('express')
 const app = express()
 const cors = require('cors')
@@ -13,7 +14,7 @@ app.use(express.json())
 app.use(cors())
 
 const swaggerDocument = yaml.load(fs.readFileSync('./docs/swagger_example.yaml', 'utf8'))
-
+app.use('/api', userRoutes)
 app.use('/api/swagger/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
 app.get('/server', (req, res) => {
