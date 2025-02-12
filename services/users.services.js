@@ -13,6 +13,7 @@ class UsersService {
             throw Error
         }
     }
+    
 }
 
 module.exports = new UsersService()
