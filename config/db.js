@@ -14,10 +14,12 @@ const pool = new Pool({
 // Подключение к Redis
 const redisClient = createClient({
     socket: {
-        host: process.env.REDIS_HOST,
-        port: process.env.REDIS_PORT,
+        host: process.env.REDIS_HOST || '127.0.0.1',
+        port: process.env.REDIS_PORT || 6379,
     },
 })
+
+redisClient.connect().catch(console.error)
 
 // Закрытие подключений при завершении работы
 const shutdown = async () => {
