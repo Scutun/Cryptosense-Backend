@@ -1,6 +1,5 @@
 const bcrypt = require('bcrypt')
 const model = require('../models/users.models')
-
 class UsersService {
     async createUser(req) {
         try {
@@ -13,7 +12,17 @@ class UsersService {
             throw Error
         }
     }
-    
+    async findUser(req) {
+        try {
+            const { email,password } = req.body
+            const hashPassword = await bcrypt.hash(password, 10)
+            const user = await model.getUserByEmail(email,hashPassword)
+
+            return user
+        } catch (error) {
+            throw Error
+        }
+    }
 }
 
 module.exports = new UsersService()
