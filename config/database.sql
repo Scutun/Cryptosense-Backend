@@ -4,17 +4,78 @@ CREATE TABLE IF NOT EXISTS difficulties (
     name VARCHAR(255) UNIQUE NOT NULL
 );
 
+-- Запись сдложности курсов
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM difficulties WHERE name = 'Легкая') THEN
+    INSERT INTO difficulties (name) VALUES ('Легкая');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM difficulties WHERE name = 'Средняя') THEN
+    INSERT INTO difficulties (name) VALUES ('Средняя');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM difficulties WHERE name = 'Сложная') THEN
+    INSERT INTO difficulties (name) VALUES ('Сложная');
+  END IF;
+
+END $$;
+
 -- таблица словарь с тегами для курсов
 CREATE TABLE IF NOT EXISTS tags (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) UNIQUE NOT NULL
 );
 
+-- Запись названий тегов курсов
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Bitcoin') THEN
+    INSERT INTO tags (name) VALUES ('Bitcoin');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Ethereum') THEN
+    INSERT INTO tags (name) VALUES ('Ethereum');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Litecoin') THEN
+    INSERT INTO tags (name) VALUES ('Litecoin');
+  END IF;
+END $$;
+
 -- таблица словарь фотографий
 CREATE TABLE IF NOT EXISTS photos (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) UNIQUE NOT NULL
 );
+
+-- Запись названий аватаров
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM photos WHERE name = 'cristalAvatar.jpg') THEN
+    INSERT INTO photos (name) VALUES ('cristalAvatar.jpg');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM photos WHERE name = 'bitcoinPlusAvatar.jpg') THEN
+    INSERT INTO photos (name) VALUES ('bitcoinPlusAvatar.jpg');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM photos WHERE name = 'bitpandaAvatar.jpg') THEN
+    INSERT INTO photos (name) VALUES ('bitpandaAvatar.jpg');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM photos WHERE name = 'cDollarAvatar.jpg') THEN
+    INSERT INTO photos (name) VALUES ('cDollarAvatar.jpg');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM photos WHERE name = 'rightsAvatar.jpg') THEN
+    INSERT INTO photos (name) VALUES ('rightsAvatar.jpg');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM photos WHERE name = 'synthetixAvatar.jpg') THEN
+    INSERT INTO photos (name) VALUES ('synthetixAvatar.jpg');
+  END IF;
+END $$;
 
 -- таблица пользователей
 CREATE TABLE IF NOT EXISTS users (
@@ -41,12 +102,19 @@ CREATE TABLE IF NOT EXISTS courses (
     creator_id BIGINT NOT NULL,
     creation_date DATE NOT NULL,
     course_duration TEXT,
-
     difficulty_id BIGINT,
-    tag_id BIGINT,
     
-    FOREIGN KEY (difficulty_id) REFERENCES difficulties(id) ON DELETE SET NULL,
-    FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE SET NULL
+    FOREIGN KEY (difficulty_id) REFERENCES difficulties(id) ON DELETE SET NULL
+);
+
+-- Промежуточная таблица для связи курсов и тегов
+CREATE TABLE IF NOT EXISTS course_tags (
+    id SERIAL PRIMARY KEY,
+    course_id BIGINT NOT NULL,
+    tag_id BIGINT NOT NULL,
+    
+    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
+    FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
 );
 
 -- таблица уроков курса
