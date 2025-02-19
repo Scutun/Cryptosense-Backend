@@ -102,12 +102,19 @@ CREATE TABLE IF NOT EXISTS courses (
     creator_id BIGINT NOT NULL,
     creation_date DATE NOT NULL,
     course_duration TEXT,
-
     difficulty_id BIGINT,
-    tag_id BIGINT,
     
-    FOREIGN KEY (difficulty_id) REFERENCES difficulties(id) ON DELETE SET NULL,
-    FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE SET NULL
+    FOREIGN KEY (difficulty_id) REFERENCES difficulties(id) ON DELETE SET NULL
+);
+
+-- Промежуточная таблица для связи курсов и тегов
+CREATE TABLE IF NOT EXISTS course_tags (
+    id SERIAL PRIMARY KEY,
+    course_id BIGINT NOT NULL,
+    tag_id BIGINT NOT NULL,
+    
+    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
+    FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
 );
 
 -- таблица уроков курса
