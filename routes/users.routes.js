@@ -6,7 +6,7 @@ const tokenController = require('../controllers/tokens.controller')
 const checkToken = require('../middlewares/checkToken')
 
 router.post('/users/create', userController.createUser)
-router.post('/users/newTokens', tokenController.updateRefreshToken)
+router.get('/users/newTokens', tokenController.updateRefreshToken)
 router.post('/users/verifyEmail', checkToken, userController.verifyEmail)
 
 router.post('/users/login', userController.loginUser)

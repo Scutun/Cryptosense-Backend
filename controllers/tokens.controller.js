@@ -1,18 +1,19 @@
 const jwt = require('jsonwebtoken')
-const redisClient = require('../config/db')
-const cookieParser = require('cookie-parser')
+const redisClient = require('../config/db').redisClient
+const tokenService = require('../services/tokens.services')
 
 class TokenController {
     async updateRefreshToken(req, res) {
         try {
             const refreshToken = req.cookies.refreshToken
+
             if (!refreshToken) {
                 return res.status(403).json({ message: 'The token is not provided' })
             }
 
             const user = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
-            await compareRefreshToken(refreshToken, user.userID)
-            const newTokens = genAllTokens(user.userID)
+            await tokenService.compareRefreshToken(refreshToken, user.id)
+            const newTokens = tokenService.genAllTokens(user.id)
             // Отправляем новый refresh-токен в куках
             res.cookie('refreshToken', newTokens.refreshToken, { httpOnly: true, secure: true })
 

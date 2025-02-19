@@ -8,9 +8,11 @@ const swaggerUi = require('swagger-ui-express')
 const fs = require('fs')
 const yaml = require('js-yaml')
 const PORT = process.env.PORT || 3020
+const cookieParser = require('cookie-parser')
 
 const userRoutes = require('./routes/users.routes')
 
+app.use(cookieParser())
 app.use(express.json())
 app.use(cors())
 

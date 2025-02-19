@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-const redis = require('../config/db')
+const redis = require('../config/db').redisClient
 class Tokens {
     genAccessToken(user_id) {
         const accessToken = jwt.sign({ id: user_id }, process.env.ACCESS_TOKEN_SECRET, {
@@ -17,9 +17,9 @@ class Tokens {
         return { accessToken, refreshToken }
     }
     async saveRefreshToken(user_id, refreshToken) {
-        // 14 дней (1209600  секунд)
         try {
-            await redis.setex(`user_id:${user_id}`, 1209600, refreshToken)
+            // 14 дней (1209600  секунд)
+            await redis.setEx(`user_id:${user_id}`, 1209600, refreshToken)
         } catch (error) {
             throw { status: 500, message: `Error saving the refresh token: ${error.message}` }
         }

@@ -1,11 +1,11 @@
-const db = require('../config/db')
+const db = require('../config/db').pool
 
 class UsersModel {
     async newUser(info) {
         try {
             const { email, hashPassword, login, name, surname, date } = info
-            console.log(info)
-            const user = await db.pool.query(
+
+            const user = await db.query(
                 `INSERT INTO  users (name,surname,email,password,nickname,registration_date) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id,email`,
                 [name, surname, email, hashPassword, login, date],
             )
@@ -21,7 +21,7 @@ class UsersModel {
                     throw { status: 400, message: `The username "${login}" is already taken` }
                 }
             }
-            console.log(error)
+
             throw { status: 400, message: `Error when creating a user: ${error.message}` }
         }
     }
