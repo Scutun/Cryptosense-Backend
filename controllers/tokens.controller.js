@@ -1,28 +1,24 @@
 const jwt = require('jsonwebtoken')
-const redisClient = require('../config/db').redisClient
-const tokenService = require('../services/tokens.services')
+const tokenService = require('../utils/tokens.services')
 
 class TokenController {
-    async updateRefreshToken(req, res) {
+    async updateRefreshToken(req, res, next) {
         try {
             const refreshToken = req.cookies.refreshToken
-
             if (!refreshToken) {
-                return res.status(403).json({ message: 'The token is not provided' })
+                return res.status(403).json({ message: 'Токен не предоставлен' })
             }
 
             const user = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
-            await tokenService.compareRefreshToken(refreshToken, user.id)
-            const newTokens = tokenService.genAllTokens(user.id)
-            // Отправляем новый refresh-токен в куках
-            res.cookie('refreshToken', newTokens.refreshToken, { httpOnly: true, secure: true })
 
-            // Возвращаем новый access-токен
+            await tokenService.compareRefreshToken(refreshToken, user.id)
+
+            const newTokens = tokenService.genAllTokens(user.id)
+
+            res.cookie('refreshToken', newTokens.refreshToken, { httpOnly: true, secure: false })
             res.json({ accessToken: newTokens.accessToken })
         } catch (error) {
-            return res
-                .status(403)
-                .json({ message: 'Error updating the token', error: error.message })
+            next({ status: 403, message: `Ошибка при обновлении токена доступа: ${error.message}` })
         }
     }
 }

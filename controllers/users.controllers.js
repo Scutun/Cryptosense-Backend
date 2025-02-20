@@ -1,59 +1,71 @@
 const userService = require('../services/users.services')
-const tokenService = require('../services/tokens.services')
-const emailService = require('../services/email.services')
+const tokenService = require('../utils/tokens.services')
+const emailService = require('../utils/emails.services')
 const jwt = require('jsonwebtoken')
-class UsersController {
-    async createUser(req, res) {
-        try {
-            const user = await userService.createUser(req.body)
-            const emailToken = tokenService.genAccessToken(user)
-            await emailService.sendVerificationEmail(req.body.email, emailToken)
 
-            res.status(201).json({ message: 'the letter has been sent to the post office' })
+class UsersController {
+    async createUser(req, res, next) {
+        try {
+            await userService.searchUsers(req.email, req.login)
+            const emailToken = tokenService.genAccessToken(req.email)
+            await emailService.sendVerificationEmail(req.body.email, emailToken)
+            await userService.createUser(req.body)
+
+            res.status(201).json({ message: 'Письмо отправлено на почту' })
         } catch (error) {
-            res.status(500).json({ message: error.message })
+            next(error.message)
         }
     }
-    async loginUser(req, res) {
+
+    async loginUser(req, res, next) {
         try {
-            const user_id = await userService.loginUser(req.body)
-            const newTokens = tokenService.genAllTokens(user_id)
-            await tokenService.saveRefreshToken(user_id, newTokens.refreshToken)
-            res.cookie('refreshToken', newTokens.refreshToken, { httpOnly: true, secure: true })
+            const id = await userService.loginUser(req.body)
+            const newTokens = tokenService.genAllTokens(id)
+
+            await tokenService.saveRefreshToken(id, newTokens.refreshToken)
+
+            res.cookie('refreshToken', newTokens.refreshToken, { httpOnly: true, secure: false })
             res.json({ accessToken: newTokens.accessToken })
         } catch (error) {
-            res.status(401).json({ message: error.message })
+            next({ status: 400, message: error.message })
         }
     }
-    async resetUserPassword(req, res) {
+
+    async resetUserPassword(req, res, next) {
         try {
             const user = await userService.resetUserPassword(req.body)
             const emailToken = tokenService.genAccessToken(user)
+
             await emailService.sendResetPasswordEmail(req.body.email, emailToken)
-            res.status(200).json({ message: 'the letter has been sent to the post office' })
+
+            res.status(200).json({ message: 'Письмо отправлено на почту' })
         } catch (error) {
-            res.status(500).json({ message: error.message })
+            next(error.message)
         }
     }
-    async verifyEmail(req, res) {
+
+    async verifyEmail(req, res, next) {
         try {
-            const authHeaders = req.headers.authorization
-            const token = authHeaders && authHeaders.split(' ')[1]
-            const user = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
+            
+            const user = getIdFromToken(req)
+
             await userService.activateUser(user.id)
             const newTokens = tokenService.genAllTokens(user.id)
-            res.cookie('refreshToken', newTokens.refreshToken, { httpOnly: true, secure: true })
+
+            res.cookie('refreshToken', newTokens.refreshToken, { httpOnly: true, secure: false })
             res.json({ accessToken: newTokens.accessToken })
         } catch (error) {
-            res.status(400).json({ message: error.message })
+            next({ status: 400, message: error.message })
         }
     }
-    async newUserPassword(req, res) {
+
+    async newUserPassword(req, res, next) {
         try {
             await userService.newUserPassword(req.body)
-            res.status(200).json({ message: 'password update sucsecc' })
+
+            res.status(200).json({ message: 'Пароль успешно обновлен' })
         } catch (error) {
-            res.status(500).json({ message: error.message })
+            next(error.message)
         }
     }
 }

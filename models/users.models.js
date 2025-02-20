@@ -4,25 +4,33 @@ class UsersModel {
     async newUser(info) {
         try {
             const { email, hashPassword, login, name, surname, date } = info
-
+            console.log(info)
             const user = await db.query(
-                `INSERT INTO  users (name,surname,email,password,nickname,registration_date) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id,email`,
+                `INSERT INTO  users (name,surname,email,password,nickname,registration_date) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id`,
                 [name, surname, email, hashPassword, login, date],
             )
             return user.rows[0].id
         } catch (error) {
             if (error.code === '23505') {
-                if (error.detail.includes('email')) {
-                    throw {
-                        status: 400,
-                        message: `The user with this email address: ${email} already exists`,
-                    }
-                } else if (error.detail.includes('nickname')) {
-                    throw { status: 400, message: `The username "${login}" is already taken` }
+                throw {
+                    status: 400,
+                    message: `Пользователь с ${error.detail.key === 'email' ? 'с таким e-mail' : 'с таким логином'} уже существет`,
                 }
             }
 
-            throw { status: 400, message: `Error when creating a user: ${error.message}` }
+            throw { status: 400, message: `Ошибка создания пользователя: ${error.message}` }
+        }
+    }
+
+    async searchUsers(email, login) {
+        try {
+            const user = await db.query(
+                `SELECT id,activated,password FROM users WHERE email = $1 OR nickname = $2`,
+                [email, login],
+            )
+            return user.rows
+        } catch (error) {
+            throw { status: 400, message: `Ошибка поиска пользователя: ${error.message}` }
         }
     }
 
@@ -35,21 +43,29 @@ class UsersModel {
 
             return user.rows[0]
         } catch (error) {
-            throw { status: 400, message: `Error when getting user by email: ${error.message}` }
+            throw {
+                status: 400,
+                message: `Ошибка при поиске пользователя с таким электронным адресом: ${error.message}`,
+            }
         }
     }
-    async activateUser(user_id) {
+
+    async activateUser(id) {
         try {
-            await db.query(`UPDATE users SET activated = true WHERE id = $1`, [user_id])
+            await db.query(`UPDATE users SET activated = true WHERE id = $1`, [id])
         } catch (error) {
-            throw { status: 400, message: `Error when verifying user: ${error.message}` }
+            throw { status: 400, message: `Ошибка при активации пользователя: ${error.message}` }
         }
     }
+
     async updateUserPassword(email, hashPassword) {
         try {
             await db.query(`UPDATE users SET password = $1 WHERE email = $2`, [hashPassword, email])
         } catch (error) {
-            throw { status: 400, message: `Error when updating user password: ${error.message}` }
+            throw {
+                status: 400,
+                message: `Ошибка обновления пароля пользователя: ${error.message}`,
+            }
         }
     }
 }
