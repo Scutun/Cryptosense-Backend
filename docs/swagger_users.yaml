@@ -1,0 +1,175 @@
+# prettier-ignore
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "User API",
+    "version": "1.0.0",
+    "description": "API для управления пользователями и токенами"
+  },
+  "paths": {
+    "/v1/users/create": {
+      "post": {
+        "summary": "Создать пользователя",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" },
+                  "login": { "type": "string" },
+                  "password": { "type": "string" },
+                  "name": { "type": "string" },
+                  "surname": { "type": "string" }
+                },
+                "required": ["email", "login", "password", "name", "surname"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Письмо отправлено на почту"
+          },
+          "400": { "description": "Ошибка запроса" }
+        }
+      }
+    },
+    "/v1/users/verify/email": {
+      "post": {
+        "summary": "Подтвердить email",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": { "type": "string" }
+                },
+                "required": ["token"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": { "description": "Ошибка авторизации" }
+        }
+      }
+    },
+    "/v1/users/login": {
+      "post": {
+        "summary": "Авторизация пользователя",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" },
+                  "password": { "type": "string" }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "accessToken": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Неверные учетные данные" },
+          "403": { "description": "Пользователь не подтвердил почту" },
+          "404": { "description": "Пользователь не найден" }
+        }
+      }
+    },
+    "/v1/users/reset/password": {
+      "post": {
+        "summary": "Запрос на сброс пароля",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" }
+                },
+                "required": ["email"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Запрос на сброс отправлен"
+          },
+          "404": { "description": "Пользователь не найден" },
+          "403": { "description": "Пользователь не подтвердил почту" }
+        }
+      }
+    },
+    "/v1/users/update/password": {
+      "post": {
+        "summary": "Обновление пароля",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" },
+                  "newPassword": { "type": "string" }
+                },
+                "required": ["email", "newPassword"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Пароль успешно обновлен"
+          },
+          "400": { "description": "Ошибка при обновлении пароля" }
+        }
+      }
+    },
+    "/v1/users/new/tokens": {
+      "get": {
+        "summary": "Обновление токенов",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "accessToken": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

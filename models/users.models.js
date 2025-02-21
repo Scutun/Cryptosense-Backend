@@ -50,9 +50,9 @@ class UsersModel {
         }
     }
 
-    async activateUser(id) {
+    async activateUser(email) {
         try {
-            await db.query(`UPDATE users SET activated = true WHERE id = $1`, [id])
+            await db.query(`UPDATE users SET activated = true WHERE email = $1`, [email])
         } catch (error) {
             throw { status: 400, message: `Ошибка при активации пользователя: ${error.message}` }
         }

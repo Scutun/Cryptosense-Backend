@@ -1,6 +1,10 @@
 const nodemailer = require('nodemailer')
 
 async function sendVerificationEmail(email, token) {
+    if (!email || !token) {
+        throw { status: 400, message: 'E-mail и токен обязательны' }
+    }
+
     const transporter = nodemailer.createTransport({
         host: process.env.MAIL_STMP,
         port: process.env.MAIL_PORT,
@@ -42,6 +46,10 @@ async function sendVerificationEmail(email, token) {
 }
 
 async function sendResetPasswordEmail(email, token) {
+    if (!email || !token) {
+        throw { status: 400, message: 'E-mail и токен обязательны' }
+    }
+
     const transporter = nodemailer.createTransport({
         host: process.env.MAIL_STMP,
         port: process.env.MAIL_PORT,
