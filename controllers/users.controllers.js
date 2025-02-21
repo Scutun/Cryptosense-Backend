@@ -1,6 +1,6 @@
 const userService = require('../services/users.services')
-const tokenService = require('../utils/tokens.services')
-const emailService = require('../utils/emails.services')
+const tokenService = require('../utils/tokens.utils')
+const emailService = require('../utils/emails.utils')
 const jwt = require('jsonwebtoken')
 
 class UsersController {
@@ -46,7 +46,6 @@ class UsersController {
 
     async verifyEmail(req, res, next) {
         try {
-            
             const user = getIdFromToken(req)
 
             await userService.activateUser(user.id)

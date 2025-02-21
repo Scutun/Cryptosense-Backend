@@ -16,8 +16,22 @@ app.use(cookieParser())
 app.use(express.json())
 app.use(cors())
 
-const swaggerDocument = yaml.load(fs.readFileSync('./docs/swagger_example.yaml', 'utf8'))
-app.use('/api/swagger/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
+const swaggerExample = yaml.load(fs.readFileSync('./docs/swagger_example.yaml', 'utf8'))
+const swaggerUsers = yaml.load(fs.readFileSync('./docs/swagger_users.yaml', 'utf8'))
+
+const mergedSwagger = {
+    ...swaggerExample,
+    paths: { ...swaggerExample.paths, ...swaggerUsers.paths },
+    components: {
+        ...swaggerExample.components,
+        schemas: {
+            ...swaggerExample.components?.schemas,
+            ...swaggerUsers.components?.schemas,
+        },
+    },
+}
+
+app.use('/api/swagger/docs', swaggerUi.serve, swaggerUi.setup(mergedSwagger))
 
 app.use('/api', userRoutes)
 

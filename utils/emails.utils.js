@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer')
 
 async function sendVerificationEmail(email, token) {
-    if (!email || !token) {
+    if (email.length === 0 || token.length === 0) {
         throw { status: 400, message: 'E-mail и токен обязательны' }
     }
 
@@ -46,7 +46,7 @@ async function sendVerificationEmail(email, token) {
 }
 
 async function sendResetPasswordEmail(email, token) {
-    if (!email || !token) {
+    if (email.length === 0 || token.length === 0) {
         throw { status: 400, message: 'E-mail и токен обязательны' }
     }
 

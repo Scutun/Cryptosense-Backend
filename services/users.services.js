@@ -1,11 +1,18 @@
 const bcrypt = require('bcrypt')
 const modelUser = require('../models/users.models')
+
 class UsersService {
     async createUser(userInfo) {
         try {
             const { email, password, login, name, surname } = userInfo
 
-            if (!email || !password || !login || !name || !surname) {
+            if (
+                email.length === 0 ||
+                password.length === 0 ||
+                login.length === 0 ||
+                name.length === 0 ||
+                surname.length === 0
+            ) {
                 throw { status: 400, message: 'Все поля обязательны для заполнения' }
             }
 
@@ -21,18 +28,18 @@ class UsersService {
 
     async searchUsers(email, login) {
         try {
-            if (!email && !login) {
+            if (email.length === 0 || login.length === 0) {
                 throw { status: 400, message: 'Необходимо передать e-mail или логин' }
             }
 
             const users = await modelUser.searchUsers(email, login)
 
             if (users.length === 2) {
-                throw { status: 404, message: 'e-mail и логин заняты' }
+                throw { status: 404, message: 'Такие e-mail и логин заняты' }
             } else if (users.length === 1) {
                 throw {
                     status: 404,
-                    message: `${users.email === email ? 'e-mail уже занят' : 'логин уже занят'}`,
+                    message: `Этот ${users.email === email ? 'e-mail уже занят' : 'логин уже занят'}`,
                 }
             }
         } catch (error) {
@@ -44,7 +51,7 @@ class UsersService {
         try {
             const { email, password } = info
 
-            if (!email || !password) {
+            if (email.length === 0 || password.length === 0) {
                 throw { status: 400, message: 'E-mail и пароль обязательны' }
             }
 
@@ -67,7 +74,7 @@ class UsersService {
 
     async activateUser(email) {
         try {
-            if (!email) {
+            if (email.length === 0) {
                 throw { status: 400, message: 'E-mail обязателен' }
             }
 
@@ -78,7 +85,7 @@ class UsersService {
     }
 
     async resetUserPassword(info) {
-        if (!info.email) {
+        if (info.email.length === 0) {
             throw { status: 400, message: 'E-mail обязателен' }
         }
 
@@ -96,7 +103,7 @@ class UsersService {
         try {
             const { email, password } = info
 
-            if (!email || !password) {
+            if (email.length === 0 || password.length === 0) {
                 throw { status: 400, message: 'E-mail и новый пароль обязательны' }
             }
 

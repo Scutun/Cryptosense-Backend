@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-const tokenService = require('../utils/tokens.services')
+const tokenService = require('../utils/tokens.utils')
 
 class TokenController {
     async updateRefreshToken(req, res, next) {

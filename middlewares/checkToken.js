@@ -9,7 +9,7 @@ function checkToken(req, res, next) {
 
         next()
     } catch (error) {
-        res.status(403).json({ message: 'Invalid or expired token.' })
+        res.status(403).json({ message: 'Недействительный токен' })
     }
 }
 
