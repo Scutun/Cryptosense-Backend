@@ -8,13 +8,32 @@ const swaggerUi = require('swagger-ui-express')
 const fs = require('fs')
 const yaml = require('js-yaml')
 const PORT = process.env.PORT || 3020
+const cookieParser = require('cookie-parser')
 
+const userRoutes = require('./routes/users.routes')
+
+app.use(cookieParser())
 app.use(express.json())
 app.use(cors())
 
-const swaggerDocument = yaml.load(fs.readFileSync('./docs/swagger_example.yaml', 'utf8'))
+const swaggerExample = yaml.load(fs.readFileSync('./docs/swagger_example.yaml', 'utf8'))
+const swaggerUsers = yaml.load(fs.readFileSync('./docs/swagger_users.yaml', 'utf8'))
 
-app.use('/api/swagger/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
+const mergedSwagger = {
+    ...swaggerExample,
+    paths: { ...swaggerExample.paths, ...swaggerUsers.paths },
+    components: {
+        ...swaggerExample.components,
+        schemas: {
+            ...swaggerExample.components?.schemas,
+            ...swaggerUsers.components?.schemas,
+        },
+    },
+}
+
+app.use('/api/swagger/docs', swaggerUi.serve, swaggerUi.setup(mergedSwagger))
+
+app.use('/api', userRoutes)
 
 app.get('/server', (req, res) => {
     res.send('Server is running')
