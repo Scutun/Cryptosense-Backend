@@ -236,7 +236,7 @@
                 "type": "object",
                 "properties": {
                   "accessToken": { "type": "string", "description": "JWT access token" },
-                  "message": { "type": "srting", "description": "Пользователь зарегистрован"}
+                  "message": { "type": "srting", "description": "Токен обновлен"}
                 }
               }
             }

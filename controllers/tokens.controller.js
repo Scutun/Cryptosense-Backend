@@ -16,7 +16,7 @@ class TokenController {
             const newTokens = tokenService.genAllTokens(user.id)
 
             res.cookie('refreshToken', newTokens.refreshToken, { httpOnly: true, secure: false })
-            res.json({ accessToken: newTokens.accessToken })
+            res.status(201).json({ accessToken: newTokens.accessToken, message: 'Токен обновлен' })
         } catch (error) {
             next({ status: 400, message: `Ошибка при обновлении токена доступа: ${error.message}` })
         }
