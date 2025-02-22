@@ -34,9 +34,7 @@ class UsersService {
 
             const users = await modelUser.searchUsers(email, login)
 
-            if (users.length === 2) {
-                throw { status: 409, message: 'Такие e-mail и логин заняты' }
-            } else if (users.length === 1) {
+            if (users.length > 0) {
                 throw {
                     status: 409,
                     message: `Этот ${users.email === email ? 'e-mail уже занят' : 'логин уже занят'}`,

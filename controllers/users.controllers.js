@@ -1,6 +1,6 @@
 const userService = require('../services/users.services')
-const tokenService = require('../utils/tokens.utils')
-const emailService = require('../utils/emails.utils')
+const tokenUtils = require('../utils/tokens.utils')
+const emailUtils = require('../utils/emails.utils')
 const jwt = require('jsonwebtoken')
 
 class UsersController {
@@ -8,8 +8,8 @@ class UsersController {
         try {
             await userService.searchUsers(req.email, req.login)
 
-            const emailToken = tokenService.genAccessToken(req.email)
-            await emailService.sendVerificationEmail(req.body.email, emailToken)
+            const emailToken = tokenUtils.genAccessToken(req.email)
+            await emailUtils.sendVerificationEmail(req.body.email, emailToken)
             await userService.createUser(req.body)
 
             res.status(201).json({ message: 'Письмо отправлено на почту' })
@@ -21,9 +21,9 @@ class UsersController {
     async loginUser(req, res, next) {
         try {
             const id = await userService.loginUser(req.body)
-            const newTokens = tokenService.genAllTokens(id)
+            const newTokens = tokenUtils.genAllTokens(id)
 
-            await tokenService.saveRefreshToken(id, newTokens.refreshToken)
+            await tokenUtils.saveRefreshToken(id, newTokens.refreshToken)
 
             res.cookie('refreshToken', newTokens.refreshToken, { httpOnly: true, secure: false })
             res.status(201).json({
@@ -38,9 +38,9 @@ class UsersController {
     async resetUserPassword(req, res, next) {
         try {
             const user = await userService.resetUserPassword(req.body)
-            const emailToken = tokenService.genAccessToken(user)
+            const emailToken = tokenUtils.genAccessToken(user)
 
-            await emailService.sendResetPasswordEmail(req.body.email, emailToken)
+            await emailUtils.sendResetPasswordEmail(req.body.email, emailToken)
 
             res.status(201).json({ message: 'Письмо отправлено на почту' })
         } catch (error) {
@@ -53,7 +53,7 @@ class UsersController {
             const user = getIdFromToken(req)
 
             await userService.activateUser(user.id)
-            const newTokens = tokenService.genAllTokens(user.id)
+            const newTokens = tokenUtils.genAllTokens(user.id)
 
             res.cookie('refreshToken', newTokens.refreshToken, { httpOnly: true, secure: false })
             res.status(201).json({

@@ -31,7 +31,7 @@
         "responses": {
           "201": { "description": "Письмо отправлено на почту", "content": { "application/json": { "example": { "message": "Error" } } }},
           "400": { "description": "Ошибка при создании пользователя", "content": { "application/json": { "example": { "message": "Error" } } } },
-          "409": { "description": "Пользователь с таким email уже существует", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "409": { "description": "Этот e-mail или логин уже заняты", "content": { "application/json": { "example": { "message": "Error" } } } },
           "422": { "description": "Переданны не все данные", "content": { "application/json": { "example": { "message": "Error" } } } },
           "500": { "description": "Ошибка сервера", "content": { "application/json": { "example": { "message": "Error" } } } },
           "503": { "description": "Ошибка при отправке письма", "content": { "application/json": { "example": { "message": "Error" } } }},

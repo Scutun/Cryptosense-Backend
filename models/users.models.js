@@ -21,7 +21,7 @@ class UsersModel {
                 `SELECT id,activated FROM users WHERE email = $1 OR nickname = $2`,
                 [email, login],
             )
-            return user.rows
+            return user.rows[0]
         } catch (error) {
             throw error
         }

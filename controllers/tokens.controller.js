@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-const tokenService = require('../utils/tokens.utils')
+const tokenUtils = require('../utils/tokens.utils')
 
 class TokenController {
     async updateRefreshToken(req, res, next) {
@@ -11,9 +11,9 @@ class TokenController {
 
             const user = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
 
-            await tokenService.compareRefreshToken(refreshToken, user.id)
+            await tokenUtils.compareRefreshToken(refreshToken, user.id)
 
-            const newTokens = tokenService.genAllTokens(user.id)
+            const newTokens = tokenUtils.genAllTokens(user.id)
 
             res.cookie('refreshToken', newTokens.refreshToken, { httpOnly: true, secure: false })
             res.status(201).json({ accessToken: newTokens.accessToken, message: 'Токен обновлен' })
