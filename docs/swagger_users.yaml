@@ -29,12 +29,12 @@
           }
         },
         "responses": {
-          "201": { "description": "Письмо отправлено на почту"},
-          "400": { "description": "Ошибка при создании пользователя" },
-          "409": { "description": "Пользователь с таким email уже существует" },
-          "422": { "description": "Переданны не все данные" },
-          "500": { "description": "Ошибка сервера" },
-          "503": { "description": "Ошибка при отправке письма"},
+          "201": { "description": "Письмо отправлено на почту", "content": { "application/json": { "example": { "message": "Error" } } }},
+          "400": { "description": "Ошибка при создании пользователя", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "409": { "description": "Пользователь с таким email уже существует", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "422": { "description": "Переданны не все данные", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "500": { "description": "Ошибка сервера", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "503": { "description": "Ошибка при отправке письма", "content": { "application/json": { "example": { "message": "Error" } } }},
         }
           
         
@@ -78,11 +78,11 @@
             }
           }
         },
-          "400": { "description": "Ошибка при активации пользователя" },
-          "401": { "description": "Ошибка авторизации" },
-          "403": { "description": "Недействительный токен" },
-          "422": { "description": "Переданны не все данные" },
-          "500": { "description": "Ошибка сервера" }
+          "400": { "description": "Ошибка при активации пользователя", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "401": { "description": "Ошибка авторизации", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "403": { "description": "Недействительный токен", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "422": { "description": "Переданны не все данные", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "500": { "description": "Ошибка сервера", "content": { "application/json": { "example": { "message": "Error" } } } }
         }
       }
     },
@@ -128,12 +128,12 @@
             }
           }
         },
-          "400": { "description": "Ошибка при авторизации пользователя" },
-          "401": { "description": "Неправильный пароль" },
-          "403": { "description": "Пользователь не подтвердил почту" },
-          "404": { "description": "Пользователь не найден" },
-          "422": { "description": "Переданны не все данные" },
-          "500": { "description": "Ошибка сервера" }
+          "400": { "description": "Ошибка при авторизации пользователя", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "401": { "description": "Неправильный пароль", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "403": { "description": "Пользователь не подтвердил почту", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "404": { "description": "Пользователь не найден", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "422": { "description": "Переданны не все данные", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "500": { "description": "Ошибка сервера", "content": { "application/json": { "example": { "message": "Error" } } } }
         }
       }
     },
@@ -155,13 +155,13 @@
           }
         },
         "responses": {
-          "201": { "description": "Письмо отправлено на почту"},
-          "400": { "description": "Ошибка при сбросе пароля" },
-          "403": { "description": "Пользователь не подтвердил почту" },
-          "404": { "description": "Пользователь не найден" },
-          "422": { "description": "Переданны не все данные" },
-          "500": { "description": "Ошибка сервера" },
-          "503": { "description": "Ошибка при отправке письма"}
+          "201": { "description": "Письмо отправлено на почту", "content": { "application/json": { "example": { "message": "Error" } } }},
+          "400": { "description": "Ошибка при сбросе пароля", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "403": { "description": "Пользователь не подтвердил почту", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "404": { "description": "Пользователь не найден", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "422": { "description": "Переданны не все данные", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "500": { "description": "Ошибка сервера", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "503": { "description": "Ошибка при отправке письма", "content": { "application/json": { "example": { "message": "Error" } } }}
         }
       }
     },
@@ -195,11 +195,11 @@
           }
         },
         "responses": {
-          "202": { "description": "Пароль успешно обновлен"},
-          "400": { "description": "Ошибка при обновлении пароля" },
-          "403": { "description": "Недействительный токен" },
-          "422": { "description": "Переданны не все данные" },
-          "500": { "description": "Ошибка сервера" }
+          "202": { "description": "Пароль успешно обновлен", "content": { "application/json": { "example": { "message": "Error" } } }},
+          "400": { "description": "Ошибка при обновлении пароля", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "403": { "description": "Недействительный токен", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "422": { "description": "Переданны не все данные", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "500": { "description": "Ошибка сервера", "content": { "application/json": { "example": { "message": "Error" } } } }
         }
       }
     },
@@ -241,9 +241,9 @@
             }
           }
         },
-          "400": { "description": "Ошибка при обновлении токена доступа" },
-          "422": { "description": "Токен не предоставлен" },
-          "500": { "description": "Ошибка сервера" }
+          "400": { "description": "Ошибка при обновлении токена доступа", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "422": { "description": "Токен не предоставлен", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "500": { "description": "Ошибка сервера", "content": { "application/json": { "example": { "message": "Error" } } } }
         }
       }
     }
