@@ -29,35 +29,61 @@
           }
         },
         "responses": {
-          "201": {
-            "description": "Письмо отправлено на почту"
-          },
-          "400": { "description": "Ошибка запроса" }
+          "201": { "description": "Письмо отправлено на почту"},
+          "400": { "description": "Ошибка при создании пользователя" },
+          "409": { "description": "Пользователь с таким email уже существует" },
+          "418": { "description": "Пользователь чайник, я тоже "},
+          "422": { "description": "Переданны не все данные" },
+          "500": { "description": "Ошибка сервера" },
+          "503": { "description": "Ошибка при отправке письма"},
         }
+          
+        
       }
     },
     "/v1/users/verify/email": {
       "post": {
         "summary": "Подтвердить email",
-        "requestBody": {
-          "required": true,
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer your_token_here"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+          "description": "Успешный вход, токен сохранён в куки",
+          "headers": {
+            "Cookieы": {
+              "description": "Содержит refreshToken",
+              "schema": {
+                "type": "string",
+                "example": "refreshToken=your_token_here; HttpOnly;"
+              }
+            }
+          },
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
-                  "token": { "type": "string" }
-                },
-                "required": ["token"]
+                  "accessToken": { "type": "string", "description": "JWT access token" },
+                  "message": { "type": "srting", "description": "Пользователь зарегистрован"}
+                }
               }
             }
           }
         },
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "401": { "description": "Ошибка авторизации" }
+          "400": { "description": "Ошибка при активации пользователя" },
+          "401": { "description": "Ошибка авторизации" },
+          "403": { "description": "Недействительный токен" },
+          "422": { "description": "Переданны не все данные" },
+          "500": { "description": "Ошибка сервера" }
         }
       }
     },
@@ -80,22 +106,35 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "accessToken": { "type": "string" }
-                  }
-                }
+          "201": {
+          "description": "Успешный вход, токен сохранён в куки",
+          "headers": {
+            "Cookies": {
+              "description": "Содержит refreshToken",
+              "schema": {
+                "type": "string",
+                "example": "refreshToken=your_token_here; HttpOnly;"
               }
             }
           },
-          "401": { "description": "Неверные учетные данные" },
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "accessToken": { "type": "string", "description": "JWT access token" },
+                  "message": { "type": "srting", "description": "Пользователь зарегистрован"}
+                }
+              }
+            }
+          }
+        },
+          "400": { "description": "Ошибка при авторизации пользователя" },
+          "401": { "description": "Неправильный пароль" },
           "403": { "description": "Пользователь не подтвердил почту" },
-          "404": { "description": "Пользователь не найден" }
+          "404": { "description": "Пользователь не найден" },
+          "422": { "description": "Переданны не все данные" },
+          "500": { "description": "Ошибка сервера" }
         }
       }
     },
@@ -117,17 +156,30 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Запрос на сброс отправлен"
-          },
+          "201": { "description": "Письмо отправлено на почту"},
+          "400": { "description": "Ошибка при сбросе пароля" },
+          "403": { "description": "Пользователь не подтвердил почту" },
           "404": { "description": "Пользователь не найден" },
-          "403": { "description": "Пользователь не подтвердил почту" }
+          "422": { "description": "Переданны не все данные" },
+          "500": { "description": "Ошибка сервера" },
+          "503": { "description": "Ошибка при отправке письма"}
         }
       }
     },
     "/v1/users/update/password": {
-      "post": {
+      "patch": {
         "summary": "Обновление пароля",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer your_token_here"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -144,30 +196,55 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Пароль успешно обновлен"
-          },
-          "400": { "description": "Ошибка при обновлении пароля" }
+          "202": { "description": "Пароль успешно обновлен"},
+          "400": { "description": "Ошибка при обновлении пароля" },
+          "403": { "description": "Недействительный токен" },
+          "422": { "description": "Переданны не все данные" },
+          "500": { "description": "Ошибка сервера" }
         }
       }
     },
     "/v1/users/new/tokens": {
       "get": {
         "summary": "Обновление токенов",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "Cookies",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "refreshToken=your_token_here; HttpOnly;"
+            }
+          }
+        ],
         "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "accessToken": { "type": "string" }
-                  }
+          "201": {
+          "description": "Успешный вход, токен сохранён в куки",
+          "headers": {
+            "Cookies": {
+              "description": "Содержит refreshToken",
+              "schema": {
+                "type": "string",
+                "example": "refreshToken=your_token_here; HttpOnly;"
+              }
+            }
+          },
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "accessToken": { "type": "string", "description": "JWT access token" },
+                  "message": { "type": "srting", "description": "Пользователь зарегистрован"}
                 }
               }
             }
           }
+        },
+          "400": { "description": "Ошибка при обновлении токена доступа" },
+          "422": { "description": "Токен не предоставлен" },
+          "500": { "description": "Ошибка сервера" }
         }
       }
     }

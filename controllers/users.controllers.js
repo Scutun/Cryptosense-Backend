@@ -7,6 +7,7 @@ class UsersController {
     async createUser(req, res, next) {
         try {
             await userService.searchUsers(req.email, req.login)
+
             const emailToken = tokenService.genAccessToken(req.email)
             await emailService.sendVerificationEmail(req.body.email, emailToken)
             await userService.createUser(req.body)
@@ -25,7 +26,10 @@ class UsersController {
             await tokenService.saveRefreshToken(id, newTokens.refreshToken)
 
             res.cookie('refreshToken', newTokens.refreshToken, { httpOnly: true, secure: false })
-            res.json({ accessToken: newTokens.accessToken })
+            res.status(201).json({
+                accessToken: newTokens.accessToken,
+                message: 'Пользователь зарегистрован',
+            })
         } catch (error) {
             next({ status: 400, message: error.message })
         }
@@ -38,7 +42,7 @@ class UsersController {
 
             await emailService.sendResetPasswordEmail(req.body.email, emailToken)
 
-            res.status(200).json({ message: 'Письмо отправлено на почту' })
+            res.status(201).json({ message: 'Письмо отправлено на почту' })
         } catch (error) {
             next(error.message)
         }
@@ -52,7 +56,10 @@ class UsersController {
             const newTokens = tokenService.genAllTokens(user.id)
 
             res.cookie('refreshToken', newTokens.refreshToken, { httpOnly: true, secure: false })
-            res.json({ accessToken: newTokens.accessToken })
+            res.status(201).json({
+                accessToken: newTokens.accessToken,
+                message: 'Пользователь зарегистрован',
+            })
         } catch (error) {
             next({ status: 400, message: error.message })
         }
@@ -62,7 +69,7 @@ class UsersController {
         try {
             await userService.newUserPassword(req.body)
 
-            res.status(200).json({ message: 'Пароль успешно обновлен' })
+            res.status(202).json({ message: 'Пароль успешно обновлен' })
         } catch (error) {
             next(error.message)
         }

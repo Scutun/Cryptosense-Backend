@@ -5,8 +5,8 @@ class TokenController {
     async updateRefreshToken(req, res, next) {
         try {
             const refreshToken = req.cookies.refreshToken
-            if (!refreshToken) {
-                return res.status(403).json({ message: 'Токен не предоставлен' })
+            if (refreshToken.length === 0) {
+                return res.status(422).json({ message: 'Токен не предоставлен' })
             }
 
             const user = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
@@ -18,7 +18,7 @@ class TokenController {
             res.cookie('refreshToken', newTokens.refreshToken, { httpOnly: true, secure: false })
             res.json({ accessToken: newTokens.accessToken })
         } catch (error) {
-            next({ status: 403, message: `Ошибка при обновлении токена доступа: ${error.message}` })
+            next({ status: 400, message: `Ошибка при обновлении токена доступа: ${error.message}` })
         }
     }
 }

@@ -2,7 +2,7 @@ const nodemailer = require('nodemailer')
 
 async function sendVerificationEmail(email, token) {
     if (email.length === 0 || token.length === 0) {
-        throw { status: 400, message: 'E-mail и токен обязательны' }
+        throw { status: 422, message: 'E-mail и токен обязательны' }
     }
 
     const transporter = nodemailer.createTransport({
@@ -41,13 +41,13 @@ async function sendVerificationEmail(email, token) {
     try {
         await transporter.sendMail(mailOptions)
     } catch (error) {
-        throw { status: 500, message: `Ошибка при отправке письма: ${error.message}` }
+        throw { status: 503, message: `Ошибка при отправке письма: ${error.message}` }
     }
 }
 
 async function sendResetPasswordEmail(email, token) {
     if (email.length === 0 || token.length === 0) {
-        throw { status: 400, message: 'E-mail и токен обязательны' }
+        throw { status: 422, message: 'E-mail и токен обязательны' }
     }
 
     const transporter = nodemailer.createTransport({
@@ -86,7 +86,7 @@ async function sendResetPasswordEmail(email, token) {
     try {
         await transporter.sendMail(mailOptions)
     } catch (error) {
-        throw { status: 500, message: `Ошибка при отправке письма: ${error.message}` }
+        throw { status: 503, message: `Ошибка при отправке письма: ${error.message}` }
     }
 }
 

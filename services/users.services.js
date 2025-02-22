@@ -13,7 +13,7 @@ class UsersService {
                 name.length === 0 ||
                 surname.length === 0
             ) {
-                throw { status: 400, message: 'Все поля обязательны для заполнения' }
+                throw { status: 422, message: 'Все поля обязательны для заполнения' }
             }
 
             const hashPassword = await bcrypt.hash(password, 10)
@@ -29,16 +29,16 @@ class UsersService {
     async searchUsers(email, login) {
         try {
             if (email.length === 0 || login.length === 0) {
-                throw { status: 400, message: 'Необходимо передать e-mail или логин' }
+                throw { status: 422, message: 'Необходимо передать e-mail или логин' }
             }
 
             const users = await modelUser.searchUsers(email, login)
 
             if (users.length === 2) {
-                throw { status: 404, message: 'Такие e-mail и логин заняты' }
+                throw { status: 409, message: 'Такие e-mail и логин заняты' }
             } else if (users.length === 1) {
                 throw {
-                    status: 404,
+                    status: 409,
                     message: `Этот ${users.email === email ? 'e-mail уже занят' : 'логин уже занят'}`,
                 }
             }
@@ -52,7 +52,7 @@ class UsersService {
             const { email, password } = info
 
             if (email.length === 0 || password.length === 0) {
-                throw { status: 400, message: 'E-mail и пароль обязательны' }
+                throw { status: 422, message: 'E-mail и пароль обязательны' }
             }
 
             const user = await modelUser.loginUser(email)
@@ -75,7 +75,7 @@ class UsersService {
     async activateUser(email) {
         try {
             if (email.length === 0) {
-                throw { status: 400, message: 'E-mail обязателен' }
+                throw { status: 422, message: 'E-mail обязателен' }
             }
 
             await modelUser.activateUser(email)
@@ -85,18 +85,22 @@ class UsersService {
     }
 
     async resetUserPassword(info) {
-        if (info.email.length === 0) {
-            throw { status: 400, message: 'E-mail обязателен' }
-        }
+        try {
+            if (info.email.length === 0) {
+                throw { status: 422, message: 'E-mail обязателен' }
+            }
 
-        const user = await modelUser.loginUser(info.email)
+            const user = await modelUser.loginUser(info.email)
 
-        if (user.length === 0) {
-            throw { status: 404, message: 'Пользователь не найдеть' }
-        } else if (user.activated === false) {
-            throw { status: 403, message: 'Пользователь не подтвердил почту' }
+            if (user.length === 0) {
+                throw { status: 404, message: 'Пользователь не найдеть' }
+            } else if (user.activated === false) {
+                throw { status: 403, message: 'Пользователь не подтвердил почту' }
+            }
+            return user.id
+        } catch (error) {
+            throw { status: 400, message: `Ошибка при сбросе пароля: ${error.message}` }
         }
-        return user.id
     }
 
     async newUserPassword(info) {
@@ -104,7 +108,7 @@ class UsersService {
             const { email, password } = info
 
             if (email.length === 0 || password.length === 0) {
-                throw { status: 400, message: 'E-mail и новый пароль обязательны' }
+                throw { status: 422, message: 'E-mail и новый пароль обязательны' }
             }
 
             const hashPassword = await bcrypt.hash(password, 10)

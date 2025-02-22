@@ -12,6 +12,6 @@ router.post('/v1/users/reset/password', userController.resetUserPassword)
 
 router.get('/v1/users/new/tokens', tokenController.updateRefreshToken)
 
-router.petch('/v1/users/update/password', checkToken, userController.newUserPassword)
+router.patch('/v1/users/update/password', checkToken, userController.newUserPassword)
 
 module.exports = router
