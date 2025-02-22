@@ -14,7 +14,7 @@ class UsersController {
 
             res.status(201).json({ message: 'Письмо отправлено на почту' })
         } catch (error) {
-            next(error.message)
+            next(error)
         }
     }
 
@@ -28,10 +28,10 @@ class UsersController {
             res.cookie('refreshToken', newTokens.refreshToken, { httpOnly: true, secure: false })
             res.status(201).json({
                 accessToken: newTokens.accessToken,
-                message: 'Пользователь зарегистрован',
+                message: 'Пользователь авторизован',
             })
         } catch (error) {
-            next({ status: 400, message: error.message })
+            next(error)
         }
     }
 
@@ -44,7 +44,7 @@ class UsersController {
 
             res.status(201).json({ message: 'Письмо отправлено на почту' })
         } catch (error) {
-            next(error.message)
+            next(error)
         }
     }
 
@@ -61,7 +61,7 @@ class UsersController {
                 message: 'Пользователь зарегистрован',
             })
         } catch (error) {
-            next({ status: 400, message: error.message })
+            next(error)
         }
     }
 
@@ -71,7 +71,7 @@ class UsersController {
 
             res.status(202).json({ message: 'Пароль успешно обновлен' })
         } catch (error) {
-            next(error.message)
+            next(error)
         }
     }
 }
