@@ -12,6 +12,7 @@ const cookieParser = require('cookie-parser')
 
 const userRoutes = require('./routes/users.routes')
 const courseRoutes = require('./routes/courses.routes')
+const reviewRoutes = require('./routes/reviews.routes')
 const errorHandler = require('./middlewares/errorHandler')
 
 app.use(cookieParser())
@@ -37,6 +38,7 @@ app.use('/api/swagger/docs', swaggerUi.serve, swaggerUi.setup(mergedSwagger))
 
 app.use('/api', userRoutes)
 app.use('/api', courseRoutes)
+app.use('/api', reviewRoutes)
 app.use(errorHandler)
 
 app.get('/server', (req, res) => {

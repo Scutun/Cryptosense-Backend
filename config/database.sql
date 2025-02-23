@@ -148,7 +148,7 @@ CREATE TABLE IF NOT EXISTS comments (
     id SERIAL PRIMARY KEY,
     rating INT,
     content TEXT NOT NULL,
-    user_nickname VARCHAR(255) NOT NULL,
+    user_nickname VARCHAR(255) NOT NULL UNIQUE,
 
     course_id INT NOT NULL,
 

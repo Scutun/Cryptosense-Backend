@@ -1,13 +1,15 @@
-const coursesModel = require('../models/courses.models')
+const reviewsModel = require('../models/reviews.models')
 
-class CoursesService {
-    async getCourseInfoById(id) {
+class ReviewsService {
+    async getReviewByCourseId(id) {
         try {
             if (id.length === 0) {
                 throw { status: 400, message: 'Id курса не предоставлен' }
             }
-            const info = await coursesModel.getCourseInfoById(id)
-            if (!info) {
+
+            const info = await reviewsModel.getReviewByCourseId(id)
+
+            if (!info[0]) {
                 throw { status: 404, message: 'Курс не найден' }
             }
             return info
@@ -17,4 +19,4 @@ class CoursesService {
     }
 }
 
-module.exports = new CoursesService()
+module.exports = new ReviewsService()
