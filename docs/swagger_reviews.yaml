@@ -1,0 +1,162 @@
+# prettier-ignore
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Reviews API",
+    "version": "1.0.0",
+    "description": "API для управления отзывами пользователей"
+  },
+  "paths": {
+    "/v1/reviews/create": {
+      "post": {
+        "summary": "Создать отзыв",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer your_token_here"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "rating": { "type": "integer", "example": 5 },
+                  "content": { "type": "string", "example": "Отличный курс!" },
+                  "courseId": { "type": "integer", "example": 123 }
+                },
+                "required": ["rating", "content", "courseId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Отзыв создан", "content": { "application/json": { "example": { "message": "Отзыв создан" } } } },
+          "400": { "description": "Ошибка при создании отзыва", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "422": { "description": "Переданны не все данные", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "500": { "description": "Ошибка сервера", "content": { "application/json": { "example": { "message": "Error" } } } }
+        }
+      }
+    },
+    "/v1/reviews/all": {
+      "get": {
+        "summary": "Получить все отзывы",
+        "responses": {
+          "200": {
+            "description": "Список отзывов",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "rating": { "type": "integer", "example": 5 },
+                      "nickname": {"type": "string", "example": "koze_v_shlype" }, 
+                      "content": {"type": "string", "example": "tut dolgen but text " }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Ошибка при получении отзывов", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "422": { "description": "Идентификатор курса не передан", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "500": { "description": "Ошибка сервера", "content": { "application/json": { "example": { "message": "Error" } } } }
+        }
+      }
+    },
+    "/v1/reviews/change": {
+      "patch": {
+        "summary": "Изменить отзыв",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer your_token_here"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reviewId": { "type": "integer", "example": 10 },
+                  "rating": { "type": "integer", "example": 4 },
+                  "content": { "type": "string", "example": "Курс хороший, но есть недочёты" }
+                },
+                "required": ["reviewId", "rating", "content"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Отзыв изменён", "content": { "application/json": { "example": { "message": "Отзыв изменён" } } } },
+          "400": { "description": "Ошибка при изменении отзыва", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "404": { "description": "Отзыв не найден", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "422": { "description": "Переданны не все данные", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "500": { "description": "Ошибка сервера", "content": { "application/json": { "example": { "message": "Error" } } } }
+        }
+      }
+    },
+    "/v1/reviews/delete": {
+      "delete": {
+        "summary": "Удалить отзыв",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Bearer your_token_here"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reviewId": { "type": "integer", "example": 10 }
+                },
+                "required": ["reviewId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Отзыв удалён", "content": { "application/json": { "example": { "message": "Отзыв удалён" } } } },
+          "400": { "description": "Ошибка при удалении отзыва", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "404": { "description": "Отзыв не найден", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "422": { "description": "Идентификаторы не переданы", "content": { "application/json": { "example": { "message": "Error" } } } },
+          "500": { "description": "Ошибка сервера", "content": { "application/json": { "example": { "message": "Error" } } } }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken')
 class UsersController {
     async createUser(req, res, next) {
         try {
-            await userService.searchUsers(req.email, req.login)
+            await userService.searchUsers(req.body.email, req.body.login)
 
             const emailToken = tokenUtils.genAccessToken(req.email)
             await emailUtils.sendVerificationEmail(req.body.email, emailToken)
