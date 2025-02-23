@@ -1,0 +1,85 @@
+#prettier-ignore
+openapi: 3.0.0
+info:
+  title: Reviews API
+  version: 1.0.0
+  description: API для получения отзывов о курсе
+
+paths:
+  /v1/reviews/course/{id}:
+    get:
+      summary: Получить отзывы о курсе
+      description: Возвращает список отзывов по ID курса.
+      tags:
+        - Reviews
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Уникальный идентификатор курса.
+      responses:
+        '200':
+          description: Успешный ответ со списком отзывов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: Уникальный идентификатор отзыва
+                    rating:
+                      type: integer
+                      description: Оценка курса
+                    content:
+                      type: string
+                      description: Содержимое отзыва
+                    nickname:
+                      type: string
+                      description: Никнейм пользователя
+
+        '400':
+          description: Ошибка в передаче ID курса
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 'Id курса не предоставлен'
+
+        '404':
+          description: Курс не найден
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: 'Курс не найден'
+
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 'Внутренняя ошибка сервера'

@@ -19,17 +19,17 @@ app.use(cookieParser())
 app.use(express.json())
 app.use(cors())
 
-const swaggerExample = yaml.load(fs.readFileSync('./docs/swagger_example.yaml', 'utf8'))
-const swaggerUsers = yaml.load(fs.readFileSync('./docs/swagger_users.yaml', 'utf8'))
+const swaggerUsers = yaml.load(fs.readFileSync('./docs/users.swagger.yaml', 'utf8'))
+const swaggerReviews = yaml.load(fs.readFileSync('./docs/reviews.swagger.yaml', 'utf8'))
 
 const mergedSwagger = {
-    ...swaggerExample,
-    paths: { ...swaggerExample.paths, ...swaggerUsers.paths },
+    ...swaggerUsers,
+    paths: { ...swaggerUsers.paths, ...swaggerReviews.paths },
     components: {
-        ...swaggerExample.components,
+        ...swaggerUsers.components,
         schemas: {
-            ...swaggerExample.components?.schemas,
             ...swaggerUsers.components?.schemas,
+            ...swaggerReviews.components?.schemas,
         },
     },
 }
