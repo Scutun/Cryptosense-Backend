@@ -1,0 +1,372 @@
+#prettier-ignore
+openapi: 3.0.0
+info:
+  title: Reviews API
+  version: 1.0.0
+  description: API для получения отзывов о курсе
+
+paths:
+  /v1/reviews/course/{id}:
+    get:
+      summary: Получить отзывы о курсе
+      description: Возвращает список отзывов по ID курса.
+      tags:
+        - Reviews
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Уникальный идентификатор курса.
+      responses:
+        '200':
+          description: Успешный ответ со списком отзывов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: Уникальный идентификатор отзыва
+                    rating:
+                      type: integer
+                      description: Оценка курса
+                    content:
+                      type: string
+                      description: Содержимое отзыва
+                    nickname:
+                      type: string
+                      description: Никнейм пользователя
+
+        '400':
+          description: Ошибка в передаче ID курса
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 'Id курса не предоставлен'
+
+        '404':
+          description: Курс не найден
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: 'Курс не найден'
+
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 'Внутренняя ошибка сервера'
+
+  /v1/reviews/create:
+    post:
+      tags:
+        - Reviews
+      summary: Создать отзыв
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: Bearer your_token_here
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - rating
+                - content
+                - courseId
+              properties:
+                rating:
+                  type: integer
+                  example: 5
+                content:
+                  type: string
+                  example: Отличный курс!
+                courseId:
+                  type: integer
+                  example: 123
+      responses:
+        '201':
+          description: Отзыв создан
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 201
+                  message:
+                    type: string
+                    example: 'Отзыв создан'
+        '400':
+          description: Ошибка при создании отзыва
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 'Ошибка при создании отзыва'
+        '422':
+          description: Переданы не все данные
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 422
+                  message:
+                    type: string
+                    example: 'Переданы не все данные'
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 'Ошибка сервера'
+
+  /v1/reviews/change:
+    put:
+      tags:
+        - Reviews
+      summary: Изменить отзыв
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: Bearer your_token_here
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - reviewId
+                - rating
+                - content
+              properties:
+                reviewId:
+                  type: integer
+                  example: 10
+                rating:
+                  type: integer
+                  example: 4
+                content:
+                  type: string
+                  example: Курс хороший, но есть недочёты
+      responses:
+        '200':
+          description: Отзыв изменён
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 'Отзыв изменён'
+        '400':
+          description: Ошибка при изменении отзыва
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 'Ошибка при изменении отзыва'
+        '404':
+          description: Отзыв не найден
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: 'Отзыв не найден'
+        '422':
+          description: Переданы не все данные
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 422
+                  message:
+                    type: string
+                    example: 'Переданы не все данные'
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 'Ошибка сервера'
+
+  /v1/reviews/delete:
+    delete:
+      tags:
+        - Reviews
+      summary: Удалить отзыв
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: Bearer your_token_here
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - reviewId
+              properties:
+                reviewId:
+                  type: integer
+                  example: 10
+      responses:
+        '200':
+          description: Отзыв удалён
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 'Отзыв удалён'
+
+        '400':
+          description: Ошибка при удалении отзыва
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 'Ошибка при удалении отзыва'
+
+        '404':
+          description: Отзыв не найден
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: 'Отзыв не найден'
+
+        '422':
+          description: Идентификаторы не переданы
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 422
+                  message:
+                    type: string
+                    example: 'Идентификаторы не переданы'
+
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 'Ошибка сервера'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

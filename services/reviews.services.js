@@ -21,7 +21,7 @@ class ReviewsService {
 
             await reviewsModel.createReview(reviewInfo)
         } catch (error) {
-            throw { status: 400, message: `Ошибка при создании отзыва: ${error.message}` }
+            throw error
         }
     }
 
@@ -45,7 +45,7 @@ class ReviewsService {
 
             await reviewsModel.changeReview(reviewInfo)
         } catch (error) {
-            throw { status: 400, message: `Ошибка при редактирование отзыва: ${error.message}` }
+            throw error
         }
     }
 
@@ -56,19 +56,24 @@ class ReviewsService {
             }
             await reviewsModel.deleteReview(userId, reviewId)
         } catch (error) {
-            throw { status: 400, message: `Ошибка при удалении отзыва: ${error.message}` }
+            throw error
         }
     }
 
-    async getAllReviews(courseId) {
+    async getReviewByCourseId(id) {
         try {
-            if (courseId.length === 0) {
-                throw { status: 422, message: 'Идентификатор курса не передан' }
+            if (id.length === 0) {
+                throw { status: 400, message: 'Id курса не предоставлен' }
             }
-            const reviews = await reviewsModel.getAllReviews(courseId)
-            return reviews
+
+            const info = await reviewsModel.getReviewByCourseId(id)
+
+            if (!info[0]) {
+                throw { status: 404, message: 'Курс не найден' }
+            }
+            return info
         } catch (error) {
-            throw { status: 400, message: `Ошибка при получении всех отзывов: ${error.message}` }
+            throw error
         }
     }
 }

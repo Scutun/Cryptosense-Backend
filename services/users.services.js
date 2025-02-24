@@ -22,7 +22,7 @@ class UsersService {
 
             return await modelUser.newUser(info)
         } catch (error) {
-            throw { status: 400, message: `Ошибка при создании пользователя: ${error.message} ` }
+            throw error
         }
     }
 
@@ -33,16 +33,15 @@ class UsersService {
             }
 
             const users = await modelUser.searchUsers(email, login)
-            
+
             if (users.length > 0) {
                 throw {
                     status: 409,
                     message: `Этот ${users[0].email == email ? 'e-mail уже занят' : 'логин уже занят'}`,
                 }
             }
-            
         } catch (error) {
-            throw error            
+            throw error
         }
     }
 
@@ -67,7 +66,7 @@ class UsersService {
 
             return user.id
         } catch (error) {
-            throw { status: 400, message: `Ошибка при авторизации пользователя: ${error.message}` }
+            throw error
         }
     }
 
@@ -77,9 +76,11 @@ class UsersService {
                 throw { status: 422, message: 'E-mail обязателен' }
             }
 
-            await modelUser.activateUser(email)
+            const user = await modelUser.activateUser(email)
+
+            return user[0].id
         } catch (error) {
-            throw { status: 400, message: `Ошибка при активации пользователя: ${error.message}` }
+            throw error
         }
     }
 
@@ -98,7 +99,7 @@ class UsersService {
             }
             return user.id
         } catch (error) {
-            throw { status: 400, message: `Ошибка при сбросе пароля: ${error.message}` }
+            throw error
         }
     }
 
@@ -113,7 +114,7 @@ class UsersService {
             const hashPassword = await bcrypt.hash(password, 10)
             await modelUser.updateUserPassword(email, hashPassword)
         } catch (error) {
-            throw { status: 400, message: `Ошибка при обновлении пароля: ${error.message}` }
+            throw error
         }
     }
 }

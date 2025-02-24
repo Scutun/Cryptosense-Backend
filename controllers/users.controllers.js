@@ -9,7 +9,7 @@ class UsersController {
             await userService.searchUsers(req.body.email, req.body.login)
 
             const emailToken = tokenUtils.genAccessToken(req.body.email)
-            
+
             await emailUtils.sendVerificationEmail(req.body.email, emailToken)
             await userService.createUser(req.body)
 
@@ -51,10 +51,11 @@ class UsersController {
 
     async verifyEmail(req, res, next) {
         try {
-            const user = getIdFromToken(req)
+            const user = tokenUtils.getIdFromToken(req)
 
-            await userService.activateUser(user.id)
-            const newTokens = tokenUtils.genAllTokens(user.id)
+            const newUser = await userService.activateUser(user)
+
+            const newTokens = tokenUtils.genAllTokens(newUser)
 
             res.cookie('refreshToken', newTokens.refreshToken, { httpOnly: true, secure: false })
             res.status(201).json({

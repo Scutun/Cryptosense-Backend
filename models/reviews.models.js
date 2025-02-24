@@ -13,13 +13,13 @@ class ReviewsModel {
         }
     }
 
-    async getAllReviews(courseId) {
+    async getReviewByCourseId(id) {
         try {
-            const reviews = await db.query(
-                `SELECT id,rating, content,user_nickname as nickname FROM comments WHERE course_id=$1`,
-                [courseId],
+            const review = await db.query(
+                `SELECT id, rating, content, user_nickname as nickname FROM comments WHERE course_id = $1`,
+                [id],
             )
-            return reviews.rows
+            return review.rows
         } catch (error) {
             throw error
         }
@@ -27,13 +27,13 @@ class ReviewsModel {
 
     async deleteReview(userId, reviewId) {
         try {
-            await db.query(
+            const result = await db.query(
                 `DELETE FROM comments 
                  WHERE id = $1 AND user_nickname = (SELECT nickname FROM users WHERE id = $2)`,
                 [reviewId, userId],
             )
 
-            if (result.rowCount === 0) {
+            if (result.rowCount == 0) {
                 throw { status: 404, message: 'Комментарий не найден' }
             }
         } catch (error) {
