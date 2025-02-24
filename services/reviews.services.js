@@ -9,7 +9,7 @@ class ReviewsService {
                 info.content.length === 0 ||
                 info.courseId.length === 0
             ) {
-                throw { status: 422, message: 'Переданны не все данные' }
+                throw { status: 422, message: 'Переданы не все данные' }
             }
 
             const reviewInfo = {
@@ -33,7 +33,7 @@ class ReviewsService {
                 info.content.length === 0 ||
                 info.reviewId.length === 0
             ) {
-                throw { status: 422, message: 'Переданны не все данные' }
+                throw { status: 422, message: 'Переданы не все данные' }
             }
 
             const reviewInfo = {

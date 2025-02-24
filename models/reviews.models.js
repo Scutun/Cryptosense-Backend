@@ -16,10 +16,7 @@ class ReviewsModel {
     async getAllReviews(courseId) {
         try {
             const reviews = await db.query(
-                `SELECT users.nickname, comments.rating, comments.content 
-                 FROM comments 
-                 LEFT JOIN users ON comments.user_nickname = users.nickname 
-                 WHERE comments.course_id = $1`,
+                `SELECT id,rating, content,user_nickname as nickname FROM comments WHERE course_id=$1`,
                 [courseId],
             )
             return reviews.rows

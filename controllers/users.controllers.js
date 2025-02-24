@@ -8,7 +8,8 @@ class UsersController {
         try {
             await userService.searchUsers(req.body.email, req.body.login)
 
-            const emailToken = tokenUtils.genAccessToken(req.email)
+            const emailToken = tokenUtils.genAccessToken(req.body.email)
+            
             await emailUtils.sendVerificationEmail(req.body.email, emailToken)
             await userService.createUser(req.body)
 
