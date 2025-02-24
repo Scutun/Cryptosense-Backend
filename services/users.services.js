@@ -33,15 +33,16 @@ class UsersService {
             }
 
             const users = await modelUser.searchUsers(email, login)
-
+            
             if (users.length > 0) {
                 throw {
                     status: 409,
-                    message: `Этот ${users.email === email ? 'e-mail уже занят' : 'логин уже занят'}`,
+                    message: `Этот ${users[0].email == email ? 'e-mail уже занят' : 'логин уже занят'}`,
                 }
             }
+            
         } catch (error) {
-            throw { status: 400, message: `Ошибка при поиске пользователя: ${error.message}` }
+            throw error            
         }
     }
 

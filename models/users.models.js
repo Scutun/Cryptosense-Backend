@@ -18,7 +18,7 @@ class UsersModel {
     async searchUsers(email, login) {
         try {
             const user = await db.query(
-                `SELECT id,activated FROM users WHERE email = $1 OR nickname = $2`,
+                `SELECT email FROM users WHERE email = $1 OR nickname = $2`,
                 [email, login],
             )
             return user.rows
