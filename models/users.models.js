@@ -21,6 +21,7 @@ class UsersModel {
                 `SELECT email FROM users WHERE email = $1 OR nickname = $2`,
                 [email, login],
             )
+
             return user.rows
         } catch (error) {
             throw error
@@ -34,7 +35,7 @@ class UsersModel {
                 [email],
             )
 
-            return user.rows
+            return user
         } catch (error) {
             throw error
         }

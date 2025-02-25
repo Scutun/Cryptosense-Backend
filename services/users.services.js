@@ -34,10 +34,10 @@ class UsersService {
 
             const users = await modelUser.searchUsers(email, login)
 
-            if (users[0].length > 0) {
+            if (users[0].email.length > 0) {
                 throw {
                     status: 409,
-                    message: `Этот ${users[0].email == email ? 'e-mail уже занят' : 'логин уже занят'}`,
+                    message: `Этот ${users[0].email === email ? 'e-mail уже занят' : 'логин уже занят'}`,
                 }
             }
         } catch (error) {
@@ -55,16 +55,16 @@ class UsersService {
 
             const user = await modelUser.loginUser(email)
 
-            if (user[0].length === 0) {
+            if (user.rowCount === 0) {
                 throw { status: 404, message: 'Пользователь не найден' }
-            } else if (user[0].activated  == false) {
+            } else if (user.rows[0].id.activated == false) {
                 throw { status: 403, message: 'Пользователь не подтвердил почту' }
             }
-            if (!bcrypt.compare(user[0].password, password)) {
+            if (!bcrypt.compareSync(password, user.rows[0].password)) {
                 throw { status: 401, message: 'Неправильный пароль' }
             }
 
-            return user[0].id
+            return user.rows[0].id
         } catch (error) {
             throw error
         }
