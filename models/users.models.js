@@ -42,11 +42,11 @@ class UsersModel {
 
     async activateUser(email) {
         try {
-            return (
-                await db.query(`UPDATE users SET activated = true WHERE email = $1 RETURNING id`, [
-                    email,
-                ])
-            ).rows
+            const user = await db.query(
+                `UPDATE users SET activated = true WHERE email = $1 RETURNING id`,
+                [email],
+            )
+            return user.rows
         } catch (error) {
             throw error
         }
