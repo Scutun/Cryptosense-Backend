@@ -60,7 +60,7 @@ class UsersService {
             } else if (user.rows[0].id.activated == false) {
                 throw { status: 403, message: 'Пользователь не подтвердил почту' }
             }
-            if (!bcrypt.compareSync(password, user.rows[0].password)) {
+            if (!(await bcrypt.compare(password, user.rows[0].password))) {
                 throw { status: 401, message: 'Неправильный пароль' }
             }
 
