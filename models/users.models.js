@@ -18,10 +18,10 @@ class UsersModel {
     async searchUsers(email, login) {
         try {
             const user = await db.query(
-                `SELECT id,activated FROM users WHERE email = $1 OR nickname = $2`,
+                `SELECT email FROM users WHERE email = $1 OR nickname = $2`,
                 [email, login],
             )
-            return user.rows[0]
+            return user.rows
         } catch (error) {
             throw error
         }
@@ -34,7 +34,7 @@ class UsersModel {
                 [email],
             )
 
-            return user.rows[0]
+            return user
         } catch (error) {
             throw error
         }
@@ -42,7 +42,11 @@ class UsersModel {
 
     async activateUser(email) {
         try {
-            await db.query(`UPDATE users SET activated = true WHERE email = $1`, [email])
+            const user = await db.query(
+                `UPDATE users SET activated = true WHERE email = $1 RETURNING id`,
+                [email],
+            )
+            return user.rows
         } catch (error) {
             throw error
         }

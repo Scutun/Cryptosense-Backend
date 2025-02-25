@@ -152,5 +152,6 @@ CREATE TABLE IF NOT EXISTS comments (
 
     course_id INT NOT NULL,
 
+    UNIQUE (user_nickname, course_id)
     FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
 );

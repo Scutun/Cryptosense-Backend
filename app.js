@@ -9,11 +9,11 @@ const fs = require('fs')
 const yaml = require('js-yaml')
 const PORT = process.env.PORT || 3020
 const cookieParser = require('cookie-parser')
+const errorHandler = require('./middlewares/errorHandler')
 
 const userRoutes = require('./routes/users.routes')
 const courseRoutes = require('./routes/courses.routes')
 const reviewRoutes = require('./routes/reviews.routes')
-const errorHandler = require('./middlewares/errorHandler')
 
 app.use(cookieParser())
 app.use(express.json())
