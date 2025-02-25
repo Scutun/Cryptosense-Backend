@@ -34,7 +34,7 @@ class UsersModel {
                 [email],
             )
 
-            return user.rows[0]
+            return user
         } catch (error) {
             throw error
         }
