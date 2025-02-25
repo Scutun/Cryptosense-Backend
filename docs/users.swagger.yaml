@@ -1,251 +1,528 @@
 # prettier-ignore
-{
-  "openapi": "3.0.0",
-  "info": {
-    "title": "User API",
-    "version": "1.0.0",
-    "description": "API для управления пользователями и токенами"
-  },
-  "paths": {
-    "/v1/users/create": {
-      "post": {
-        "summary": "Создать пользователя",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "email": { "type": "string" },
-                  "login": { "type": "string" },
-                  "password": { "type": "string" },
-                  "name": { "type": "string" },
-                  "surname": { "type": "string" }
-                },
-                "required": ["email", "login", "password", "name", "surname"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": { "description": "Письмо отправлено на почту", "content": { "application/json": { "example": { "message": "Error" } } }},
-          "400": { "description": "Ошибка при создании пользователя", "content": { "application/json": { "example": { "message": "Error" } } } },
-          "409": { "description": "Этот e-mail или логин уже заняты", "content": { "application/json": { "example": { "message": "Error" } } } },
-          "422": { "description": "Переданны не все данные", "content": { "application/json": { "example": { "message": "Error" } } } },
-          "500": { "description": "Ошибка сервера", "content": { "application/json": { "example": { "message": "Error" } } } },
-          "503": { "description": "Ошибка при отправке письма", "content": { "application/json": { "example": { "message": "Error" } } }},
-        }
-          
-        
-      }
-    },
-    "/v1/users/verify/email": {
-      "post": {
-        "summary": "Подтвердить email",
-        "parameters": [
-          {
-            "name": "Authorization",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "example": "Bearer your_token_here"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-          "description": "Успешный вход, токен сохранён в куки",
-          "headers": {
-            "Cookieы": {
-              "description": "Содержит refreshToken",
-              "schema": {
-                "type": "string",
-                "example": "refreshToken=your_token_here; HttpOnly;"
-              }
-            }
-          },
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "accessToken": { "type": "string", "description": "JWT access token" },
-                  "message": { "type": "srting", "description": "Пользователь зарегистрован"}
-                }
-              }
-            }
-          }
-        },
-          "400": { "description": "Ошибка при активации пользователя", "content": { "application/json": { "example": { "message": "Error" } } } },
-          "401": { "description": "Ошибка авторизации", "content": { "application/json": { "example": { "message": "Error" } } } },
-          "403": { "description": "Недействительный токен", "content": { "application/json": { "example": { "message": "Error" } } } },
-          "422": { "description": "Переданны не все данные", "content": { "application/json": { "example": { "message": "Error" } } } },
-          "500": { "description": "Ошибка сервера", "content": { "application/json": { "example": { "message": "Error" } } } }
-        }
-      }
-    },
-    "/v1/users/login": {
-      "post": {
-        "summary": "Авторизация пользователя",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "email": { "type": "string" },
-                  "password": { "type": "string" }
-                },
-                "required": ["email", "password"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-          "description": "Успешный вход, токен сохранён в куки",
-          "headers": {
-            "Cookies": {
-              "description": "Содержит refreshToken",
-              "schema": {
-                "type": "string",
-                "example": "refreshToken=your_token_here; HttpOnly;"
-              }
-            }
-          },
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "accessToken": { "type": "string", "description": "JWT access token" },
-                  "message": { "type": "srting", "description": "Пользователь зарегистрован"}
-                }
-              }
-            }
-          }
-        },
-          "400": { "description": "Ошибка при авторизации пользователя", "content": { "application/json": { "example": { "message": "Error" } } } },
-          "401": { "description": "Неправильный пароль", "content": { "application/json": { "example": { "message": "Error" } } } },
-          "403": { "description": "Пользователь не подтвердил почту", "content": { "application/json": { "example": { "message": "Error" } } } },
-          "404": { "description": "Пользователь не найден", "content": { "application/json": { "example": { "message": "Error" } } } },
-          "422": { "description": "Переданны не все данные", "content": { "application/json": { "example": { "message": "Error" } } } },
-          "500": { "description": "Ошибка сервера", "content": { "application/json": { "example": { "message": "Error" } } } }
-        }
-      }
-    },
-    "/v1/users/reset/password": {
-      "post": {
-        "summary": "Запрос на сброс пароля",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "email": { "type": "string" }
-                },
-                "required": ["email"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": { "description": "Письмо отправлено на почту", "content": { "application/json": { "example": { "message": "Error" } } }},
-          "400": { "description": "Ошибка при сбросе пароля", "content": { "application/json": { "example": { "message": "Error" } } } },
-          "403": { "description": "Пользователь не подтвердил почту", "content": { "application/json": { "example": { "message": "Error" } } } },
-          "404": { "description": "Пользователь не найден", "content": { "application/json": { "example": { "message": "Error" } } } },
-          "422": { "description": "Переданны не все данные", "content": { "application/json": { "example": { "message": "Error" } } } },
-          "500": { "description": "Ошибка сервера", "content": { "application/json": { "example": { "message": "Error" } } } },
-          "503": { "description": "Ошибка при отправке письма", "content": { "application/json": { "example": { "message": "Error" } } }}
-        }
-      }
-    },
-    "/v1/users/update/password": {
-      "patch": {
-        "summary": "Обновление пароля",
-        "parameters": [
-          {
-            "name": "Authorization",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "example": "Bearer your_token_here"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "email": { "type": "string" },
-                  "password": { "type": "string" }
-                },
-                "required": ["email", "newPassword"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "202": { "description": "Пароль успешно обновлен", "content": { "application/json": { "example": { "message": "Error" } } }},
-          "400": { "description": "Ошибка при обновлении пароля", "content": { "application/json": { "example": { "message": "Error" } } } },
-          "403": { "description": "Недействительный токен", "content": { "application/json": { "example": { "message": "Error" } } } },
-          "422": { "description": "Переданны не все данные", "content": { "application/json": { "example": { "message": "Error" } } } },
-          "500": { "description": "Ошибка сервера", "content": { "application/json": { "example": { "message": "Error" } } } }
-        }
-      }
-    },
-    "/v1/users/new/tokens": {
-      "get": {
-        "summary": "Обновление токенов",
-        "parameters": [
-          {
-            "name": "Authorization",
-            "in": "Cookies",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "example": "refreshToken=your_token_here; HttpOnly;"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-          "description": "Успешный вход, токен сохранён в куки",
-          "headers": {
-            "Cookies": {
-              "description": "Содержит refreshToken",
-              "schema": {
-                "type": "string",
-                "example": "refreshToken=your_token_here; HttpOnly;"
-              }
-            }
-          },
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "accessToken": { "type": "string", "description": "JWT access token" },
-                  "message": { "type": "srting", "description": "Токен обновлен"}
-                }
-              }
-            }
-          }
-        },
-          "400": { "description": "Ошибка при обновлении токена доступа", "content": { "application/json": { "example": { "message": "Error" } } } },
-          "422": { "description": "Токен не предоставлен", "content": { "application/json": { "example": { "message": "Error" } } } },
-          "500": { "description": "Ошибка сервера", "content": { "application/json": { "example": { "message": "Error" } } } }
-        }
-      }
-    }
-  }
-}
+openapi: 3.0.0
+info:
+  title: User API
+  version: 1.0.0
+  description: API для управления пользователями и токенами
+
+paths:
+  /v1/users/create:
+    post:
+      summary: Создать пользователя
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                login:
+                  type: string
+                password:
+                  type: string
+                name:
+                  type: string
+                surname:
+                  type: string
+              required:
+                - email
+                - login
+                - password
+                - name
+                - surname
+      responses:
+        "201":
+          description: Письмо отправлено на почту
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 201
+                  message:
+                    type: string
+                    example: "Письмо отправлено на почту"
+        "409":
+          description: Этот e-mail или логин уже заняты
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 409
+                  message:
+                    type: string
+                    example: "Этот e-mail или логин уже заняты"
+        "422":
+          description: Переданы не все данные
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 422
+                  message:
+                    type: string
+                    example: "Переданы не все данные"
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: "Ошибка сервера"
+        "503":
+          description: Ошибка при отправке письма
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 503
+                  message:
+                    type: string
+                    example: "Ошибка при отправке письма"
+  /v1/users/verify/email:
+    post:
+      summary: Подтвердить email
+      tags:
+        - Users
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: Bearer your_token_here
+      responses:
+        "201":
+          description: Успешный вход, токен сохранён в куки
+          headers:
+            Cookies:
+              description: Содержит refreshToken
+              schema:
+                type: string
+                example: refreshToken=your_token_here; HttpOnly;
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    description: JWT access token
+                  message:
+                    type: string
+                    description: Пользователь зарегистрирован
+
+        "401":
+          description: Ошибка авторизации
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 401
+                  message:
+                    type: string
+                    example: "Ошибка авторизации"
+        "403":
+          description: Недействительный токен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 403
+                  message:
+                    type: string
+                    example: "Недействительный токен"
+        "422":
+          description: Переданы не все данные
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 422
+                  message:
+                    type: string
+                    example: "Переданы не все данные"
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: "Ошибка сервера"
+  /v1/users/login:
+    post:
+      summary: "Авторизация пользователя"
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - email
+                - password
+      responses:
+        "201":
+          description: "Успешный вход, токен сохранён в куки"
+          headers:
+            Cookies:
+              description: "Содержит refreshToken"
+              schema:
+                type: string
+                example: "refreshToken=your_token_here; HttpOnly;"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    description: "JWT access token"
+                  message:
+                    type: string
+                    description: "Пользователь зарегистрован"
+
+        "401":
+          description: "Неправильный пароль"
+          content:
+            application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: integer
+                      example: 401
+                    message:
+                      type: string
+                      example: 'Неправильный пароль'
+
+        "403":
+          description: "Пользователь не подтвердил почту"
+          content:
+            application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: integer
+                      example: 403
+                    message:
+                      type: string
+                      example: 'Пользователь не подтвердил почту'
+
+        "404":
+          description: "Пользователь не найден"
+          content:
+            application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: integer
+                      example: 404
+                    message:
+                      type: string
+                      example: 'Пользователь не найден'
+
+        "422":
+          description: "Переданны не все данные"
+          content:
+            application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: integer
+                      example: 422
+                    message:
+                      type: string
+                      example: 'Переданны не все данные'
+
+        "500":
+          description: "Ошибка сервера"
+          content:
+            application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: integer
+                      example: 500
+                    message:
+                      type: string
+                      example: 'Ошибка сервера'
+
+  /v1/users/reset/password:
+    post:
+      summary: "Запрос на сброс пароля"
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+              required:
+                - email
+      responses:
+        "201":
+          description: "Письмо отправлено на почту"
+          content:
+            application/json:
+              example:
+                message: "Письмо отправлено на почту"
+
+        "403":
+          description: "Пользователь не подтвердил почту"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 403
+                  message:
+                    type: string
+                    example: 'Пользователь не подтвердил почту'
+
+        "404":
+          description: "Пользователь не найден"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: '"Пользователь не найден'
+
+        "422":
+          description: "Переданны не все данные"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 422
+                  message:
+                    type: string
+                    example: 'Переданны не все данные'
+
+        "500":
+          description: "Ошибка сервера"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 'Ошибка сервера'
+
+        "503":
+          description: "Ошибка при отправке письма"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 503
+                  message:
+                    type: string
+                    example: 'Ошибка при отправке письма'
+
+  /v1/users/update/password:
+    patch:
+      summary: "Обновление пароля"
+      tags:
+        - Users
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          schema:
+            type: string
+            example: "Bearer your_token_here"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - email
+                - newPassword
+      responses:
+        "202":
+          description: "Пароль успешно обновлен"
+          content:
+            application/json:
+              example:
+                message: "Пароль успешно обновлен"
+
+        "403":
+          description: "Недействительный токен"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 403
+                  message:
+                    type: string
+                    example: 'Недействительный токен'
+
+        "422":
+          description: "Переданны не все данные"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 422
+                  message:
+                    type: string
+                    example: 'Переданны не все данные'
+
+        "500":
+          description: "Ошибка сервера"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 'Ошибка сервера'
+
+
+  /v1/users/new/tokens:
+    get:
+      summary: "Обновление токенов"
+      tags:
+        - Users
+      parameters:
+        - name: "Authorization"
+          in: "Cookies"
+          required: true
+          schema:
+            type: string
+            example: "refreshToken=your_token_here; HttpOnly;"
+      responses:
+        "201":
+          description: "Успешный вход, токен сохранён в куки"
+          headers:
+            Cookies:
+              description: "Содержит refreshToken"
+              schema:
+                type: string
+                example: "refreshToken=your_token_here; HttpOnly;"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    description: "JWT access token"
+                  message:
+                    type: string
+                    description: "Токен обновлен"
+
+        "422":
+          description: "Токен не предоставлен"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 422
+                  message:
+                    type: string
+                    example: 'Токен не предоставлен'
+                    
+        "500":
+          description: "Ошибка сервера"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 'Ошибка сервера'

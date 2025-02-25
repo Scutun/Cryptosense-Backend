@@ -124,25 +124,10 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: integer
-                    example: 201
                   message:
                     type: string
                     example: 'Отзыв создан'
-        '400':
-          description: Ошибка при создании отзыва
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 400
-                  message:
-                    type: string
-                    example: 'Ошибка при создании отзыва'
+        
         '422':
           description: Переданы не все данные
           content:
@@ -210,25 +195,10 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: integer
-                    example: 200
                   message:
                     type: string
                     example: 'Отзыв изменён'
-        '400':
-          description: Ошибка при изменении отзыва
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 400
-                  message:
-                    type: string
-                    example: 'Ошибка при изменении отзыва'
+        
         '404':
           description: Отзыв не найден
           content:
@@ -301,26 +271,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: integer
-                    example: 200
                   message:
                     type: string
                     example: 'Отзыв удалён'
-
-        '400':
-          description: Ошибка при удалении отзыва
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 400
-                  message:
-                    type: string
-                    example: 'Ошибка при удалении отзыва'
 
         '404':
           description: Отзыв не найден
