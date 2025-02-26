@@ -92,9 +92,9 @@ class UsersService {
 
             const user = await modelUser.loginUser(info.email)
 
-            if (user[0].length === 0) {
+            if (user.rowCount === 0) {
                 throw { status: 404, message: 'Пользователь не найдеть' }
-            } else if (user[0].activated === false) {
+            } else if (user.rows[0].activated === false) {
                 throw { status: 403, message: 'Пользователь не подтвердил почту' }
             }
             return user.id
