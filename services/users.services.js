@@ -34,10 +34,10 @@ class UsersService {
 
             const users = await modelUser.searchUsers(email, login)
 
-            if (users.length > 0) {
+            if (users.rowCount > 0) {
                 throw {
                     status: 409,
-                    message: `Этот ${users[0].email == email ? 'e-mail уже занят' : 'логин уже занят'}`,
+                    message: `Этот ${users.rows[0].email === email ? 'e-mail уже занят' : 'логин уже занят'}`,
                 }
             }
         } catch (error) {
@@ -57,10 +57,10 @@ class UsersService {
 
             if (user.rowCount === 0) {
                 throw { status: 404, message: 'Пользователь не найден' }
-            } else if (user.rows[0].activated  == false) {
+            } else if (user.rows[0].activated == false) {
                 throw { status: 403, message: 'Пользователь не подтвердил почту' }
             }
-            if (!bcrypt.compare(user.password, password)) {
+            if (!(await bcrypt.compare(password, user.rows[0].password))) {
                 throw { status: 401, message: 'Неправильный пароль' }
             }
 
@@ -92,27 +92,26 @@ class UsersService {
 
             const user = await modelUser.loginUser(info.email)
 
-            if (user.length === 0) {
+            if (user.rowCount === 0) {
                 throw { status: 404, message: 'Пользователь не найдеть' }
-            } else if (user.activated === false) {
+            } else if (user.rows[0].activated === false) {
                 throw { status: 403, message: 'Пользователь не подтвердил почту' }
             }
-            return user.id
+            return user.rows[0].id
         } catch (error) {
             throw error
         }
     }
 
-    async newUserPassword(info) {
+    async newUserPassword(id, password) {
         try {
-            const { email, password } = info
-
-            if (email.length === 0 || password.length === 0) {
-                throw { status: 422, message: 'E-mail и новый пароль обязательны' }
+            if (password.length === 0) {
+                throw { status: 422, message: 'Новый пароль обязателен' }
             }
 
             const hashPassword = await bcrypt.hash(password, 10)
-            await modelUser.updateUserPassword(email, hashPassword)
+
+            await modelUser.updateUserPassword(id, hashPassword)
         } catch (error) {
             throw error
         }

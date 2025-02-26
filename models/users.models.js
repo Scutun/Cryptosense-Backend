@@ -21,7 +21,8 @@ class UsersModel {
                 `SELECT email FROM users WHERE email = $1 OR nickname = $2`,
                 [email, login],
             )
-            return user.rows
+
+            return user
         } catch (error) {
             throw error
         }
@@ -52,9 +53,9 @@ class UsersModel {
         }
     }
 
-    async updateUserPassword(email, hashPassword) {
+    async updateUserPassword(id, hashPassword) {
         try {
-            await db.query(`UPDATE users SET password = $1 WHERE email = $2`, [hashPassword, email])
+            await db.query(`UPDATE users SET password = $1 WHERE id = $2`, [hashPassword, id])
         } catch (error) {
             throw error
         }

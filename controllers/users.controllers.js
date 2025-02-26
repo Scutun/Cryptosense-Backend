@@ -1,7 +1,6 @@
 const userService = require('../services/users.services')
 const tokenUtils = require('../utils/tokens.utils')
 const emailUtils = require('../utils/emails.utils')
-const jwt = require('jsonwebtoken')
 
 class UsersController {
     async createUser(req, res, next) {
@@ -69,7 +68,9 @@ class UsersController {
 
     async newUserPassword(req, res, next) {
         try {
-            await userService.newUserPassword(req.body)
+            const id = tokenUtils.getIdFromToken(req)
+
+            await userService.newUserPassword(id, req.body.password)
 
             res.status(202).json({ message: 'Пароль успешно обновлен' })
         } catch (error) {

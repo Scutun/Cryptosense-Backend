@@ -15,17 +15,17 @@ function getIdFromToken(req) {
 
 function genAccessToken(id) {
     const accessToken = jwt.sign({ id: id }, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: '2h',
+        expiresIn: process.env.ACCESS_TOKEN_LIFE,
     })
     return accessToken
 }
 
 function genAllTokens(id) {
     const accessToken = jwt.sign({ id: id }, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: '2h',
+        expiresIn: process.env.ACCESS_TOKEN_LIFE,
     })
     const refreshToken = jwt.sign({ id: id }, process.env.REFRESH_TOKEN_SECRET, {
-        expiresIn: '14d',
+        expiresIn: process.env.REFRESH_TOKEN_LIFE,
     })
     return { accessToken, refreshToken }
 }

@@ -9,7 +9,7 @@ function checkToken(req, res, next) {
 
         next()
     } catch (error) {
-        res.status(403).json({ message: 'Недействительный токен' })
+        res.status(403).json({ status: 40102, message: 'Недействительный токен' })
     }
 }
 
