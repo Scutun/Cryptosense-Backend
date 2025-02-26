@@ -1,7 +1,6 @@
 const userService = require('../services/users.services')
 const tokenUtils = require('../utils/tokens.utils')
 const emailUtils = require('../utils/emails.utils')
-const jwt = require('jsonwebtoken')
 
 class UsersController {
     async createUser(req, res, next) {

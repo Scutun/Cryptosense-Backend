@@ -22,7 +22,7 @@ class UsersModel {
                 [email, login],
             )
 
-            return user.rows
+            return user
         } catch (error) {
             throw error
         }
