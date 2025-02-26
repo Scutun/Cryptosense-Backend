@@ -97,22 +97,21 @@ class UsersService {
             } else if (user.rows[0].activated === false) {
                 throw { status: 403, message: 'Пользователь не подтвердил почту' }
             }
-            return user.id
+            return user.rows[0].id
         } catch (error) {
             throw error
         }
     }
 
-    async newUserPassword(info) {
+    async newUserPassword(id, password) {
         try {
-            const { email, password } = info
-
-            if (email.length === 0 || password.length === 0) {
-                throw { status: 422, message: 'E-mail и новый пароль обязательны' }
+            if (password.length === 0) {
+                throw { status: 422, message: 'Новый пароль обязателен' }
             }
 
             const hashPassword = await bcrypt.hash(password, 10)
-            await modelUser.updateUserPassword(email, hashPassword)
+            console.log(hashPassword, password)
+            await modelUser.updateUserPassword(id, hashPassword)
         } catch (error) {
             throw error
         }

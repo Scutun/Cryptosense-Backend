@@ -68,7 +68,9 @@ class UsersController {
 
     async newUserPassword(req, res, next) {
         try {
-            await userService.newUserPassword(req.body)
+            const id = tokenUtils.getIdFromToken(req)
+
+            await userService.newUserPassword(id, req.body)
 
             res.status(202).json({ message: 'Пароль успешно обновлен' })
         } catch (error) {
