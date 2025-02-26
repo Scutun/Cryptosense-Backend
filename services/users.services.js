@@ -110,7 +110,7 @@ class UsersService {
             }
 
             const hashPassword = await bcrypt.hash(password, 10)
-            console.log(hashPassword, password)
+
             await modelUser.updateUserPassword(id, hashPassword)
         } catch (error) {
             throw error
