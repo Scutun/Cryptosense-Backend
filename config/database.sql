@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS courses (
     creation_date DATE NOT NULL,
     course_duration INTEGER NOT NULL,
     rating NUMERIC(3, 1) NOT NULL DEFAULT 5.0,
-    course_photo TEXT,
+    course_photo TEXT DEFAULT 'DefaultCoursePhoto.jpg',
     subscribers INTEGER DEFAULT 0,
 
     difficulty_id BIGINT,
