@@ -101,10 +101,24 @@ CREATE TABLE IF NOT EXISTS courses (
     description TEXT,
     creator_id BIGINT NOT NULL,
     creation_date DATE NOT NULL,
-    course_duration TEXT,
+    course_duration INTEGER NOT NULL,
+    rating NUMERIC(3, 1) NOT NULL DEFAULT 5.0,
+    course_photo TEXT DEFAULT 'DefaultCoursePhoto.jpg',
+    subscribers INTEGER DEFAULT 0,
+
     difficulty_id BIGINT,
     
     FOREIGN KEY (difficulty_id) REFERENCES difficulties(id) ON DELETE SET NULL
+);
+
+-- таблица разделов
+CREATE TABLE IF NOT EXISTS sections (
+  id SERIAL PRIMARY KEY,
+  NAME VARCHAR(255) UNIQUE NOT NULL,
+
+  course_id BIGINT,
+  
+  FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
 );
 
 -- Промежуточная таблица для связи курсов и тегов
@@ -139,6 +153,10 @@ CREATE TABLE IF NOT EXISTS user_courses (
     user_id INT NOT NULL,
     course_id INT NOT NULL,
 
+    progress INT DEFAULT 0,
+
+    UNIQUE (user_id, course_id),
+
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
 );
@@ -152,6 +170,7 @@ CREATE TABLE IF NOT EXISTS comments (
 
     course_id INT NOT NULL,
 
-    UNIQUE (user_nickname, course_id)
+    UNIQUE (user_nickname, course_id),
+    
     FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
 );

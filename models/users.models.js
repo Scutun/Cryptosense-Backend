@@ -60,6 +60,53 @@ class UsersModel {
             throw error
         }
     }
+
+    async getUser(id) {
+        try {
+            const result = await db.query(
+                `SELECT users.name, users.surname, users.email, users.nickname, users.registration_date as registrationDate, users.perutation, photos.name as photo FROM users 
+                left join photos on users.photo_id = photos.id WHERE users.id = $1
+                `,
+                [id],
+            )
+            return result
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async updateUserInfo(id, info) {
+        try {
+            const { name, surname, nickname, photo } = info
+
+            const photoId = await db.query(`SELECT id FROM photos WHERE name = $1`, [photo])
+
+            const newUser = await db.query(
+                `UPDATE users SET name = $1, surname = $2, nickname = $3, photo_id = $4 WHERE id = $5 RETURNING name, surname, nickname`,
+                [name, surname, nickname, photoId.rows[0].id, id],
+            )
+
+            const result = newUser.rows[0]
+
+            return { result, photo }
+        } catch (error) {
+            if (error.code === '23505') {
+                throw {
+                    status: 400,
+                    message: `Пользователь с никнеймом: ${nickname} уже существует`,
+                }
+            }
+            throw error
+        }
+    }
+
+    async deleteUser(id) {
+        try {
+            await db.query(`DELETE FROM users WHERE id = $1`, [id])
+        } catch (error) {
+            throw error
+        }
+    }
 }
 
 module.exports = new UsersModel()

@@ -6,6 +6,7 @@ const app = express()
 const cors = require('cors')
 const swaggerUi = require('swagger-ui-express')
 const fs = require('fs')
+const path = require('path')
 const yaml = require('js-yaml')
 const PORT = process.env.PORT || 3020
 const cookieParser = require('cookie-parser')
@@ -20,26 +21,38 @@ app.use(express.json())
 app.use(cors())
 
 const swaggerUsers = yaml.load(fs.readFileSync('./docs/users.swagger.yaml', 'utf8'))
+const swaggerCourses = yaml.load(fs.readFileSync('./docs/courses.swagger.yaml', 'utf8'))
 const swaggerReviews = yaml.load(fs.readFileSync('./docs/reviews.swagger.yaml', 'utf8'))
+const swaggerPhoto = yaml.load(fs.readFileSync('./docs/photos.swagger.yaml', 'utf8'))
 
 const mergedSwagger = {
     ...swaggerUsers,
-    paths: { ...swaggerUsers.paths, ...swaggerReviews.paths },
+    paths: {
+        ...swaggerUsers.paths,
+        ...swaggerCourses.paths,
+        ...swaggerReviews.paths,
+        ...swaggerPhoto.paths,
+    },
     components: {
         ...swaggerUsers.components,
         schemas: {
             ...swaggerUsers.components?.schemas,
+            ...swaggerCourses.components?.schemas,
             ...swaggerReviews.components?.schemas,
+            ...swaggerPhoto.components?.schemas,
         },
     },
 }
 
-app.use('/api/swagger/docs', swaggerUi.serve, swaggerUi.setup(mergedSwagger))
+app.use('/api/v1/swagger/docs', swaggerUi.serve, swaggerUi.setup(mergedSwagger))
 
 app.use('/api', userRoutes)
 app.use('/api', courseRoutes)
 app.use('/api', reviewRoutes)
 app.use(errorHandler)
+
+app.use('/api/profiles/avatars/url/', express.static(path.join(__dirname, 'uploads/avatars')))
+app.use('/api/courses/photo/url/', express.static(path.join(__dirname, 'uploads/covers')))
 
 app.get('/server', (req, res) => {
     res.send('Server is running')
@@ -47,5 +60,5 @@ app.get('/server', (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`)
-    console.log(`Documentation is available on http://localhost:${PORT}/api/swagger/docs`)
+    console.log(`Documentation is available on http://localhost:${PORT}/api/v1/swagger/docs`)
 })

@@ -52,10 +52,19 @@ async function compareRefreshToken(refreshToken, id) {
     }
 }
 
+async function deleteRefreshToken(id) {
+    try {
+        await redis.del(`user_id:${id}`)
+    } catch (error) {
+        throw { status: 500, message: `Ошибка при удалении токена обновления: ${error.message}` }
+    }
+}
+
 module.exports = {
     genAllTokens,
     genAccessToken,
     saveRefreshToken,
     compareRefreshToken,
     getIdFromToken,
+    deleteRefreshToken,
 }
