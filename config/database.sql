@@ -111,6 +111,15 @@ CREATE TABLE IF NOT EXISTS courses (
     FOREIGN KEY (difficulty_id) REFERENCES difficulties(id) ON DELETE SET NULL
 );
 
+CREATE TABLE IF NOT EXISTS sections (
+  id SERIAL PRIMARY KEY,
+  NAME VARCHAR(255) UNIQUE NOT NULL,
+
+  course_id BIGINT,
+  
+  FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
+)
+
 -- Промежуточная таблица для связи курсов и тегов
 CREATE TABLE IF NOT EXISTS course_tags (
     id SERIAL PRIMARY KEY,
@@ -142,6 +151,8 @@ CREATE TABLE IF NOT EXISTS user_courses (
 
     user_id INT NOT NULL,
     course_id INT NOT NULL,
+
+    progress INT DEFAULT 0,
 
     UNIQUE (user_id, course_id)
 
