@@ -123,11 +123,11 @@ class UsersService {
         try {
             const user = await modelUser.getUser(id)
 
-            if (user.length === 0) {
+            if (user.rowCount === 0) {
                 throw { status: 404, message: 'Пользователь не найден' }
             }
 
-            return user
+            return user.rows[0]
         } catch (error) {
             throw error
         }
@@ -135,13 +135,18 @@ class UsersService {
 
     async updateUserInfo(id, info) {
         try {
-            if (info.name === 0 || info.surname === 0 || info.nickname === 0 || info.photo === 0) {
+            if (
+                info.name.length === 0 ||
+                info.surname.length === 0 ||
+                info.nickname.length === 0 ||
+                info.photo.length === 0
+            ) {
                 throw { status: 400, message: 'Неверные значения были переданы' }
             }
 
             const user = await modelUser.getUser(id)
 
-            if (user.length === 0) {
+            if (user.rowCount === 0) {
                 throw { status: 404, message: 'Пользователь не найден' }
             }
 
@@ -157,7 +162,7 @@ class UsersService {
         try {
             const user = await modelUser.getUser(id)
 
-            if (user.length === 0) {
+            if (user.rowCount === 0) {
                 throw { status: 404, message: 'Пользователь не найден' }
             }
 

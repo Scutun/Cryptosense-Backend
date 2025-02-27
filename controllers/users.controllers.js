@@ -118,7 +118,7 @@ class UsersController {
 
             await userService.deleteUser(id)
 
-            res.status(200).json('User deleted')
+            res.status(200).json('Пользователь успешно удален')
         } catch (error) {
             next(error)
         }

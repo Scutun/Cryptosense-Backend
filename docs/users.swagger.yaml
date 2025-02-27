@@ -389,6 +389,193 @@ paths:
                     type: string
                     example: 'Ошибка при отправке письма'
 
+  /v1/users/logout:
+    post:
+      parameters:
+        - name: "Authorization"
+          in: "Cookies"
+          required: true
+          schema:
+            type: string
+            example: "refreshToken=your_token_here; HttpOnly;"
+      tags:
+        - Users
+      summary: Выход пользователя
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Пользователь вышел
+          content:
+            application/json:
+              schema:
+                type: string
+                example: "Пользователь успешно удален"
+        "403":
+          description: Недействительный токен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 40102
+                  message:
+                    type: string
+                    example: "Недействительный токен"
+        "500":
+          description: Ошибка при удалении токена обновления
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: "Ошибка при удалении токена обновления: error_message"
+
+  /v1/users/new/tokens:
+    get:
+      summary: "Обновление токенов"
+      tags:
+        - Users
+      parameters:
+        - name: "Authorization"
+          in: "Cookies"
+          required: true
+          schema:
+            type: string
+            example: "refreshToken=your_token_here; HttpOnly;"
+      responses:
+        "201":
+          description: "Успешный вход, токен сохранён в куки"
+          headers:
+            Cookies:
+              description: "Содержит refreshToken"
+              schema:
+                type: string
+                example: "refreshToken=your_token_here; HttpOnly;"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    description: "JWT access token"
+                  message:
+                    type: string
+                    description: "Токен обновлен"
+
+        "422":
+          description: "Токен не предоставлен"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 422
+                  message:
+                    type: string
+                    example: 'Токен не предоставлен'
+                    
+        "500":
+          description: "Ошибка сервера"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 'Ошибка сервера'
+
+  /v1/users/me:
+    get:
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          schema:
+            type: string
+            example: "Bearer your_token_here"
+      tags:
+        - Users
+      summary: Получение информации о пользователе
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Информация о пользователе
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  surname:
+                    type: string
+                  email:
+                    type: string
+                  nickname:
+                    type: string
+                  registrationdate:
+                    type: string
+                    format: date-time
+                  reputation:
+                    type: string
+                  photo:
+                    type: string
+        "404":
+          description: Пользователь не найден
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: "Пользователь не найден"
+        "403":
+          description: Недействительный токен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 40102
+                  message:
+                    type: string
+                    example: "Недействительный токен"
+        "500":
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: "Внутренняя ошибка сервера"
+
   /v1/users/update/password:
     patch:
       summary: "Обновление пароля"
@@ -462,42 +649,58 @@ paths:
                     type: string
                     example: 'Ошибка сервера'
 
-
-  /v1/users/new/tokens:
-    get:
-      summary: "Обновление токенов"
-      tags:
-        - Users
+  /v1/users/update/info:
+    put:
       parameters:
         - name: "Authorization"
-          in: "Cookies"
+          in: "header"
           required: true
           schema:
             type: string
-            example: "refreshToken=your_token_here; HttpOnly;"
+            example: "Bearer your_token_here"
+      tags:
+        - Users
+      summary: Обновление информации пользователя
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                surname:
+                  type: string
+                nickname:
+                  type: string
+                photo:
+                  type: string
+              required:
+                - name
+                - surname
+                - nickname
+                - photo
       responses:
-        "201":
-          description: "Успешный вход, токен сохранён в куки"
-          headers:
-            Cookies:
-              description: "Содержит refreshToken"
-              schema:
-                type: string
-                example: "refreshToken=your_token_here; HttpOnly;"
+        "200":
+          description: Успешное обновление
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  accessToken:
+                  name:
                     type: string
-                    description: "JWT access token"
-                  message:
+                  surname:
                     type: string
-                    description: "Токен обновлен"
-
-        "422":
-          description: "Токен не предоставлен"
+                  nickname:
+                    type: string
+                  photo:
+                    type: string
+        "404":
+          description: Пользователь не найден
           content:
             application/json:
               schema:
@@ -505,13 +708,38 @@ paths:
                 properties:
                   status:
                     type: integer
-                    example: 422
+                    example: 404
                   message:
                     type: string
-                    example: 'Токен не предоставлен'
-                    
+                    example: "Пользователь не найден"
+        "400":
+          description: Ошибки в данных
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "Пользователь с никнеймом: nickname уже существует"
+        "403":
+          description: Недействительный токен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 40102
+                  message:
+                    type: string
+                    example: "Недействительный токен"
         "500":
-          description: "Ошибка сервера"
+          description: Внутренняя ошибка сервера
           content:
             application/json:
               schema:
@@ -522,4 +750,66 @@ paths:
                     example: 500
                   message:
                     type: string
-                    example: 'Ошибка сервера'
+                    example: "Внутренняя ошибка сервера"
+                
+  /v1/users/delete:
+    delete:
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          schema:
+            type: string
+            example: "Bearer your_token_here"
+      tags:
+        - Users
+      summary: Удаление пользователя
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Пользователь успешно удален
+          content:
+            application/json:
+              schema:
+                type: string
+                example: "Пользователь успешно удален"
+        "404":
+          description: Пользователь не найден
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: "Пользователь не найден"
+        "403":
+          description: Недействительный токен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 40102
+                  message:
+                    type: string
+                    example: "Недействительный токен"
+        "500":
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: "Внутренняя ошибка сервера"

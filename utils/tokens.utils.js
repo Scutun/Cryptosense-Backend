@@ -66,4 +66,5 @@ module.exports = {
     saveRefreshToken,
     compareRefreshToken,
     getIdFromToken,
+    deleteRefreshToken,
 }
