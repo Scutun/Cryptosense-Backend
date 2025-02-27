@@ -77,6 +77,52 @@ class UsersController {
             next(error)
         }
     }
+
+    async logoutUser(req, res, next) {
+        try {
+            const id = getIdFromToken(req)
+
+            await tokenUtils.deleteRefreshToken(id)
+
+            res.status(200).json('User logged out')
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async getUser(req, res, next) {
+        try {
+            const id = tokenUtils.getIdFromToken(req)
+
+            const user = await userService.getUser(id)
+            res.json(user)
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async updateUserInfo(req, res, next) {
+        try {
+            const id = tokenUtils.getIdFromToken(req)
+
+            const user = await userService.updateUserInfo(id, req.body)
+            res.json(user)
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async deleteUser(req, res, next) {
+        try {
+            const id = tokenUtils.getIdFromToken(req)
+
+            await userService.deleteUser(id)
+
+            res.status(200).json('User deleted')
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 module.exports = new UsersController()

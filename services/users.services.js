@@ -1,5 +1,7 @@
 const bcrypt = require('bcrypt')
 const modelUser = require('../models/users.models')
+const tokenUtils = require('../utils/tokens.utils')
+const jwt = require('jsonwebtoken')
 
 class UsersService {
     async createUser(userInfo) {
@@ -112,6 +114,57 @@ class UsersService {
             const hashPassword = await bcrypt.hash(password, 10)
 
             await modelUser.updateUserPassword(id, hashPassword)
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async getUser(id) {
+        try {
+            const user = await modelUser.getUser(id)
+
+            if (user.length === 0) {
+                throw { status: 404, message: 'Пользователь не найден' }
+            }
+
+            return user
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async updateUserInfo(id, info) {
+        try {
+            if (info.name === 0 || info.surname === 0 || info.nickname === 0 || info.photo === 0) {
+                throw { status: 400, message: 'Неверные значения были переданы' }
+            }
+
+            const user = await modelUser.getUser(id)
+
+            if (user.length === 0) {
+                throw { status: 404, message: 'Пользователь не найден' }
+            }
+
+            const newInfo = await modelUser.updateUserInfo(id, info)
+
+            return newInfo
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async deleteUser(id) {
+        try {
+            const user = await modelUser.getUser(id)
+
+            if (user.length === 0) {
+                throw { status: 404, message: 'Пользователь не найден' }
+            }
+
+            await modelUser.deleteUser(id)
+            tokenUtils.deleteRefreshToken(id)
+
+            return
         } catch (error) {
             throw error
         }
