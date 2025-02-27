@@ -6,6 +6,7 @@ const app = express()
 const cors = require('cors')
 const swaggerUi = require('swagger-ui-express')
 const fs = require('fs')
+const path = require('path')
 const yaml = require('js-yaml')
 const PORT = process.env.PORT || 3020
 const cookieParser = require('cookie-parser')
@@ -42,6 +43,9 @@ app.use('/api', userRoutes)
 app.use('/api', courseRoutes)
 app.use('/api', reviewRoutes)
 app.use(errorHandler)
+
+app.use('/api/profiles/avatars/url/', express.static(path.join(__dirname, 'uploads/avatars')))
+app.use('/api/courses/photo/url/', express.static(path.join(__dirname, 'uploads/covers')))
 
 app.get('/server', (req, res) => {
     res.send('Server is running')
