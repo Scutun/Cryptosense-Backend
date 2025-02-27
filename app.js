@@ -20,15 +20,17 @@ app.use(express.json())
 app.use(cors())
 
 const swaggerUsers = yaml.load(fs.readFileSync('./docs/users.swagger.yaml', 'utf8'))
+const swaggerCourses = yaml.load(fs.readFileSync('./docs/courses.swagger.yaml', 'utf8'))
 const swaggerReviews = yaml.load(fs.readFileSync('./docs/reviews.swagger.yaml', 'utf8'))
 
 const mergedSwagger = {
     ...swaggerUsers,
-    paths: { ...swaggerUsers.paths, ...swaggerReviews.paths },
+    paths: { ...swaggerUsers.paths, ...swaggerCourses.paths, ...swaggerReviews.paths },
     components: {
         ...swaggerUsers.components,
         schemas: {
             ...swaggerUsers.components?.schemas,
+            ...swaggerCourses.components?.schemas,
             ...swaggerReviews.components?.schemas,
         },
     },
