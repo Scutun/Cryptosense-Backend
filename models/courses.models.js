@@ -23,6 +23,36 @@ class CoursesModel {
             throw error
         }
     }
+
+    async getChosenCourses(id, limit, offset, status) {
+        try {
+            const countResult = await db.query(
+                `SELECT COUNT(*) AS total 
+                 FROM user_courses
+                 WHERE user_id = $1 AND active = $2`,
+                [id, status],
+            )
+
+            const total = parseInt(countResult.rows[0].total, 10)
+
+            const courses = await db.query(
+                `SELECT CONCAT(users.name, ' ', users.surname) AS creator, 
+                        courses.course_photo AS photo, 
+                        courses.title, 
+                        courses.courses_duration AS duration
+                 FROM user_courses
+                 LEFT JOIN courses ON user_courses.course_id = courses.id                
+                 LEFT JOIN users ON courses.creator_id = users.id
+                 WHERE user_courses.user_id = $1 AND user_courses.active = $2
+                 LIMIT $3 OFFSET $4`,
+                [id, status, limit, offset],
+            )
+
+            return { total, courses: courses.rows }
+        } catch (error) {
+            throw error
+        }
+    }
 }
 
 module.exports = new CoursesModel()
