@@ -38,8 +38,10 @@ class CoursesModel {
             const courses = await db.query(
                 `SELECT CONCAT(users.name, ' ', users.surname) AS creator, 
                         courses.course_photo AS photo, 
-                        courses.title, 
-                        courses.courses_duration AS duration
+                        courses.title,
+                        courses.rating,
+                        courses.subscribers, 
+                        courses.course_duration as duration
                  FROM user_courses
                  LEFT JOIN courses ON user_courses.course_id = courses.id                
                  LEFT JOIN users ON courses.creator_id = users.id

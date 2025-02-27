@@ -101,7 +101,11 @@ CREATE TABLE IF NOT EXISTS courses (
     description TEXT,
     creator_id BIGINT NOT NULL,
     creation_date DATE NOT NULL,
-    course_duration TEXT,
+    course_duration INTEGER NOT NULL,
+    rating NUMERIC(3, 1) NOT NULL DEFAULT 5.0,
+    course_photo TEXT,
+    subscribers INTEGER DEFAULT 0,
+
     difficulty_id BIGINT,
     
     FOREIGN KEY (difficulty_id) REFERENCES difficulties(id) ON DELETE SET NULL
@@ -138,6 +142,8 @@ CREATE TABLE IF NOT EXISTS user_courses (
 
     user_id INT NOT NULL,
     course_id INT NOT NULL,
+
+    UNIQUE (user_id, course_id)
 
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
