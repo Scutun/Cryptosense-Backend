@@ -20,6 +20,15 @@ class CoursesController {
             next(error)
         }
     }
+
+    async getCourses(req, res, next) {
+        try {
+            const courses = await coursesService.getCourses(req.query)
+            res.json(courses)
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 module.exports = new CoursesController()
