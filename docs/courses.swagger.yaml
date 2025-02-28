@@ -207,3 +207,114 @@ paths:
                     example: 500
                   message:
                     type: string
+
+  /v1/courses/list:
+    get:
+      summary: Получить список курсов с сортировкой или без
+      description: Возвращает список курсов с поддержкой пагинации и сортировки по кол-ву подписчиков и по дате создание.
+      tags:
+        - Courses
+      parameters:
+        - name: limit
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Ограничение на количество возвращаемых курсов.
+        - name: offset
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+          description: Количество записей для пропуска (для пагинации).
+        - name: sort
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [all, follow, creation]
+          description: Тип сортировки (all, follow, creation), если all - то без сортировки, follow - по кол-ву подвисчиков, cretion - по дате создания.
+        - name: order
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [all, asc, desc]
+          description: Направление сортировки (all, asc, desc), если all - то без сортировки, asc - по возрастанию, desc - по убыванию.
+
+      responses:
+        '200':
+          description: Успешный ответ со списком курсов
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  info:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        description: Общее количество курсов, подходящих под запрос
+                      courses:
+                        type: array
+                        description: Список курсов
+                        items:
+                          type: object
+                          properties:
+                            creator:
+                              type: string
+                              description: Фамилия и имя создателя курса
+                            photo:
+                              type: string
+                              description: Название фото курса в формате JPG
+                            title:
+                              type: string
+                              description: Название курса
+                            duration:
+                              type: integer
+                              description: Продолжительность курса (в часах)
+
+        '400':
+          description: Ошибка в параметрах запроса
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 'Неверные значения limit или offset'
+
+        '404':
+          description: Курсы не найдены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: 'Курсы не найдены'
+
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 'Внутренняя ошибка сервера'

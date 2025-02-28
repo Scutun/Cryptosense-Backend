@@ -55,6 +55,61 @@ class CoursesModel {
             throw error
         }
     }
+
+    async getAllCourses(limit, offset) {
+        try {
+            const countResult = await db.query(
+                `SELECT COUNT(*) AS total 
+                 FROM courses`,
+            )
+
+            const total = parseInt(countResult.rows[0].total, 10)
+
+            const info = await db.query(
+                `SELECT CONCAT(users.name, ' ', users.surname) AS creator, 
+                        courses.course_photo AS photo, 
+                        courses.title,
+                        courses.rating,
+                        courses.subscribers, 
+                        courses.course_duration as duration
+                 FROM courses                
+                 LEFT JOIN users ON courses.creator_id = users.id
+                 LIMIT $1 OFFSET $2`,
+                [limit, offset],
+            )
+            return { total, courses: info.rows }
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async getSortedCourses(limit, offset, sort, order) {
+        try {
+            const countResult = await db.query(
+                `SELECT COUNT(*) AS total 
+                 FROM courses`,
+            )
+
+            const total = parseInt(countResult.rows[0].total, 10)
+
+            const info = await db.query(
+                `SELECT CONCAT(users.name, ' ', users.surname) AS creator, 
+                        courses.course_photo AS photo, 
+                        courses.title,
+                        courses.rating,
+                        courses.subscribers, 
+                        courses.course_duration as duration
+                 FROM courses                
+                 LEFT JOIN users ON courses.creator_id = users.id
+                 ORDER BY $1 $2
+                 LIMIT $3 OFFSET $4`,
+                [sort, order, limit, offset],
+            )
+            return { total, courses: info.rows }
+        } catch (error) {
+            throw error
+        }
+    }
 }
 
 module.exports = new CoursesModel()
