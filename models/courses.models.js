@@ -46,7 +46,7 @@ class CoursesModel {
             if (course.rowCount < 1) {
                 throw { status: 403, message: 'У вас недостаточно прав для удаления этого курса' }
             }
-            console.log(courseId)
+
             await redis.del(`course:${courseId}`)
 
             await db.query('DELETE FROM courses WHERE id = $1', [courseId])

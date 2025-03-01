@@ -16,8 +16,8 @@ class CoursesController {
     async deleteCourse(req, res, next) {
         try {
             const userId = tokenUtils.getIdFromToken(req)
-            await coursesService.getCourseInfoById(req.body.courseId)
-            await coursesService.deleteCourse(req.body.courseId, userId)
+            await coursesService.getCourseInfoById(req.params.id)
+            await coursesService.deleteCourse(req.params.id, userId)
             res.json({ message: 'Курс удален' })
         } catch (error) {
             next(error)
