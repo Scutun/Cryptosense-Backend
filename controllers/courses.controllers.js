@@ -2,6 +2,28 @@ const coursesService = require('../services/courses.services')
 const tokenUtils = require('../utils/tokens.utils')
 
 class CoursesController {
+    async createCourse(req, res, next) {
+        try {
+            const userId = tokenUtils.getIdFromToken(req)
+            const courseId = await coursesService.createCourse(req.body, userId)
+            const info = await coursesService.getCourseInfoById(courseId)
+            res.json(info)
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async deletecourse(req, res, next) {
+        try {
+            const userId = tokenUtils.getIdFromToken(req)
+            await coursesService.getCourseInfoById(req.body.courseId)
+            await coursesService.deleteCourse(req.body.courseId, userId)
+            res.json({ status: 200, message: 'Курс удален' })
+        } catch (error) {
+            next(error)
+        }
+    }
+
     async getCourseInfoById(req, res, next) {
         try {
             const info = await coursesService.getCourseInfoById(req.params.id)

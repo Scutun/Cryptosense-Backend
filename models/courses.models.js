@@ -1,6 +1,60 @@
 const db = require('../config/db').pool
+const redis = require('../config/db').redisClient
 
 class CoursesModel {
+    async createCourse(info, creatorId) {
+        try {
+            const result = await db.query(
+                `INSERT INTO courses (title, description, creator_id, course_duration, difficulty_id, creation_date) 
+                 VALUES ($1, $2, $3, $4, $5, NOW()) RETURNING id`,
+                [info.title, info.description, creatorId, info.courseDuration, info.difficultyId],
+            )
+
+            return result.rows[0].id
+        } catch (error) {
+            if (error.code === '23505') {
+                throw { status: 409, message: 'Курс с таким названием уже существует' }
+            }
+            throw error
+        }
+    }
+
+    async addCourseTags(courseId, tagsArray) {
+        try {
+            await db.query('DELETE FROM course_tags WHERE course_id = $1', [courseId])
+
+            const values = tagsArray.flat()
+            const placeholders = tagsArray
+                .map((row, i) => `(${row.map((_, j) => `$${i * row.length + j + 1}`).join(', ')})`)
+                .join(', ')
+
+            await db.query(
+                `INSERT INTO course_tags (course_id, tag_id) VALUES ${placeholders}`,
+                values,
+            )
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async deleteCourse(courseId, userId) {
+        try {
+            const course = await db.query(
+                `SELECT * FROM courses where creator_id = $1 and id = $2`,
+                [userId, courseId],
+            )
+            if (course.rowCount < 1) {
+                throw { status: 403, message: 'У вас недостаточно прав для удаления этого курса' }
+            }
+            console.log(courseId)
+            await redis.del(`course:${courseId}`)
+
+            await db.query('DELETE FROM courses WHERE id = $1', [courseId])
+        } catch (error) {
+            throw error
+        }
+    }
+
     async getCourseInfoById(id) {
         try {
             const info = await db.query(

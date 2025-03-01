@@ -1,6 +1,43 @@
 const coursesModel = require('../models/courses.models')
 
 class CoursesService {
+    async createCourse(info, creatorId) {
+        try {
+            if (
+                !info.title ||
+                !creatorId ||
+                !info.courseDuration ||
+                !info.difficultyId ||
+                !info.courseDuration ||
+                info.tags.length === 0
+            ) {
+                throw { status: 400, message: 'Не все поля заполнены' }
+            }
+
+            const courseId = await coursesModel.createCourse(info, creatorId)
+
+            const tags = info.tags.map((num) => [courseId, num])
+
+            await coursesModel.addCourseTags(courseId, tags)
+
+            return courseId
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async deleteCourse(courseId, userId) {
+        try {
+            if (courseId.length === 0 || userId.length === 0) {
+                throw { status: 400, message: 'Не все поля заполнены' }
+            }
+
+            await coursesModel.deleteCourse(courseId, userId)
+        } catch (error) {
+            throw error
+        }
+    }
+
     async getCourseInfoById(id) {
         try {
             if (id.length === 0) {
