@@ -59,7 +59,7 @@ class CoursesModel {
         try {
             const info = await db.query(
                 `SELECT 
-                    id, courses.id, courses.title, courses.description, 
+                    courses.id, courses.id, courses.title, courses.description, 
                     CONCAT(users.name, ' ', users.surname) AS creator, 
                     courses.creation_date, courses.course_duration, difficulties.name AS difficulty, 
                     ARRAY_AGG(tags.name) AS tags
@@ -90,7 +90,7 @@ class CoursesModel {
             const total = parseInt(countResult.rows[0].total, 10)
 
             const courses = await db.query(
-                `SELECT id, CONCAT(users.name, ' ', users.surname) AS creator, 
+                `SELECT courses.id, CONCAT(users.name, ' ', users.surname) AS creator, 
                         courses.course_photo AS photo, 
                         courses.title,
                         courses.rating,
@@ -120,7 +120,7 @@ class CoursesModel {
             const total = parseInt(countResult.rows[0].total, 10)
 
             const info = await db.query(
-                `SELECT id, CONCAT(users.name, ' ', users.surname) AS creator, 
+                `SELECT courses.id, CONCAT(users.name, ' ', users.surname) AS creator, 
                         courses.course_photo AS photo, 
                         courses.title,
                         courses.rating,

@@ -1,4 +1,5 @@
 const sectionsService = require('../services/sections.services')
+const tokenUtils = require('../utils/tokens.utils')
 
 class SectionsController {
     async createSection(req, res, next) {

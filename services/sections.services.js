@@ -10,7 +10,7 @@ class SectionsService {
                 throw { status: 404, message: 'Курса с таким id не существует' }
             }
 
-            if (course.rows[0].creator_id !== user) {
+            if (course.rows[0].creator_id != user) {
                 throw { status: 406, message: 'Вы не являетесь создателем этого курса' }
             }
 
@@ -54,7 +54,7 @@ class SectionsService {
                 throw { status: 404, message: 'Курса или раздела с таким id не существует' }
             }
 
-            if (course.rows[0].creator_id !== user) {
+            if (course.rows[0].creator_id != user) {
                 throw { status: 406, message: 'Вы не являетесь создателем этого курса' }
             }
 
@@ -79,7 +79,7 @@ class SectionsService {
                 throw { status: 404, message: 'Курса или раздела с таким id не существует' }
             }
 
-            if (course.rows[0].creator_id !== user) {
+            if (course.rows[0].creator_id != user) {
                 throw { status: 406, message: 'Вы не являетесь создателем этого курса' }
             }
 
