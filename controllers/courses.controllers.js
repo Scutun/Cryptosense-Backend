@@ -13,7 +13,7 @@ class CoursesController {
         }
     }
 
-    async deletecourse(req, res, next) {
+    async deleteCourse(req, res, next) {
         try {
             const userId = tokenUtils.getIdFromToken(req)
             await coursesService.getCourseInfoById(req.body.courseId)
