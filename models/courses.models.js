@@ -110,6 +110,16 @@ class CoursesModel {
             throw error
         }
     }
+
+    async getCourseById(id) {
+        try {
+            const info = await db.query(`SELECT creator_id FROM courses WHERE id = $1`, [id])
+
+            return info
+        } catch (error) {
+            throw error
+        }
+    }
 }
 
 module.exports = new CoursesModel()

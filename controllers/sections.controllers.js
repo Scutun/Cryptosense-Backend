@@ -3,7 +3,9 @@ const sectionsService = require('../services/sections.services')
 class SectionsController {
     async createSection(req, res, next) {
         try {
-            const section = await sectionsService.createSection(req.body)
+            const userId = tokenUtils.getIdFromToken(req)
+
+            const section = await sectionsService.createSection(req.body, userId)
             res.json(section)
         } catch (error) {
             next(error)
@@ -21,7 +23,9 @@ class SectionsController {
 
     async updateSection(req, res, next) {
         try {
-            const section = await sectionsService.updateSection(req.body)
+            const userId = tokenUtils.getIdFromToken(req)
+
+            const section = await sectionsService.updateSection(req.body, userId)
             res.json(section)
         } catch (error) {
             next(error)
@@ -30,8 +34,10 @@ class SectionsController {
 
     async deleteSection(req, res, next) {
         try {
-            const section = await sectionsService.deleteSection(req.params.id)
-            res.status(200).json({ status: 200, message: 'Раздел успешно удален' })
+            const userId = tokenUtils.getIdFromToken(req)
+
+            await sectionsService.deleteSection(req.params.id, userId)
+            res.status(200).json({ message: 'Раздел успешно удален' })
         } catch (error) {
             next(error)
         }

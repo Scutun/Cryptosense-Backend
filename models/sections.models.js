@@ -4,7 +4,7 @@ class SectionsModel {
     async createSection(info) {
         try {
             const section = await db.query(
-                `INSERT INTO sections (name, course_id) VALUES ($1) RETURNING *`,
+                `INSERT INTO sections (name, course_id) VALUES ($1) RETURNING id, name, course_id as courseId`,
                 [info.name, info.courseId],
             )
 
@@ -16,7 +16,10 @@ class SectionsModel {
 
     async getSections(id) {
         try {
-            const sections = await db.query(`SELECT * FROM sections where course_id = $1`, [id])
+            const sections = await db.query(
+                `SELECT id, name, course_id as courseId FROM sections where course_id = $1`,
+                [id],
+            )
 
             return sections
         } catch (error) {
@@ -26,7 +29,10 @@ class SectionsModel {
 
     async getSectionById(id) {
         try {
-            const section = await db.query(`SELECT * FROM sections WHERE id = $1`, [id])
+            const section = await db.query(
+                `SELECT id, name, course_id as courseId FROM sections WHERE id = $1`,
+                [id],
+            )
 
             return section
         } catch (error) {
@@ -37,7 +43,7 @@ class SectionsModel {
     async updateSection(info) {
         try {
             const section = await db.query(
-                `UPDATE sections SET name = $1 WHERE id = $2 RETURNING *`,
+                `UPDATE sections SET name = $1 WHERE id = $2 RETURNING id, name, course_id as courseId`,
                 [info.name, info.id],
             )
 
