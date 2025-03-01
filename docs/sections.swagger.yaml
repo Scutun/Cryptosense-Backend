@@ -1,0 +1,415 @@
+#prettier-ignore
+openapi: 3.0.0
+info:
+  title: Sections API
+  version: 1.0.0
+  description: API для работы с разделами курса
+
+paths:
+  /v1/sections/create:
+    post:
+      summary: Создание раздела
+      description: Возвращает созданный раздел.
+      tags:
+        - Sections
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: Bearer your_token_here
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - courseId
+              properties:
+                name:
+                  type: string
+                  example: "Раздел 1"
+                courseId:
+                  type: integer
+                  example: 1
+      responses:
+        '200':
+          description: Успешный ответ c созданным разделом
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: Уникальный идентификатор раздела
+                  name:
+                    type: string
+                    description: Название раздела
+                  courseId:
+                    type: string
+                    description: Идентификатор курса, к которому принадлежит раздел
+
+        '400':
+          description: Ошибка в передаче названия раздела
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 'Название секции не предоставлено'
+
+        '403':
+          description: Недействительный токен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 40102
+                  message:
+                    type: string
+                    example: 'Недействительный токен'
+
+        '406':
+          description: Вы не являетесь создателем этого курса
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 406
+                  message:
+                    type: string
+                    example: 'Вы не являетесь создателем этого курса'
+
+        '404':
+          description: Курса с таким id не существует
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: 'Курса с таким id не существует'
+
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 'Внутренняя ошибка сервера'
+
+  /v1/sections/list/{id}:
+    get:
+      tags:
+        - Sections
+      summary: Получить список разделов
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Список разделов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    name:
+                      type: string
+                      example: "Раздел 1"
+                    courseId:
+                      type: integer
+                      example: 1
+        
+        '400':
+          description: Id курса не предоставлен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 'Id курса не предоставлен'
+
+        '404':
+          description: У этого курса пока нет разделов
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: 'У этого курса пока нет разделов'
+
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 'Ошибка сервера'
+
+  /v1/sections/update:
+    put:
+      tags:
+        - Sections
+      summary: Изменить раздел
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: Bearer your_token_here
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+                - name
+              properties:
+                id:
+                  type: integer
+                  example: 1
+                name:
+                  type: string
+                  example: "Раздел 1"
+                
+      responses:
+        '200':
+          content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      name:
+                        type: string
+                        example: "Раздел 1"
+                      courseId:
+                        type: integer
+                        example: 1
+
+        '400':
+          description: Название раздела не предоставлено
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 'Название раздела не предоставлено'
+
+        '403':
+          description: Недействительный токен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 40102
+                  message:
+                    type: string
+                    example: 'Недействительный токен'
+        
+        '404':
+          description: Курса или раздела с таким id не существует
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: 'Курса или раздела с таким id не существует'
+
+        '406':
+          description: Вы не являетесь создателем этого курса
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 406
+                  message:
+                    type: string
+                    example: 'Вы не являетесь создателем этого курса'
+
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 'Ошибка сервера'
+
+  /v1/sections/delete/{id}:
+    delete:
+      tags:
+        - Sections
+      summary: Удалить раздел
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: Bearer your_token_here
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - reviewId
+              properties:
+                reviewId:
+                  type: integer
+                  example: 10
+      responses:
+        '200':
+          description: Раздел успешно удален
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Раздел успешно удален'
+
+        '403':
+          description: Недействительный токен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 40102
+                  message:
+                    type: string
+                    example: 'Недействительный токен'
+
+        '404':
+          description: Курса или раздела с таким id не существует
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: 'Курса или раздела с таким id не существует'
+
+        '406':
+          description: Вы не являетесь создателем этого курса
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 406
+                  message:
+                    type: string
+                    example: 'Вы не являетесь создателем этого курса'
+
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 'Ошибка сервера'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
