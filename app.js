@@ -15,6 +15,7 @@ const errorHandler = require('./middlewares/errorHandler')
 const userRoutes = require('./routes/users.routes')
 const courseRoutes = require('./routes/courses.routes')
 const reviewRoutes = require('./routes/reviews.routes')
+const sectionRoutes = require('./routes/sections.routes')
 
 app.use(cookieParser())
 app.use(express.json())
@@ -23,6 +24,7 @@ app.use(cors())
 const swaggerUsers = yaml.load(fs.readFileSync('./docs/users.swagger.yaml', 'utf8'))
 const swaggerCourses = yaml.load(fs.readFileSync('./docs/courses.swagger.yaml', 'utf8'))
 const swaggerReviews = yaml.load(fs.readFileSync('./docs/reviews.swagger.yaml', 'utf8'))
+const swaggerSections = yaml.load(fs.readFileSync('./docs/sections.swagger.yaml', 'utf8'))
 const swaggerPhoto = yaml.load(fs.readFileSync('./docs/photos.swagger.yaml', 'utf8'))
 
 const mergedSwagger = {
@@ -31,6 +33,7 @@ const mergedSwagger = {
         ...swaggerUsers.paths,
         ...swaggerCourses.paths,
         ...swaggerReviews.paths,
+        ...swaggerSections.paths,
         ...swaggerPhoto.paths,
     },
     components: {
@@ -39,6 +42,7 @@ const mergedSwagger = {
             ...swaggerUsers.components?.schemas,
             ...swaggerCourses.components?.schemas,
             ...swaggerReviews.components?.schemas,
+            ...swaggerSections.components?.schemas,
             ...swaggerPhoto.components?.schemas,
         },
     },
@@ -49,6 +53,7 @@ app.use('/api/v1/swagger/docs', swaggerUi.serve, swaggerUi.setup(mergedSwagger))
 app.use('/api', userRoutes)
 app.use('/api', courseRoutes)
 app.use('/api', reviewRoutes)
+app.use('/api', sectionRoutes)
 app.use(errorHandler)
 
 app.use('/api/profiles/avatars/url/', express.static(path.join(__dirname, 'uploads/avatars')))

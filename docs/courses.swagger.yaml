@@ -182,6 +182,9 @@ paths:
                         items:
                           type: object
                           properties:
+                            id:
+                              type: integer
+                              description: ID курса
                             creator:
                               type: string
                               description: Фамилия и имя создателя курса
@@ -385,6 +388,9 @@ paths:
                         items:
                           type: object
                           properties:
+                            id:
+                              type: integer
+                              description: ID курса
                             creator:
                               type: string
                               description: Фамилия и имя создателя курса

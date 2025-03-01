@@ -114,9 +114,9 @@ CREATE TABLE IF NOT EXISTS courses (
 -- таблица разделов
 CREATE TABLE IF NOT EXISTS sections (
   id SERIAL PRIMARY KEY,
-  NAME VARCHAR(255) UNIQUE NOT NULL,
+  name VARCHAR(255) UNIQUE NOT NULL,
 
-  course_id BIGINT,
+  course_id BIGINT NOT NULL,
   
   FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
 );
