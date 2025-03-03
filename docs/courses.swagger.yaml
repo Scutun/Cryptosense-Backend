@@ -367,6 +367,12 @@ paths:
             type: string
             enum: [all, asc, desc]
           description: Направление сортировки (all, asc, desc), если all - то без сортировки, asc - по возрастанию, desc - по убыванию.
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Поиск по названию тега или курса
 
       responses:
         '200':

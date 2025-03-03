@@ -86,6 +86,7 @@ class CoursesService {
             const offset = parseInt(query.offset, 10)
             const sort = query.sort
             const order = query.order
+            const search = query.search || ''
             const sortCondition = ''
 
             if (isNaN(limit) || isNaN(offset)) {
@@ -96,7 +97,7 @@ class CoursesService {
                 (sort !== 'follow' && sort !== 'creation') ||
                 (order !== 'asc' && order !== 'desc')
             ) {
-                const courses = await coursesModel.getAllCourses(limit, offset)
+                const courses = await coursesModel.getAllCourses(limit, offset, search)
 
                 if (courses.total === 0) {
                     throw { status: 404, message: 'Курсы не найдены' }
@@ -115,6 +116,7 @@ class CoursesService {
                     offset,
                     sortCondition,
                     order,
+                    search,
                 )
 
                 if (courses.total === 0) {
