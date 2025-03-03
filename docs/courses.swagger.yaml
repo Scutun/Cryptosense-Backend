@@ -1,0 +1,529 @@
+#prettier-ignore
+openapi: 3.0.0
+info:
+  title: Courses API
+  version: 1.0.0
+  description: API для получения списка курсов
+
+paths:
+  /v1/courses/create:
+    post:
+      summary: "Создать новый курс"
+      description: "Создает новый курс с указанными параметрами. Требуется авторизация."
+      tags:
+        - Courses
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Токен авторизации в формате Bearer.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - courseDuration
+                - difficultyId
+                - tags
+              properties:
+                title:
+                  type: string
+                  description: "Название курса"
+                description:
+                  type: string
+                  description: "Описание курса"
+                courseDuration:
+                  type: integer
+                  description: "Продолжительность курса "
+                difficultyId:
+                  type: integer
+                  description: "Идентификатор уровня сложности"
+                tags:
+                  type: array
+                  items:
+                    type: integer
+                  description: "Массив идентификаторов тегов"
+      responses:
+        '200':
+          description: Успешное получение информации о курсе
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  title:
+                    type: string
+                  description:
+                    type: string
+                  creator:
+                    type: string
+                  creation_date:
+                    type: string
+                    format: date-time
+                  course_duration:
+                    type: string
+                  difficulty:
+                    type: string
+                  tags:
+                    type: array
+                    items:
+                      type: string
+                      nullable: true
+        '400':
+          description: Не все поля заполнены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string    
+                    example: 'Не все поля заполнены'
+        "403":
+          description: Недействительный токен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 40102
+                  message:
+                    type: string
+                    example: "Недействительный токен"
+        '409':
+          description: Курс с таким названием уже существует
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 409
+                  message:
+                    type: string    
+                    example: 'Курс с таким названием уже существует'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string        
+  /v1/courses/chosen:
+    get:
+      summary: Получить список курсов
+      description: Возвращает список курсов с поддержкой пагинации и фильтрации по статусу.
+      tags:
+        - Courses
+      parameters:
+        - name: limit
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Ограничение на количество возвращаемых курсов.
+        - name: offset
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+          description: Количество записей для пропуска (для пагинации).
+        - name: status
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [active, completed]
+          description: Статус курсов, которые нужно получить (active или completed).
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Токен авторизации в формате Bearer.
+
+      responses:
+        '200':
+          description: Успешный ответ со списком курсов
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  info:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        description: Общее количество курсов, подходящих под запрос
+                      courses:
+                        type: array
+                        description: Список курсов
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              description: ID курса
+                            creator:
+                              type: string
+                              description: Фамилия и имя создателя курса
+                            photo:
+                              type: string
+                              description: Название фото курса в формате JPG
+                            title:
+                              type: string
+                              description: Название курса
+                            duration:
+                              type: integer
+                              description: Продолжительность курса (в часах)
+
+        '400':
+          description: Ошибка в параметрах запроса
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 'Неверные значения limit или offset или status'
+
+        '403':
+          description: Токен авторизации невалиден
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 40102
+                  message:
+                    type: string
+                    example: 'Недействительный токен'
+
+        '404':
+          description: Курсы не найдены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: 'У этого пользователя нет выбранных курсов со статусом ${status}'
+
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 'Внутренняя ошибка сервера'
+
+  /v1/courses/info/{id}:
+    get:
+      tags:
+        - Courses
+      summary: Получить информацию о курсе
+      description: Возвращает информацию о курсе по его ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID курса, который необходимо получить
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Успешное получение информации о курсе
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  title:
+                    type: string
+                  description:
+                    type: string
+                  creator:
+                    type: string
+                  creation_date:
+                    type: string
+                    format: date-time
+                  course_duration:
+                    type: string
+                  difficulty:
+                    type: string
+                  tags:
+                    type: array
+                    items:
+                      type: string
+                      nullable: true
+        '400':
+          description: ID курса не предоставлен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+        '404':
+          description: Курс не найден
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+
+  /v1/courses/list:
+    get:
+      summary: Получить список курсов с сортировкой или без
+      description: Возвращает список курсов с поддержкой пагинации и сортировки по кол-ву подписчиков и по дате создание.
+      tags:
+        - Courses
+      parameters:
+        - name: limit
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Ограничение на количество возвращаемых курсов.
+        - name: offset
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+          description: Количество записей для пропуска (для пагинации).
+        - name: sort
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [all, follow, creation]
+          description: Тип сортировки (all, follow, creation), если all - то без сортировки, follow - по кол-ву подвисчиков, cretion - по дате создания.
+        - name: order
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [all, asc, desc]
+          description: Направление сортировки (all, asc, desc), если all - то без сортировки, asc - по возрастанию, desc - по убыванию.
+
+      responses:
+        '200':
+          description: Успешный ответ со списком курсов
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  info:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        description: Общее количество курсов, подходящих под запрос
+                      courses:
+                        type: array
+                        description: Список курсов
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              description: ID курса
+                            creator:
+                              type: string
+                              description: Фамилия и имя создателя курса
+                            photo:
+                              type: string
+                              description: Название фото курса в формате JPG
+                            title:
+                              type: string
+                              description: Название курса
+                            duration:
+                              type: integer
+                              description: Продолжительность курса (в часах)
+
+        '400':
+          description: Ошибка в параметрах запроса
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 'Неверные значения limit или offset'
+
+        '404':
+          description: Курсы не найдены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: 'Курсы не найдены'
+
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 'Внутренняя ошибка сервера'
+
+  
+  /v1/courses/delete/{id}:
+    delete:
+      tags:
+        - Courses
+      summary: Удалить курс
+      description: Удаляет курс
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Токен авторизации в формате Bearer.
+        - name: id
+          in: path
+          required: true
+          description: ID курса, который необходимо получить
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Курс удален
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Курс удален'
+        '400':
+          description: ID курса не предоставлен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+        '403':
+          description: У вас недостаточно прав для удаления этого курса
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 403
+                  message:
+                    type: string
+                    example: "У вас недостаточно прав для удаления этого курса"
+
+        '404':
+          description: Курс не найден
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
