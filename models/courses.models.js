@@ -134,7 +134,7 @@ class CoursesModel {
             const params = [id, status]
 
             if (limit !== 'ALL') {
-                query += ` LIMIT $2 OFFSET $3`
+                query += ` LIMIT $3 OFFSET $4`
                 params.push(Number(limit) || 10, Number(offset) || 0)
             }
 
