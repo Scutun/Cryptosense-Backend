@@ -6,7 +6,7 @@ info:
   description: Getting Photo
 
 paths:
-  /profiles/avatars/url/{filename}:
+  /v1/profiles/avatars/url/{filename}:
     get:
       summary: Получить аватар пользователя по имени файла
       description: Возвращает запрашиваемое изображение аватара пользователя с сервера.
@@ -29,7 +29,7 @@ paths:
                 format: binary
 
 
-  /courses/photo/url/{filename}:
+  /v1/courses/photo/url/{filename}:
     get:
       summary: Получить обложку курса по имени файла
       description: Возвращает запрашиваемое изображение обложки курса с сервера.
