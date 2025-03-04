@@ -102,19 +102,6 @@ paths:
                   message:
                     type: string
                     example: "Недействительный токен"
-        '409':
-          description: Курс с таким названием уже существует
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 409
-                  message:
-                    type: string    
-                    example: 'Курс с таким названием уже существует'
         '500':
           description: Внутренняя ошибка сервера
           content:
@@ -452,7 +439,120 @@ paths:
                     type: string
                     example: 'Внутренняя ошибка сервера'
 
-  
+  /v1/courses/update:
+    put:
+      summary: "Отредактировать курс"
+      description: "Отредактировать курс с указанными параметрами. Требуется авторизация."
+      tags:
+        - Courses
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Токен авторизации в формате Bearer.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - courseDuration
+                - difficultyId
+                - tags
+                - coursePhoto
+                - description
+              properties:
+                coursePhoto:
+                  type: string
+                  description: "Ссылка на изображение курса в формате JPG"
+                title:
+                  type: string
+                  description: "Название курса"
+                description:
+                  type: string
+                  description: "Описание курса"
+                courseDuration:
+                  type: integer
+                  description: "Продолжительность курса "
+                difficultyId:
+                  type: integer
+                  description: "Идентификатор уровня сложности"
+                tags:
+                  type: array
+                  items:
+                    type: integer
+                  description: "Массив идентификаторов тегов"
+      responses:
+        '200':
+          description: Успешное получение информации о курсе
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  title:
+                    type: string
+                  description:
+                    type: string
+                  creator:
+                    type: string
+                  creation_date:
+                    type: string
+                    format: date-time
+                  course_duration:
+                    type: string
+                  difficulty:
+                    type: string
+                  tags:
+                    type: array
+                    items:
+                      type: string
+                      nullable: true
+        '400':
+          description: Не все поля заполнены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string    
+                    example: 'Не все поля заполнены'
+        "403":
+          description: Недействительный токен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 40102
+                  message:
+                    type: string
+                    example: "Недействительный токен"
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string        
+
   /v1/courses/delete/{id}:
     delete:
       tags:

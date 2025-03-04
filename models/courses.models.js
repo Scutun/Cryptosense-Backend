@@ -12,9 +12,6 @@ class CoursesModel {
 
             return result.rows[0].id
         } catch (error) {
-            if (error.code === '23505') {
-                throw { status: 409, message: 'Курс с таким названием уже существует' }
-            }
             throw error
         }
     }
@@ -31,6 +28,38 @@ class CoursesModel {
             await db.query(
                 `INSERT INTO course_tags (course_id, tag_id) VALUES ${placeholders}`,
                 values,
+            )
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async updateCourse(info, creatorId) {
+        try {
+            const course = await db.query(
+                `SELECT * FROM courses where creator_id = $1 and id = $2`,
+                [creatorId, info.courseId],
+            )
+            if (course.rowCount < 1) {
+                throw { status: 403, message: 'У вас недостаточно прав для удаления этого курса' }
+            }
+            const result = await db.query(
+                `UPDATE courses 
+                 SET title = $1, 
+                     description = $2, 
+                     course_duration = $3, 
+                     difficulty_id = $4,
+                     course_photo = $5  
+                 WHERE id = $6 and creator_id = $7`,
+                [
+                    info.title,
+                    info.description,
+                    info.courseDuration,
+                    info.difficultyId,
+                    info.coursePhoto,
+                    info.courseId,
+                    creatorId,
+                ],
             )
         } catch (error) {
             throw error
