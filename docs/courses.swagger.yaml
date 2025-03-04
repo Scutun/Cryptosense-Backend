@@ -113,7 +113,8 @@ paths:
                     type: integer
                     example: 500
                   message:
-                    type: string        
+                    type: string       
+
   /v1/courses/chosen:
     get:
       summary: Получить список курсов
@@ -184,6 +185,9 @@ paths:
                         rating:
                           type: string
                           description: Рейтинг курса
+                        reviews:
+                          type: string
+                          description: Количество отзывов
                         subscribers:
                           type: integer
                           description: Количество подписчиков
@@ -400,6 +404,9 @@ paths:
                         rating:
                           type: string
                           description: Рейтинг курса
+                        reviews:
+                          type: string
+                          description: Количество отзывов
                         subscribers:
                           type: integer
                           description: Количество подписчиков

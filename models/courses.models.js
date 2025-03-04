@@ -123,6 +123,7 @@ class CoursesModel {
                         courses.course_photo AS photo, 
                         courses.title,
                         courses.rating,
+                        courses.reviews_count as reviews,
                         courses.subscribers, 
                         courses.course_duration as duration
                  FROM user_courses
@@ -159,6 +160,7 @@ class CoursesModel {
                         courses.course_photo AS photo, 
                         courses.title,
                         courses.rating,
+                        courses.reviews_count as reviews,
                         courses.subscribers, 
                         courses.course_duration as duration
                  FROM courses
@@ -196,6 +198,7 @@ class CoursesModel {
                         courses.course_photo AS photo, 
                         courses.title,
                         courses.rating,
+                        courses.reviews_count as reviews,
                         courses.subscribers, 
                         courses.course_duration as duration
                  FROM courses                
