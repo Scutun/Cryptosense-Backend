@@ -26,6 +26,30 @@ class CoursesService {
         }
     }
 
+    async updateCourse(info, creatorId) {
+        try {
+            if (
+                !info.title ||
+                !info.description ||
+                !info.courseDuration ||
+                !info.difficultyId ||
+                !info.coursePhoto ||
+                !info.courseId ||
+                !creatorId ||
+                info.tags.length === 0
+            ) {
+                throw { status: 400, message: 'Не все поля заполнены' }
+            }
+
+            await coursesModel.updateCourse(info, creatorId)
+            const tags = info.tags.map((num) => [info.courseId, num])
+            await coursesModel.addCourseTags(info.courseId, tags)
+            return info.courseId
+        } catch (error) {
+            throw error
+        }
+    }
+
     async deleteCourse(courseId, userId) {
         try {
             if (courseId.length === 0 || userId.length === 0) {
@@ -86,6 +110,7 @@ class CoursesService {
             const offset = parseInt(query.offset, 10)
             const sort = query.sort
             const order = query.order
+            const search = query.search || ''
             const sortCondition = ''
 
             if (isNaN(limit) || isNaN(offset)) {
@@ -96,7 +121,7 @@ class CoursesService {
                 (sort !== 'follow' && sort !== 'creation') ||
                 (order !== 'asc' && order !== 'desc')
             ) {
-                const courses = await coursesModel.getAllCourses(limit, offset)
+                const courses = await coursesModel.getAllCourses(limit, offset, search)
 
                 if (courses.total === 0) {
                     throw { status: 404, message: 'Курсы не найдены' }
@@ -115,6 +140,7 @@ class CoursesService {
                     offset,
                     sortCondition,
                     order,
+                    search,
                 )
 
                 if (courses.total === 0) {

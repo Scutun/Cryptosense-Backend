@@ -12,9 +12,6 @@ class CoursesModel {
 
             return result.rows[0].id
         } catch (error) {
-            if (error.code === '23505') {
-                throw { status: 409, message: 'Курс с таким названием уже существует' }
-            }
             throw error
         }
     }
@@ -31,6 +28,38 @@ class CoursesModel {
             await db.query(
                 `INSERT INTO course_tags (course_id, tag_id) VALUES ${placeholders}`,
                 values,
+            )
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async updateCourse(info, creatorId) {
+        try {
+            const course = await db.query(
+                `SELECT * FROM courses where creator_id = $1 and id = $2`,
+                [creatorId, info.courseId],
+            )
+            if (course.rowCount < 1) {
+                throw { status: 403, message: 'У вас недостаточно прав для удаления этого курса' }
+            }
+            const result = await db.query(
+                `UPDATE courses 
+                 SET title = $1, 
+                     description = $2, 
+                     course_duration = $3, 
+                     difficulty_id = $4,
+                     course_photo = $5  
+                 WHERE id = $6 and creator_id = $7`,
+                [
+                    info.title,
+                    info.description,
+                    info.courseDuration,
+                    info.difficultyId,
+                    info.coursePhoto,
+                    info.courseId,
+                    creatorId,
+                ],
             )
         } catch (error) {
             throw error
@@ -110,11 +139,17 @@ class CoursesModel {
         }
     }
 
-    async getAllCourses(limit, offset) {
+    async getAllCourses(limit, offset, search) {
         try {
+            const searchQuery = search ? `%${search}%` : `%`
+
             const countResult = await db.query(
-                `SELECT COUNT(*) AS total 
-                 FROM courses`,
+                `SELECT COUNT(DISTINCT courses.id) AS total 
+                 FROM courses
+                 LEFT JOIN course_tags ON courses.id = course_tags.course_id
+                 LEFT JOIN tags ON course_tags.tag_id = tags.id
+                 WHERE courses.title ILIKE $1 OR tags.name ILIKE $1`,
+                [searchQuery],
             )
 
             const total = parseInt(countResult.rows[0].total, 10)
@@ -126,10 +161,14 @@ class CoursesModel {
                         courses.rating,
                         courses.subscribers, 
                         courses.course_duration as duration
-                 FROM courses                
+                 FROM courses
                  LEFT JOIN users ON courses.creator_id = users.id
-                 LIMIT $1 OFFSET $2`,
-                [limit, offset],
+                 LEFT JOIN course_tags ON courses.id = course_tags.course_id
+                 LEFT JOIN tags ON course_tags.tag_id = tags.id
+                 WHERE courses.title ILIKE $1 OR tags.name ILIKE $1
+                 GROUP BY courses.id, users.name, users.surname
+                 LIMIT $2 OFFSET $3`,
+                [searchQuery, limit, offset],
             )
             return { total, courses: info.rows }
         } catch (error) {
@@ -137,11 +176,17 @@ class CoursesModel {
         }
     }
 
-    async getSortedCourses(limit, offset, sort, order) {
+    async getSortedCourses(limit, offset, sort, order, search) {
         try {
+            const searchQuery = search ? `%${search}%` : `%`
+
             const countResult = await db.query(
-                `SELECT COUNT(*) AS total 
-                 FROM courses`,
+                `SELECT COUNT(DISTINCT courses.id) AS total 
+                 FROM courses
+                 LEFT JOIN course_tags ON courses.id = course_tags.course_id
+                 LEFT JOIN tags ON course_tags.tag_id = tags.id
+                 WHERE courses.title ILIKE $1 OR tags.name ILIKE $1`,
+                [searchQuery],
             )
 
             const total = parseInt(countResult.rows[0].total, 10)
@@ -155,6 +200,9 @@ class CoursesModel {
                         courses.course_duration as duration
                  FROM courses                
                  LEFT JOIN users ON courses.creator_id = users.id
+                 LEFT JOIN course_tags ON courses.id = course_tags.course_id
+                 LEFT JOIN tags ON course_tags.tag_id = tags.id
+                 WHERE courses.title ILIKE $1 OR tags.name ILIKE $1
                  ORDER BY $1 $2
                  LIMIT $3 OFFSET $4`,
                 [sort, order, limit, offset],

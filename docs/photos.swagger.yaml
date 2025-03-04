@@ -6,6 +6,29 @@ info:
   description: Getting Photo
 
 paths:
+  /v1/profiles/avatars/all:
+    get:
+      summary: Получить все аватары пользователей
+      description: Возвращает все изображения аватаров пользователей с сервера.
+      tags:
+        - Photos
+      responses:
+        '200':
+          description: Успешное получение всех изображений аватаров пользователей
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    name:
+                      type: string
+                      example: "cristalAvatar.jpg"
+
   /v1/profiles/avatars/url/{filename}:
     get:
       summary: Получить аватар пользователя по имени файла

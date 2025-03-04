@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS users (
 -- таблица всех курсов
 CREATE TABLE IF NOT EXISTS courses (
     id SERIAL PRIMARY KEY,
-    title VARCHAR(255) UNIQUE NOT NULL,
+    title VARCHAR(255)  NOT NULL,
     description TEXT,
     creator_id BIGINT NOT NULL,
     creation_date DATE NOT NULL,
@@ -174,3 +174,6 @@ CREATE TABLE IF NOT EXISTS comments (
     
     FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
 );
+
+-- Супер пользователь для теста
+INSERT INTO users (email, password, nickname, name, surname, activated, registration_date) VALUES ('admin@mail.ru', '$2b$10$qClaDFhQzCCFB4c6TkRxmecmGIXV75a2YO1Rf3cfRslY88zZnNieS', 'admin', 'admin', 'admin', true, NOW());
