@@ -8,7 +8,18 @@ class ReviewsModel {
                  VALUES ($1, $2, (SELECT nickname FROM users WHERE id = $3), $4)`,
                 [info.rating, info.content, info.userId, info.courseId],
             )
+
+            await db.query(
+                `UPDATE courses SET rating = (SELECT AVG(rating) FROM comments WHERE course_id = $1), reviews_count = (SELECT COUNT(*) FROM comments WHERE course_id = $1) WHERE id = $1`,
+                [info.courseId],
+            )
         } catch (error) {
+            if (error.code === '23505') {
+                throw {
+                    status: 400,
+                    message: 'Этот пользователь уже оставил отзыв для этого курса',
+                }
+            }
             throw error
         }
     }

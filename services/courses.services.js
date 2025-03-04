@@ -79,12 +79,12 @@ class CoursesService {
 
     async getChosenCourses(query, id) {
         try {
-            const limit = parseInt(query.limit, 10)
-            const offset = parseInt(query.offset, 10)
+            const limit = parseInt(query.limit, 10) || 'ALL'
+            const offset = parseInt(query.offset, 10) || '0'
             const status = query.status
 
-            if (isNaN(limit) || isNaN(offset) || (status !== 'active' && status !== 'completed')) {
-                throw { status: 400, message: 'Неверные значения limit или offset или status' }
+            if (status !== 'active' && status !== 'completed') {
+                throw { status: 400, message: 'Неверные значения status' }
             }
 
             const statusCondition = status === 'active'
@@ -106,16 +106,12 @@ class CoursesService {
 
     async getCourses(query) {
         try {
-            const limit = parseInt(query.limit, 10)
-            const offset = parseInt(query.offset, 10)
+            const limit = parseInt(query.limit, 10) || 'ALL'
+            const offset = parseInt(query.offset, 10) || 0
             const sort = query.sort
             const order = query.order
             const search = query.search || ''
             const sortCondition = ''
-
-            if (isNaN(limit) || isNaN(offset)) {
-                throw { status: 400, message: 'Неверные значения limit или offset' }
-            }
 
             if (
                 (sort !== 'follow' && sort !== 'creation') ||

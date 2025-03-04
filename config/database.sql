@@ -102,7 +102,8 @@ CREATE TABLE IF NOT EXISTS courses (
     creator_id BIGINT NOT NULL,
     creation_date DATE NOT NULL,
     course_duration INTEGER NOT NULL,
-    rating NUMERIC(3, 1) NOT NULL DEFAULT 5.0,
+    rating NUMERIC(3, 1) NOT NULL DEFAULT 0,
+    reviews_count BIGINT DEFAULT 0,
     course_photo TEXT DEFAULT 'DefaultCoursePhoto.jpg',
     subscribers INTEGER DEFAULT 0,
 
@@ -164,7 +165,7 @@ CREATE TABLE IF NOT EXISTS user_courses (
 -- таблица коментариев
 CREATE TABLE IF NOT EXISTS comments (
     id SERIAL PRIMARY KEY,
-    rating INT,
+    rating INT CHECK (rating > 0 AND rating <= 5),
     content TEXT NOT NULL,
     user_nickname VARCHAR(255) NOT NULL,
 

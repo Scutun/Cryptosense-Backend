@@ -6,6 +6,105 @@ info:
   description: API для получения отзывов о курсе
 
 paths:
+  /v1/reviews/new:
+    post:
+      tags:
+        - Reviews
+      summary: Создать отзыв
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: Bearer your_token_here
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - rating
+                - content
+                - courseId
+              properties:
+                rating:
+                  type: integer
+                  example: 5
+                content:
+                  type: string
+                  example: Отличный курс!
+                courseId:
+                  type: integer
+                  example: 123
+      responses:
+        '201':
+          description: Отзыв создан
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Отзыв создан'
+
+        '400':
+          description: Ошибка в передаче данных
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 'Этот пользователь уже оставил отзыв для этого курса'
+
+        '403':
+          description: Пользователь не авторизован
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 403
+                  message:
+                    type: string
+                    example: 'Недействительный токен'
+        
+        '422':
+          description: Переданы не все данные
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 422
+                  message:
+                    type: string
+                    example: 'Переданы не все данные'
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 'Ошибка сервера'
+
   /v1/reviews/course/{id}:
     get:
       summary: Получить отзывы о курсе
@@ -84,78 +183,7 @@ paths:
                     type: string
                     example: 'Внутренняя ошибка сервера'
 
-  /v1/reviews/create:
-    post:
-      tags:
-        - Reviews
-      summary: Создать отзыв
-      parameters:
-        - name: Authorization
-          in: header
-          required: true
-          schema:
-            type: string
-            example: Bearer your_token_here
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - rating
-                - content
-                - courseId
-              properties:
-                rating:
-                  type: integer
-                  example: 5
-                content:
-                  type: string
-                  example: Отличный курс!
-                courseId:
-                  type: integer
-                  example: 123
-      responses:
-        '201':
-          description: Отзыв создан
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Отзыв создан'
-        
-        '422':
-          description: Переданы не все данные
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 422
-                  message:
-                    type: string
-                    example: 'Переданы не все данные'
-        '500':
-          description: Ошибка сервера
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 500
-                  message:
-                    type: string
-                    example: 'Ошибка сервера'
-
-  /v1/reviews/change:
+  /v1/reviews/redact:
     put:
       tags:
         - Reviews
@@ -198,6 +226,20 @@ paths:
                   message:
                     type: string
                     example: 'Отзыв изменён'
+
+        '403':
+          description: Пользователь не авторизован
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 403
+                  message:
+                    type: string
+                    example: 'Недействительный токен'
         
         '404':
           description: Отзыв не найден
@@ -239,7 +281,7 @@ paths:
                     type: string
                     example: 'Ошибка сервера'
 
-  /v1/reviews/delete:
+  /v1/reviews:
     delete:
       tags:
         - Reviews
@@ -274,6 +316,20 @@ paths:
                   message:
                     type: string
                     example: 'Отзыв удалён'
+
+        '403':
+          description: Пользователь не авторизован
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 403
+                  message:
+                    type: string
+                    example: 'Недействительный токен'
 
         '404':
           description: Отзыв не найден

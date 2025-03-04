@@ -80,7 +80,7 @@ class UsersController {
 
     async logoutUser(req, res, next) {
         try {
-            const id = getIdFromToken(req)
+            const id = tokenUtils.getIdFromToken(req)
 
             await tokenUtils.deleteRefreshToken(id)
 
