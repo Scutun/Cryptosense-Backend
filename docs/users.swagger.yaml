@@ -410,7 +410,7 @@ paths:
             application/json:
               schema:
                 type: string
-                example: "Пользователь успешно удален"
+                example: "Пользователь успешно вышел"
         "403":
           description: Недействительный токен
           content:
@@ -633,7 +633,7 @@ paths:
                     example: 422
                   message:
                     type: string
-                    example: 'Переданны не все данные'
+                    example: 'Переданы не все данные'
 
         "500":
           description: "Ошибка сервера"

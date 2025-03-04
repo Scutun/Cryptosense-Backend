@@ -57,7 +57,7 @@ app.use('/api', sectionRoutes)
 app.use(errorHandler)
 
 app.use('/api/v1/profiles/avatars/url/', express.static(path.join(__dirname, 'uploads/avatars')))
-app.use('/api/v1/courses/photo/url/', express.static(path.join(__dirname, 'uploads/covers')))
+app.use('/api/v1/courses/photo/url/', express.static(path.join(__dirname, 'uploads/course')))
 
 app.get('/server', (req, res) => {
     res.send('Server is running')
