@@ -102,19 +102,6 @@ paths:
                   message:
                     type: string
                     example: "Недействительный токен"
-        '409':
-          description: Курс с таким названием уже существует
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 409
-                  message:
-                    type: string    
-                    example: 'Курс с таким названием уже существует'
         '500':
           description: Внутренняя ошибка сервера
           content:
@@ -553,19 +540,6 @@ paths:
                   message:
                     type: string
                     example: "Недействительный токен"
-        '409':
-          description: Курс с таким названием уже существует
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 409
-                  message:
-                    type: string    
-                    example: 'Курс с таким названием уже существует'
         '500':
           description: Внутренняя ошибка сервера
           content:
