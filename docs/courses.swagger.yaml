@@ -170,33 +170,37 @@ paths:
               schema:
                 type: object
                 properties:
-                  info:
-                    type: object
-                    properties:
-                      total:
-                        type: integer
-                        description: Общее количество курсов, подходящих под запрос
-                      courses:
-                        type: array
-                        description: Список курсов
-                        items:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                              description: ID курса
-                            creator:
-                              type: string
-                              description: Фамилия и имя создателя курса
-                            photo:
-                              type: string
-                              description: Название фото курса в формате JPG
-                            title:
-                              type: string
-                              description: Название курса
-                            duration:
-                              type: integer
-                              description: Продолжительность курса (в часах)
+                  total:
+                    type: integer
+                    description: Общее количество курсов, подходящих под запрос
+                  courses:
+                    type: array
+                    description: Список курсов
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: ID курса
+                        creator:
+                          type: string
+                          description: Фамилия и имя создателя курса
+                        photo:
+                          type: string
+                          description: Название фото курса в формате JPG
+                        title:
+                          type: string
+                          description: Название курса
+                        duration:
+                          type: integer
+                          description: Продолжительность курса (в часах)
+                        rating:
+                          type: string
+                          description: Рейтинг курса
+                        subscribers:
+                          type: integer
+                          description: Количество подписчиков
+                        
 
         '400':
           description: Ошибка в параметрах запроса
@@ -403,6 +407,12 @@ paths:
                             duration:
                               type: integer
                               description: Продолжительность курса (в часах)
+                            rating:
+                              type: string
+                              description: Рейтинг курса
+                            subscribers:
+                              type: integer
+                              description: Количество подписчиков
 
         '400':
           description: Ошибка в параметрах запроса
