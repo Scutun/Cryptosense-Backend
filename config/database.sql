@@ -175,3 +175,6 @@ CREATE TABLE IF NOT EXISTS comments (
     
     FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
 );
+
+-- Супер пользователь для теста
+INSERT INTO users (email, password, nickname, name, surname, activated, registration_date) VALUES ('admin@mail.ru', '$2b$10$qClaDFhQzCCFB4c6TkRxmecmGIXV75a2YO1Rf3cfRslY88zZnNieS', 'admin', 'admin', 'admin', true, NOW());
