@@ -81,14 +81,19 @@ class UsersModel {
 
             const photoId = await db.query(`SELECT id FROM photos WHERE name = $1`, [photo])
 
+            if (photoId.rowCount === 0) {
+                throw new Error()
+            }
+
             const newUser = await db.query(
                 `UPDATE users SET name = $1, surname = $2, nickname = $3, photo_id = $4 WHERE id = $5 RETURNING name, surname, nickname`,
                 [name, surname, nickname, photoId.rows[0].id, id],
             )
 
-            const result = newUser.rows[0]
-
-            return { result, photo }
+            return {
+                ...newUser.rows[0],
+                photo,
+            }
         } catch (error) {
             if (error.code === '23505') {
                 throw {
