@@ -6,7 +6,7 @@ info:
   description: API для получения отзывов о курсе
 
 paths:
-  /v1/reviews/create:
+  /v1/reviews/new:
     post:
       tags:
         - Reviews
@@ -183,7 +183,7 @@ paths:
                     type: string
                     example: 'Внутренняя ошибка сервера'
 
-  /v1/reviews/change:
+  /v1/reviews/redact:
     put:
       tags:
         - Reviews
@@ -281,7 +281,7 @@ paths:
                     type: string
                     example: 'Ошибка сервера'
 
-  /v1/reviews/delete:
+  /v1/reviews:
     delete:
       tags:
         - Reviews

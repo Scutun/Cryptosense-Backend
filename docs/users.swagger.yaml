@@ -6,7 +6,7 @@ info:
   description: API для управления пользователями и токенами
 
 paths:
-  /v1/users/create:
+  /v1/users/registration:
     post:
       summary: Создать пользователя
       tags:
@@ -185,7 +185,7 @@ paths:
                   message:
                     type: string
                     example: "Ошибка сервера"
-  /v1/users/login:
+  /v1/users/authorization:
     post:
       summary: "Авторизация пользователя"
       tags:
@@ -576,7 +576,7 @@ paths:
                     type: string
                     example: "Внутренняя ошибка сервера"
 
-  /v1/users/update/password:
+  /v1/users/new/password:
     patch:
       summary: "Обновление пароля"
       tags:
@@ -649,7 +649,7 @@ paths:
                     type: string
                     example: 'Ошибка сервера'
 
-  /v1/users/update/info:
+  /v1/users/new/info:
     put:
       parameters:
         - name: "Authorization"
@@ -752,7 +752,7 @@ paths:
                     type: string
                     example: "Внутренняя ошибка сервера"
                 
-  /v1/users/delete:
+  /v1/users:
     delete:
       parameters:
         - name: "Authorization"

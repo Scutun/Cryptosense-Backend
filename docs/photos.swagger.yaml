@@ -8,6 +8,13 @@ info:
 paths:
   /v1/profiles/avatars/all:
     get:
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          schema:
+            type: string
+            example: "Bearer your_token_here"
       summary: Получить все аватары пользователей
       description: Возвращает все изображения аватаров пользователей с сервера.
       tags:
