@@ -118,21 +118,27 @@ class CoursesModel {
 
             const total = parseInt(countResult.rows[0].total, 10)
 
-            const courses = await db.query(
-                `SELECT courses.id, CONCAT(users.name, ' ', users.surname) AS creator, 
+            let query = `SELECT courses.id, CONCAT(users.name, ' ', users.surname) AS creator, 
                         courses.course_photo AS photo, 
                         courses.title,
                         courses.rating,
+                        courses.reviews_count as reviews,
                         courses.subscribers, 
                         courses.course_duration as duration
                  FROM user_courses
                  LEFT JOIN courses ON user_courses.course_id = courses.id                
                  LEFT JOIN users ON courses.creator_id = users.id
                  WHERE user_courses.user_id = $1 AND user_courses.active = $2
-                 LIMIT $3 OFFSET $4`,
-                [id, status, limit, offset],
-            )
+                 GROUP BY courses.id, users.name, users.surname`
 
+            const params = [id, status]
+
+            if (limit !== 'ALL') {
+                query += ` LIMIT $2 OFFSET $3`
+                params.push(Number(limit) || 10, Number(offset) || 0)
+            }
+
+            const courses = await db.query(query, params)
             return { total, courses: courses.rows }
         } catch (error) {
             throw error
@@ -154,22 +160,28 @@ class CoursesModel {
 
             const total = parseInt(countResult.rows[0].total, 10)
 
-            const info = await db.query(
-                `SELECT courses.id, CONCAT(users.name, ' ', users.surname) AS creator, 
-                        courses.course_photo AS photo, 
-                        courses.title,
-                        courses.rating,
-                        courses.subscribers, 
-                        courses.course_duration as duration
-                 FROM courses
-                 LEFT JOIN users ON courses.creator_id = users.id
-                 LEFT JOIN course_tags ON courses.id = course_tags.course_id
-                 LEFT JOIN tags ON course_tags.tag_id = tags.id
-                 WHERE courses.title ILIKE $1 OR tags.name ILIKE $1
-                 GROUP BY courses.id, users.name, users.surname
-                 LIMIT $2 OFFSET $3`,
-                [searchQuery, limit, offset],
-            )
+            let query = `SELECT courses.id, CONCAT(users.name, ' ', users.surname) AS creator, 
+                courses.course_photo AS photo, 
+                courses.title,
+                courses.rating,
+                courses.reviews_count as reviews,
+                courses.subscribers, 
+                courses.course_duration as duration
+            FROM courses
+            LEFT JOIN users ON courses.creator_id = users.id
+            LEFT JOIN course_tags ON courses.id = course_tags.course_id
+            LEFT JOIN tags ON course_tags.tag_id = tags.id
+            WHERE courses.title ILIKE $1 OR tags.name ILIKE $1
+            GROUP BY courses.id, users.name, users.surname`
+
+            const params = [searchQuery]
+
+            if (limit !== 'ALL') {
+                query += ` LIMIT $2 OFFSET $3`
+                params.push(Number(limit) || 10, Number(offset) || 0)
+            }
+
+            const info = await db.query(query, params)
             return { total, courses: info.rows }
         } catch (error) {
             throw error
@@ -196,6 +208,7 @@ class CoursesModel {
                         courses.course_photo AS photo, 
                         courses.title,
                         courses.rating,
+                        courses.reviews_count as reviews,
                         courses.subscribers, 
                         courses.course_duration as duration
                  FROM courses                

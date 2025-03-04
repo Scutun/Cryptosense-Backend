@@ -6,7 +6,7 @@ info:
   description: API для получения списка курсов
 
 paths:
-  /v1/courses/create:
+  /v1/courses/new:
     post:
       summary: "Создать новый курс"
       description: "Создает новый курс с указанными параметрами. Требуется авторизация."
@@ -113,24 +113,25 @@ paths:
                     type: integer
                     example: 500
                   message:
-                    type: string        
+                    type: string       
+
   /v1/courses/chosen:
     get:
       summary: Получить список курсов
-      description: Возвращает список курсов с поддержкой пагинации и фильтрации по статусу.
+      description: Возвращает список курсов для профиля с поддержкой пагинации и фильтрации по статусу завершенности курса.
       tags:
         - Courses
       parameters:
         - name: limit
           in: query
-          required: true
+          required: false
           schema:
             type: integer
             minimum: 1
           description: Ограничение на количество возвращаемых курсов.
         - name: offset
           in: query
-          required: true
+          required: false
           schema:
             type: integer
             minimum: 0
@@ -184,6 +185,9 @@ paths:
                         rating:
                           type: string
                           description: Рейтинг курса
+                        reviews:
+                          type: string
+                          description: Количество отзывов
                         subscribers:
                           type: integer
                           description: Количество подписчиков
@@ -326,38 +330,38 @@ paths:
   /v1/courses/list:
     get:
       summary: Получить список курсов с сортировкой или без
-      description: Возвращает список курсов с поддержкой пагинации и сортировки по кол-ву подписчиков и по дате создание.
+      description: Возвращает список курсов с поддержкой пагинации и сортировки по кол-ву подписчиков и по дате создание. Используется для страницы поиска курсов.
       tags:
         - Courses
       parameters:
         - name: limit
           in: query
-          required: true
+          required: false
           schema:
             type: integer
             minimum: 1
           description: Ограничение на количество возвращаемых курсов.
         - name: offset
           in: query
-          required: true
+          required: false
           schema:
             type: integer
             minimum: 0
           description: Количество записей для пропуска (для пагинации).
         - name: sort
           in: query
-          required: true
+          required: false
           schema:
             type: string
-            enum: [all, follow, creation]
-          description: Тип сортировки (all, follow, creation), если all - то без сортировки, follow - по кол-ву подвисчиков, cretion - по дате создания.
+            enum: [follow, creation]
+          description: Тип сортировки (follow, creation), если  follow - по кол-ву подвисчиков, cretion - по дате создания.
         - name: order
           in: query
-          required: true
+          required: false
           schema:
             type: string
-            enum: [all, asc, desc]
-          description: Направление сортировки (all, asc, desc), если all - то без сортировки, asc - по возрастанию, desc - по убыванию.
+            enum: [asc, desc]
+          description: Направление сортировки (asc, desc), если  asc - по возрастанию, desc - по убыванию.
         - name: search
           in: query
           required: false
@@ -400,23 +404,12 @@ paths:
                         rating:
                           type: string
                           description: Рейтинг курса
+                        reviews:
+                          type: string
+                          description: Количество отзывов
                         subscribers:
                           type: integer
                           description: Количество подписчиков
-
-        '400':
-          description: Ошибка в параметрах запроса
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 400
-                  message:
-                    type: string
-                    example: 'Неверные значения limit или offset'
 
         '404':
           description: Курсы не найдены
@@ -446,7 +439,7 @@ paths:
                     type: string
                     example: 'Внутренняя ошибка сервера'
 
-  /v1/courses/update:
+  /v1/courses:
     put:
       summary: "Отредактировать курс"
       description: "Отредактировать курс с указанными параметрами. Требуется авторизация."
@@ -560,7 +553,7 @@ paths:
                   message:
                     type: string        
 
-  /v1/courses/delete/{id}:
+  /v1/courses/{id}:
     delete:
       tags:
         - Courses

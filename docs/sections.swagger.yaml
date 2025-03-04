@@ -6,7 +6,7 @@ info:
   description: API для работы с разделами курса
 
 paths:
-  /v1/sections/create:
+  /v1/sections/new:
     post:
       summary: Создание раздела
       description: Возвращает созданный раздел.
@@ -197,7 +197,7 @@ paths:
                     type: string
                     example: 'Ошибка сервера'
 
-  /v1/sections/update:
+  /v1/sections:
     put:
       tags:
         - Sections
@@ -315,7 +315,7 @@ paths:
                     type: string
                     example: 'Ошибка сервера'
 
-  /v1/sections/delete/{id}:
+  /v1/sections/{id}:
     delete:
       tags:
         - Sections
