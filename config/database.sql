@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS users (
 -- таблица всех курсов
 CREATE TABLE IF NOT EXISTS courses (
     id SERIAL PRIMARY KEY,
-    title VARCHAR(255) UNIQUE NOT NULL,
+    title VARCHAR(255)  NOT NULL,
     description TEXT,
     creator_id BIGINT NOT NULL,
     creation_date DATE NOT NULL,

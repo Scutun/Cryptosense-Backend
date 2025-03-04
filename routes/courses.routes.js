@@ -10,6 +10,8 @@ router.get('/v1/courses/info/:id', coursesController.getCourseInfoById)
 router.get('/v1/courses/chosen', checkToken, coursesController.getChosenCourses)
 router.get('/v1/courses/list', coursesController.getCourses)
 
+router.put('/v1/courses/update', checkToken, coursesController.updateCourse)
+
 router.delete('/v1/courses/delete/:id', checkToken, coursesController.deleteCourse)
 
 module.exports = router

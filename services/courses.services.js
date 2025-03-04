@@ -26,6 +26,30 @@ class CoursesService {
         }
     }
 
+    async updateCourse(info, creatorId) {
+        try {
+            if (
+                !info.title ||
+                !info.description ||
+                !info.courseDuration ||
+                !info.difficultyId ||
+                !info.coursePhoto ||
+                !info.courseId ||
+                !creatorId ||
+                info.tags.length === 0
+            ) {
+                throw { status: 400, message: 'Не все поля заполнены' }
+            }
+
+            await coursesModel.updateCourse(info, creatorId)
+            const tags = info.tags.map((num) => [info.courseId, num])
+            await coursesModel.addCourseTags(info.courseId, tags)
+            return info.courseId
+        } catch (error) {
+            throw error
+        }
+    }
+
     async deleteCourse(courseId, userId) {
         try {
             if (courseId.length === 0 || userId.length === 0) {

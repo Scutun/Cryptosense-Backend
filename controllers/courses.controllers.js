@@ -24,6 +24,18 @@ class CoursesController {
         }
     }
 
+    async updateCourse(req, res, next) {
+        try {
+            const userId = tokenUtils.getIdFromToken(req)
+            await coursesService.getCourseInfoById(req.body.courseId)
+            const courseId = await coursesService.updateCourse(req.body, userId)
+            const info = await coursesService.getCourseInfoById(courseId)
+            res.json(info)
+        } catch (error) {
+            next(error)
+        }
+    }
+
     async getCourseInfoById(req, res, next) {
         try {
             const info = await coursesService.getCourseInfoById(req.params.id)
