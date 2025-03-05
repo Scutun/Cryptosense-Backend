@@ -64,7 +64,7 @@ class UsersModel {
     async getUser(id) {
         try {
             const result = await db.query(
-                `SELECT users.name, users.surname, users.email, users.nickname, users.registration_date as registrationDate, users.perutation, photos.name as photo FROM users 
+                `SELECT users.name, users.surname, users.email, users.nickname, users.registration_date as registrationDate, users.reputation, photos.name as photo FROM users 
                 left join photos on users.photo_id = photos.id WHERE users.id = $1
                 `,
                 [id],
