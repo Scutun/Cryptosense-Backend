@@ -15,7 +15,7 @@ class SectionsService {
             }
 
             if (info.name.length === 0) {
-                throw { status: 400, message: 'Название секции не предоставлено' }
+                throw { status: 400, message: 'Название раздела не предоставлено' }
             }
 
             const section = await sectionsModel.createSection(info)
@@ -35,7 +35,7 @@ class SectionsService {
             const sections = await sectionsModel.getSections(id)
 
             if (sections.rowCount === 0) {
-                throw { status: 404, message: 'У этого курса пока нет разделов' }
+                throw { status: 404, message: 'У этого курса пока нет раздела' }
             }
 
             return sections.rows
