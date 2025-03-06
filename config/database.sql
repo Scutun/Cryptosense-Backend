@@ -132,19 +132,6 @@ CREATE TABLE IF NOT EXISTS course_tags (
     FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
 );
 
--- таблица уроков курса
-CREATE TABLE IF NOT EXISTS lessons (
-    id SERIAL PRIMARY KEY,
-    title TEXT NOT NULL,
-    content TEXT NOT NULL,
-    photo TEXT,
-    graphics TEXT,
-    videos TEXT,
-
-    course_id BIGINT,
-    
-    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
-);
 
 -- таблица курсов пользователя
 CREATE TABLE IF NOT EXISTS user_courses (
