@@ -51,4 +51,4 @@ const shutdown = async () => {
 process.on('SIGINT', shutdown)
 process.on('SIGTERM', shutdown)
 
-module.exports = { pool, redisClient, mongoDb }
+module.exports = { pool, redisClient, mongoDb, connectMongoDB }
