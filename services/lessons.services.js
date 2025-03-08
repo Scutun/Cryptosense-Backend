@@ -3,10 +3,10 @@ const lessonsModel = require('../models/lessons.models')
 class LessonsService {
     async createLesson(info, creatorId) {
         try {
-            if (!info.name ||!info.sectionId ||!info.courseId ||!info.content||!creatorId){
+            if (!info.name ||!info.sectionId ||!info.courseId ||!info.content||!creatorId||Object.keys(info.content).length === 0){
                 throw {status: 400 , message:'Не все поля заполнены'}
             }
-            await lessonsModel.checkAuthor(info.sectionId,creatorId)
+            await lessonsModel.checkAuthor(info.courseId,info.sectionId,creatorId)
             const lessonId = await lessonsModel.createLesson(info.name, info.sectionId, info.courseId, info.content)
             return lessonId
         } catch (error) {
@@ -40,11 +40,11 @@ class LessonsService {
     
     async updateLesson(info, creatorId) {
         try {
-            if (!info.lessonId ||!info.name ||!info.sectionId ||!info.courseId ||!info.content||!creatorId){
+            if (!info.lessonId ||!info.name ||!info.sectionId ||!info.courseId ||!info.content||!creatorId||Object.keys(info.content).length === 0){
                 throw {status: 400 , message:'Не все поля заполнены'}
             }
-            await lessonsModel.checkAuthor(info.sectionId,creatorId)
-            await lessonsModel.updateLesson(info.lessonId, info.name, info.sectionId, info.courseId, info.content)
+            await lessonsModel.checkAuthor(info.courseId,info.sectionId,creatorId)
+            await lessonsModel.updateLesson(info.lessonId, info.name, info.sectionId, info.content)
         } catch (error) {
             throw error
         }
@@ -52,11 +52,11 @@ class LessonsService {
 
     async deleteLesson(info, creatorId) {
         try {
-            if (!info.lessonId ||!creatorId||!info.sectionId){
+            if (!info.lessonId ||!creatorId||!info.sectionId||!info.courseId){
                 throw {status: 400 , message:'Не все поля заполнены'}
             }
-            await lessonsModel.checkAuthor(info.sectionId, creatorId)
-            await lessonsModel.deleteLesson(lessonId)
+            await lessonsModel.checkAuthor(info.courseId,info.sectionId, creatorId)
+            await lessonsModel.deleteLesson(info.lessonId)
         } catch (error) {
             throw error
         }

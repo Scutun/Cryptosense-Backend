@@ -1,4 +1,5 @@
 const db = require('../config/db').pool
+const mongoDb = require('../config/db').mongoDb
 const { connectMongoDB } = require('../config/db')
 
 class LessonsModel {
@@ -10,13 +11,13 @@ class LessonsModel {
             )
 
             const newLesson = {
-                lessonId: lessonId.rows[0].id,
-                sectionId,
-                courseId,
-                info,
+                _id: lessonId.rows[0].id,
+                sectionId: sectionId,
+                courseId: courseId,
+                info: info,
             }
 
-            const mongoDb = await connectMongoDB() // Подключаемся к MongoDB
+            const mongoDb = await connectMongoDB()
             await mongoDb.collection('lessons').insertOne(newLesson)
 
             return lessonId.rows[0].id
@@ -28,16 +29,16 @@ class LessonsModel {
         }
     }
 
-    async checkAuthor(sectionId, userId) {
+    async checkAuthor(courseId, sectionId, userId) {
         try {
-            const courseId = await db.query(
+            const course = await db.query(
                 `SELECT courses.id FROM sections 
                  LEFT JOIN courses ON sections.course_id = courses.id 
-                 WHERE courses.creator_id = $1 AND sections.id = $2`,
-                [userId, sectionId],
+                 WHERE courses.creator_id = $1 AND sections.id = $2 AND courses.id = $3`,
+                [userId, sectionId, courseId],
             )
 
-            if (courseId.rowCount === 0) {
+            if (course.rowCount === 0) {
                 throw {
                     status: 403,
                     message: 'У вас недостаточно прав для редактирования этого курса',
@@ -62,7 +63,7 @@ class LessonsModel {
     async getLessonById(lessonId) {
         try {
             const mongoDb = await connectMongoDB()
-            const lesson = await mongoDb.collection('lessons').findOne({ lessonId })
+            const lesson = await mongoDb.collection('lessons').findOne({ _id: Number(lessonId) })
 
             if (lesson) return lesson
             throw { status: 404, message: 'Урок не найден' }
@@ -71,12 +72,22 @@ class LessonsModel {
         }
     }
 
-    async updateLesson(lessonId, info, name) {
+    async updateLesson(lessonId, name, sectionId, content) {
         try {
-            await db.query('UPDATE lessons SET name=$1 WHERE id=$2', [name, lessonId])
+            await db.query('UPDATE lessons SET name=$1,section_id=$3 WHERE id=$2', [
+                name,
+                lessonId,
+                sectionId,
+            ])
 
             const mongoDb = await connectMongoDB()
-            await mongoDb.collection('lessons').updateOne({ lessonId }, { $set: { info } })
+
+            await mongoDb
+                .collection('lessons')
+                .updateOne(
+                    { _id: Number(lessonId) },
+                    { $set: { info: content, sectionId: sectionId } },
+                )
         } catch (error) {
             throw error
         }
@@ -87,7 +98,7 @@ class LessonsModel {
             await db.query('DELETE FROM lessons WHERE id=$1', [lessonId])
 
             const mongoDb = await connectMongoDB()
-            await mongoDb.collection('lessons').deleteOne({ lessonId })
+            await mongoDb.collection('lessons').deleteOne({ _id: Number(lessonId) })
         } catch (error) {
             throw error
         }
@@ -98,7 +109,7 @@ class LessonsModel {
             await db.query('DELETE FROM lessons WHERE section_id=$1', [sectionId])
 
             const mongoDb = await connectMongoDB()
-            await mongoDb.collection('lessons').deleteMany({ sectionId })
+            await mongoDb.collection('lessons').deleteMany({ sectionId: Number(sectionId) })
         } catch (error) {
             throw error
         }
@@ -107,7 +118,7 @@ class LessonsModel {
     async deleteAllLessonsByCourseId(courseId) {
         try {
             const mongoDb = await connectMongoDB()
-            await mongoDb.collection('lessons').deleteMany({ courseId })
+            await mongoDb.collection('lessons').deleteMany({ courseId: Number(courseId) })
         } catch (error) {
             throw error
         }

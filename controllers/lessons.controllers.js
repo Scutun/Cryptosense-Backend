@@ -34,7 +34,7 @@ class LessonsController {
         try {
             const userId = tokenUtils.getIdFromToken(req)
             await lessonsService.updateLesson(req.body, userId)
-            res.status(204)
+            res.status(200).json({massage:"success"})
         } catch (error) {
             next(error)
         }
@@ -44,7 +44,7 @@ class LessonsController {
         try {
             const userId = tokenUtils.getIdFromToken(req)
             await lessonsService.deleteLesson(req.body, userId)
-            res.status(204)
+            res.status(201).json({massage:"success"})
         } catch (error) {
             next(error)
         }

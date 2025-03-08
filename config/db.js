@@ -34,6 +34,7 @@ const connectMongoDB = async () => {
     } catch (error) {
         console.error('Ошибка подключения к MongoDB:', error)
     }
+    return mongoDb
 }
 
 connectMongoDB()
