@@ -1,15 +1,16 @@
 const Router = require('express')
 const router = new Router()
 
+const lessonsController = require('../controllers/lessons.controllers')
 const checkToken = require('../middlewares/checkToken')
 
-router.post('/v1/lessons/new', checkToken, coursesController.createLesson)
+router.post('/v1/lessons/new', checkToken, lessonsController.createLesson)
 
-router.get('/v1/lessons/list/:id',checkToken, coursesController.getLessonInfoById)
+router.get('/v1/lessons/list/:id', checkToken, lessonsController.getAllLessonsNames)
+router.get('/v1/lessons/info/:id', checkToken, lessonsController.getLessonById)
 
-router.put('/v1/lessons/:id', checkToken, coursesController.updateLesson)
+router.put('/v1/lessons', checkToken, lessonsController.updateLesson)
 
-router.delete('/v1/lessons/:id', checkToken, coursesController.deleteLesson)
-
+router.delete('/v1/lessons', checkToken, lessonsController.deleteLesson)
 
 module.exports = router
