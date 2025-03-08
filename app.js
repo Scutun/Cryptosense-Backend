@@ -17,6 +17,7 @@ const courseRoutes = require('./routes/courses.routes')
 const reviewRoutes = require('./routes/reviews.routes')
 const sectionRoutes = require('./routes/sections.routes')
 const photosRoutes = require('./routes/photos.routes')
+const lessonsRoutes = require('./routes/lessons.routes')
 
 app.use(cookieParser())
 app.use(express.json())
@@ -27,6 +28,7 @@ const swaggerCourses = yaml.load(fs.readFileSync('./docs/courses.swagger.yaml', 
 const swaggerReviews = yaml.load(fs.readFileSync('./docs/reviews.swagger.yaml', 'utf8'))
 const swaggerSections = yaml.load(fs.readFileSync('./docs/sections.swagger.yaml', 'utf8'))
 const swaggerPhoto = yaml.load(fs.readFileSync('./docs/photos.swagger.yaml', 'utf8'))
+const swaggerLesson = yaml.load(fs.readFileSync('./docs/lessons.swagger.yaml', 'utf8'))
 
 const mergedSwagger = {
     ...swaggerUsers,
@@ -35,6 +37,7 @@ const mergedSwagger = {
         ...swaggerCourses.paths,
         ...swaggerReviews.paths,
         ...swaggerSections.paths,
+        ...swaggerLesson.paths,
         ...swaggerPhoto.paths,
     },
     components: {
@@ -45,6 +48,7 @@ const mergedSwagger = {
             ...swaggerReviews.components?.schemas,
             ...swaggerSections.components?.schemas,
             ...swaggerPhoto.components?.schemas,
+            ...swaggerLesson.components?.schemas,
         },
     },
 }
@@ -56,6 +60,7 @@ app.use('/api', courseRoutes)
 app.use('/api', reviewRoutes)
 app.use('/api', sectionRoutes)
 app.use('/api', photosRoutes)
+app.use('/api', lessonsRoutes)
 app.use(errorHandler)
 
 app.use('/api/v1/profiles/avatars/url/', express.static(path.join(__dirname, 'uploads/avatars')))

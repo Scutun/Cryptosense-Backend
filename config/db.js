@@ -34,6 +34,7 @@ const connectMongoDB = async () => {
     } catch (error) {
         console.error('Ошибка подключения к MongoDB:', error)
     }
+    return mongoDb
 }
 
 connectMongoDB()
@@ -51,4 +52,4 @@ const shutdown = async () => {
 process.on('SIGINT', shutdown)
 process.on('SIGTERM', shutdown)
 
-module.exports = { pool, redisClient, mongoDb }
+module.exports = { pool, redisClient, mongoDb, connectMongoDB }
