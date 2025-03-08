@@ -36,7 +36,7 @@ class ReviewsController {
     async deleteReview(req, res, next) {
         try {
             const user = tokenUtils.getIdFromToken(req)
-            await reviewsService.deleteReview(user, req.body.reviewId)
+            await reviewsService.deleteReview(user, req.params.id)
             res.status(200).json({ message: 'Отзыв удален' })
         } catch (error) {
             next(error)

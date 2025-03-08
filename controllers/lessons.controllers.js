@@ -6,7 +6,7 @@ class LessonsController {
         try {
             const userId = tokenUtils.getIdFromToken(req)
             const lessonId = await lessonsService.createLesson(req.body, userId)
-            res.status(201).json({ id: lessonId })
+            res.status(201).json(lessonId)
         } catch (error) {
             next(error)
         }
@@ -33,8 +33,8 @@ class LessonsController {
     async updateLesson(req, res, next) {
         try {
             const userId = tokenUtils.getIdFromToken(req)
-            await lessonsService.updateLesson(req.body, userId)
-            res.status(200).json({massage:"success"})
+            const lesson = await lessonsService.updateLesson(req.body, userId)
+            res.status(200).json(lesson)
         } catch (error) {
             next(error)
         }
@@ -44,7 +44,7 @@ class LessonsController {
         try {
             const userId = tokenUtils.getIdFromToken(req)
             await lessonsService.deleteLesson(req.body, userId)
-            res.status(201).json({massage:"success"})
+            res.status(201).json({ message: 'Урок успешно удален' })
         } catch (error) {
             next(error)
         }
