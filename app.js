@@ -10,6 +10,7 @@ const path = require('path')
 const yaml = require('js-yaml')
 const PORT = process.env.PORT || 3020
 const cookieParser = require('cookie-parser')
+const checkToken = require('./middlewares/checkToken')
 const errorHandler = require('./middlewares/errorHandler')
 
 const userRoutes = require('./routes/users.routes')
@@ -30,6 +31,7 @@ const swaggerReviews = yaml.load(fs.readFileSync('./docs/reviews.swagger.yaml', 
 const swaggerSections = yaml.load(fs.readFileSync('./docs/sections.swagger.yaml', 'utf8'))
 const swaggerPhoto = yaml.load(fs.readFileSync('./docs/photos.swagger.yaml', 'utf8'))
 const swaggerLesson = yaml.load(fs.readFileSync('./docs/lessons.swagger.yaml', 'utf8'))
+const swaggerTests = yaml.load(fs.readFileSync('./docs/tests.swagger.yaml', 'utf8'))
 
 const mergedSwagger = {
     ...swaggerUsers,
@@ -39,6 +41,7 @@ const mergedSwagger = {
         ...swaggerReviews.paths,
         ...swaggerSections.paths,
         ...swaggerLesson.paths,
+        ...swaggerTests.paths,
         ...swaggerPhoto.paths,
     },
     components: {
@@ -50,6 +53,7 @@ const mergedSwagger = {
             ...swaggerSections.components?.schemas,
             ...swaggerPhoto.components?.schemas,
             ...swaggerLesson.components?.schemas,
+            ...swaggerTests.components?.schemas,
         },
     },
 }
@@ -65,8 +69,16 @@ app.use('/api', photosRoutes)
 app.use('/api', lessonsRoutes)
 app.use(errorHandler)
 
-app.use('/api/v1/profiles/avatars/url/', express.static(path.join(__dirname, 'uploads/avatars')))
-app.use('/api/v1/courses/photo/url/', express.static(path.join(__dirname, 'uploads/course')))
+app.use(
+    '/api/v1/profiles/avatars/url/',
+    checkToken,
+    express.static(path.join(__dirname, 'uploads/avatars')),
+)
+app.use(
+    '/api/v1/courses/photo/url/',
+    checkToken,
+    express.static(path.join(__dirname, 'uploads/course')),
+)
 
 app.get('/server', (req, res) => {
     res.send('Server is running')

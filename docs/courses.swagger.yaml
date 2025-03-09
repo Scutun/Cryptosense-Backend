@@ -528,7 +528,7 @@ paths:
                     type: string    
                     example: 'Не все поля заполнены'
         "403":
-          description: Недействительный токен
+          description: У вас недостаточно прав для удаления этого курса
           content:
             application/json:
               schema:
@@ -536,10 +536,10 @@ paths:
                 properties:
                   status:
                     type: integer
-                    example: 40102
+                    example: 403
                   message:
                     type: string
-                    example: "Недействительный токен"
+                    example: "У вас недостаточно прав для удаления этого курса"
         '500':
           description: Внутренняя ошибка сервера
           content:
