@@ -22,7 +22,7 @@ class TestsModel {
             return newTest
         } catch (error) {
             if (error.code === '23503') {
-                throw { status: 400, message: 'Раздела с таким id не существует' }
+                throw { status: 404, message: 'Раздела с таким id не существует' }
             }
             throw error
         }
