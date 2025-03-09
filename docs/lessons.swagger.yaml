@@ -1,0 +1,431 @@
+#prettier-ignore
+openapi: 3.0.0
+info:
+  title: lessons API
+  version: 1.0.0
+  description: API для получения списка уроков
+
+
+paths:
+  /v1/lessons/new:
+    post:
+      summary: Создать урок
+      tags:
+        - Lessons
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Токен авторизации в формате Bearer.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - sectionId
+                - courseId
+                - info
+              properties:
+                name:
+                  type: string
+                  description: Название урока
+                sectionId:
+                  type: string
+                  description: ID секции
+                courseId:
+                  type: string
+                  description: ID курса
+                info:
+                  type: object
+                  description: Содержимое урока
+      responses:
+        '201':
+          description: Успешное создание урока
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lessonId:
+                    type: integer
+                  sectionId:
+                    type: integer
+                  courseId:
+                    type: integer
+                  info:
+                    type: object
+        "400":  
+          description: Не все поля заполнены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "Не все поля заполнены"
+        "403":  
+          description: Нет достпупа к данным
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 403
+                  message:
+                    type: string
+                    example: "У вас недостаточно прав для редактирования этого курса"
+        '404':
+          description: Раздела с таким id не существует
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: "Раздела с таким id не существует"
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string       
+
+  /v1/lessons/list/{id}:
+    get:
+      summary: Получить список всех уроков в секции
+      tags:
+        - Lessons
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Токен авторизации в формате Bearer.
+      responses:
+        "200":
+          description: Список уроков
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    name:
+                      type: string
+                      example: "урок 1"
+        "400":  
+          description: Не все поля заполнены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "Не все поля заполнены"
+        '403':
+          description: Пользователь не авторизован
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 40102
+                  message:
+                    type: string
+                    example: 'Недействительный токен'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string      
+
+  /v1/lessons/info/{id}:
+    get:
+      summary: Получить информацию о конкретном уроке
+      tags:
+        - Lessons
+    
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Токен авторизации в формате Bearer.
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Успешное создание урока
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lessonId:
+                    type: integer
+                  sectionId:
+                    type: integer
+                  courseId:
+                    type: integer
+                  info:
+                    type: object
+        "400":  
+          description: Не все поля заполнены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "Не все поля заполнены"
+        '403':
+          description: Пользователь не авторизован
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 40102
+                  message:
+                    type: string
+                    example: 'Недействительный токен'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string     
+  /v1/lessons/redact:
+    put:
+      summary: Обновить урок
+      tags:
+        - Lessons
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Токен авторизации в формате Bearer.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - lessonId
+                - name
+                - sectionId
+                - courseId
+                - info
+              properties:
+                lessonId:
+                  type: string
+                  description: ID урока
+                name:
+                  type: string
+                  description: Название урока
+                sectionId:
+                  type: string
+                  description: ID секции
+                courseId:
+                  type: string
+                  description: ID курса
+                info:
+                  type: object
+                  description: Содержимое урока
+      responses:
+        '200':
+          description: Успешное редактированние урока
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lessonId:
+                    type: integer
+                  sectionId:
+                    type: integer
+                  courseId:
+                    type: integer
+                  info:
+                    type: object
+        "400":  
+          description: Не все поля заполнены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "Не все поля заполнены"
+        "403":  
+          description: Нет достпупа к данным
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 403
+                  message:
+                    type: string
+                    example: "У вас недостаточно прав для редактирования этого курса"
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string       
+  /v1/lessons:
+    delete:
+      summary: Удалить урок
+      tags:
+        - Lessons
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Токен авторизации в формате Bearer.
+        - name: lessonId
+          in: query
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: sectionId
+          in: query
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: courseId
+          in: query
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Успешное удаление урока
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Урок успешно удален"
+
+        "400":  
+          description: Не все поля заполнены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "Не все поля заполнены"
+        "403":  
+          description: Нет достпупа к данным
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 403
+                  message:
+                    type: string
+                    example: "У вас недостаточно прав для редактирования этого курса"
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string

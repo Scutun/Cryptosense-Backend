@@ -1,0 +1,444 @@
+#prettier-ignore
+openapi: 3.0.0
+info:
+  title: Tests API
+  version: 1.0.0
+  description: API для работы с тестами в разделе курса
+
+paths:
+  /api/v1/tests/new:
+    post:
+      summary: Создание теста
+      tags:
+        - Tests
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: Bearer your_token_here
+          description: Токен авторизации
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - courseId
+                - sectionId
+                - info
+              properties:
+                name:
+                  type: string
+                  example: "Тест 1"
+                courseId:
+                  type: integer
+                  example: 1
+                sectionId:
+                  type: integer
+                  example: 1
+                info:
+                  type: array
+                  example: "Содержание теста"
+      responses:
+        '201':
+          description: Успешное создание теста
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  testId:
+                    type: integer
+                  sectionId:
+                    type: integer
+                  courseId:
+                    type: integer
+                  info:
+                    type: object
+        "400":  
+          description: Не все поля заполнены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "Не все поля заполнены"
+        "403":  
+          description: Нет достпупа к данным
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 403
+                  message:
+                    type: string
+                    example: "У вас недостаточно прав для редактирования этого курса"
+        '404':
+          description: Раздела с таким id не существует
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: "Раздела с таким id не существует"
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+
+  /api/v1/tests/list/{id}:
+    get:
+      summary: Получение списка тестов в разделе по ID раздела
+      tags:
+        - Tests
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: Bearer your_token_here
+          description: Токен авторизации
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+          description: ID раздела курса
+      responses:
+        '200':
+          description: Успешное получение списка тестов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    testId:
+                      type: integer
+                    sectionId:
+                      type: integer
+                    courseId:
+                      type: integer
+                    info:
+                      type: object
+        "400":  
+          description: Не все поля заполнены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "Не все поля заполнены"
+        '403':
+          description: Пользователь не авторизован
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 40102
+                  message:
+                    type: string
+                    example: 'Недействительный токен'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+
+  /api/v1/tests/info/{id}:
+    get:
+      summary: Получение информации о тесте по ID теста
+      tags:
+        - Tests
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: Bearer your_token_here
+          description: Токен авторизации
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+          description: ID теста
+      responses:
+        '200':
+          description: Успешное получение информации о тесте
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  testId:
+                    type: integer
+                  sectionId:
+                    type: integer
+                  courseId:
+                    type: integer
+                  info:
+                    type: object
+        "400":  
+          description: Не все поля заполнены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "Не все поля заполнены"
+        '403':
+          description: Пользователь не авторизован
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 40102
+                  message:
+                    type: string
+                    example: 'Недействительный токен'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    
+  /api/v1/tests/redact:
+    put:
+      summary: Обновление содержания теста
+      tags:
+        - Tests
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: Bearer your_token_here
+          description: Токен авторизации
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - testId
+                - name
+                - sectionId
+                - courseId
+                - info
+              properties:
+                testId:
+                  type: integer
+                  description: ID теста
+                name:
+                  type: string
+                  description: Название теста
+                sectionId:
+                  type: integer
+                  description: ID секции
+                courseId:
+                  type: integer
+                  description: ID курса
+                info:
+                  type: object
+                  description: Содержание теста
+      responses:
+        '200':
+          description: Успешное редактирование теста
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  testId:
+                    type: integer
+                  name:
+                    type: string
+                  sectionId:
+                    type: integer
+                  courseId:
+                    type: integer
+                  info:
+                    type: object
+        "400":  
+          description: Не все поля заполнены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "Не все поля заполнены"
+        "403":  
+          description: Нет достпупа к данным
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 403
+                  message:
+                    type: string
+                    example: "У вас недостаточно прав для редактирования этого курса"
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+
+  /api/v1/tests/{id}:
+    delete:
+      summary: Удаление теста по ID теста
+      tags:
+        - Tests
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: Bearer your_token_here
+          description: Токен авторизации
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+          description: ID теста
+        - name: sectionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Успешное удаление теста
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Тест успешно удален"
+        "400":  
+          description: Не все поля заполнены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "Не все поля заполнены"
+        "403":  
+          description: Нет достпупа к данным
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 403
+                  message:
+                    type: string
+                    example: "У вас недостаточно прав для редактирования этого курса"
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object 
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string

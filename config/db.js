@@ -1,5 +1,6 @@
 const { Pool } = require('pg')
 const { createClient } = require('redis')
+const { MongoClient } = require('mongodb')
 require('dotenv').config()
 
 // Подключение к PostgreSQL
@@ -21,11 +22,29 @@ const redisClient = createClient({
 
 redisClient.connect().catch(console.error)
 
+// Подключение к MongoDB
+const mongoClient = new MongoClient(process.env.MONGO_URI)
+
+let mongoDb
+
+const connectMongoDB = async () => {
+    try {
+        await mongoClient.connect()
+        mongoDb = mongoClient.db(process.env.MONGO_DB_NAME)
+    } catch (error) {
+        console.error('Ошибка подключения к MongoDB:', error)
+    }
+    return mongoDb
+}
+
+connectMongoDB()
+
 // Закрытие подключений при завершении работы
 const shutdown = async () => {
     console.log('Закрытие соединений...')
     await pool.end()
     await redisClient.quit()
+    await mongoClient.close()
     console.log('Все соединения закрыты. Завершение работы.')
     process.exit(0)
 }
@@ -33,4 +52,4 @@ const shutdown = async () => {
 process.on('SIGINT', shutdown)
 process.on('SIGTERM', shutdown)
 
-module.exports = { pool, redisClient }
+module.exports = { pool, redisClient, mongoDb, connectMongoDB }
