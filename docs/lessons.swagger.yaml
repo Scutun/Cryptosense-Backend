@@ -29,7 +29,7 @@ paths:
                 - name
                 - sectionId
                 - courseId
-                - content
+                - info
               properties:
                 name:
                   type: string
@@ -40,7 +40,7 @@ paths:
                 courseId:
                   type: string
                   description: ID курса
-                content:
+                info:
                   type: object
                   description: Содержимое урока
       responses:
@@ -239,7 +239,7 @@ paths:
                 - name
                 - sectionId
                 - courseId
-                - content
+                - info
               properties:
                 lessonId:
                   type: string
@@ -253,7 +253,7 @@ paths:
                 courseId:
                   type: string
                   description: ID курса
-                content:
+                info:
                   type: object
                   description: Содержимое урока
       responses:

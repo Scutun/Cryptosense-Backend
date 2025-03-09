@@ -7,9 +7,9 @@ class LessonsService {
                 !info.name ||
                 !info.sectionId ||
                 !info.courseId ||
-                !info.content ||
+                !info.info ||
                 !creatorId ||
-                Object.keys(info.content).length === 0
+                Object.keys(info.info).length === 0
             ) {
                 throw { status: 400, message: 'Не все поля заполнены' }
             }
@@ -18,7 +18,7 @@ class LessonsService {
                 info.name,
                 info.sectionId,
                 info.courseId,
-                info.content,
+                info.info,
             )
             const { _id, ...rest } = lesson
             const newLesson = { lessonId: _id, ...rest }
@@ -61,14 +61,14 @@ class LessonsService {
                 !info.name ||
                 !info.sectionId ||
                 !info.courseId ||
-                !info.content ||
+                !info.info ||
                 !creatorId ||
-                Object.keys(info.content).length === 0
+                Object.keys(info.info).length === 0
             ) {
                 throw { status: 400, message: 'Не все поля заполнены' }
             }
             await lessonsModel.checkAuthor(info.courseId, info.sectionId, creatorId)
-            await lessonsModel.updateLesson(info.lessonId, info.name, info.sectionId, info.content)
+            await lessonsModel.updateLesson(info.lessonId, info.name, info.sectionId, info.info)
             return info
         } catch (error) {
             throw error
