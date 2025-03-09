@@ -322,26 +322,24 @@ paths:
           schema:
             type: string
           description: Токен авторизации в формате Bearer.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - lessonId
-                - sectionId
-                - courseId
-              properties:
-                lessonId:
-                  type: integer
-                  description: ID урока
-                sectionId:
-                  type: integer
-                  description: ID секции
-                courseId:
-                  type: integer
-                  description: ID курса
+        - name: lessonId
+          in: query
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: sectionId
+          in: query
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: courseId
+          in: query
+          required: true
+          schema:
+            type: integer
+            example: 1
       responses:
         '200':
           description: Успешное удаление урока
@@ -391,5 +389,4 @@ paths:
                     type: integer
                     example: 500
                   message:
-                    type: string       
-
+                    type: string
