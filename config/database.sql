@@ -173,5 +173,18 @@ CREATE TABLE IF NOT EXISTS comments (
     FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
 );
 
--- Супер пользователь для теста
-INSERT INTO users (email, password, nickname, name, surname, activated, registration_date) VALUES ('admin@mail.ru', '$2b$10$qClaDFhQzCCFB4c6TkRxmecmGIXV75a2YO1Rf3cfRslY88zZnNieS', 'admin', 'admin', 'admin', true, NOW());
+-- Супер пользователи для теста
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM users WHERE email = 'admin1@mail.ru') THEN
+    INSERT INTO users (email, password, nickname, name, surname, activated, registration_date) VALUES ('admin1@mail.ru', '$2b$10$qClaDFhQzCCFB4c6TkRxmecmGIXV75a2YO1Rf3cfRslY88zZnNieS', 'admin1', 'admin1', 'admin1', true, NOW());
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM users WHERE email = 'admin2@mail.ru') THEN
+    INSERT INTO users (email, password, nickname, name, surname, activated, registration_date) VALUES ('admin2@mail.ru', '$2b$10$qClaDFhQzCCFB4c6TkRxmecmGIXV75a2YO1Rf3cfRslY88zZnNieS', 'admin2', 'admin2', 'admin2', true, NOW());
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM users WHERE email = 'admin3@mail.ru') THEN
+    INSERT INTO users (email, password, nickname, name, surname, activated, registration_date) VALUES ('admin3@mail.ru', '$2b$10$qClaDFhQzCCFB4c6TkRxmecmGIXV75a2YO1Rf3cfRslY88zZnNieS', 'admin3', 'admin3', 'admin3', true, NOW());
+  END IF;
+END $$;
