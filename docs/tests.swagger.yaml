@@ -1,24 +1,24 @@
 #prettier-ignore
 openapi: 3.0.0
 info:
-  title: lessons API
+  title: Tests API
   version: 1.0.0
-  description: API для получения списка уроков
-
+  description: API для работы с тестами в разделе курса
 
 paths:
-  /v1/lessons/new:
+  /api/v1/tests/new:
     post:
-      summary: Создать урок
+      summary: Создание теста
       tags:
-        - Lessons
+        - Tests
       parameters:
         - name: Authorization
           in: header
           required: true
           schema:
             type: string
-          description: Токен авторизации в формате Bearer.
+            example: Bearer your_token_here
+          description: Токен авторизации
       requestBody:
         required: true
         content:
@@ -27,31 +27,31 @@ paths:
               type: object
               required:
                 - name
-                - sectionId
                 - courseId
+                - sectionId
                 - info
               properties:
                 name:
                   type: string
-                  description: Название урока
-                sectionId:
-                  type: string
-                  description: ID секции
+                  example: "Тест 1"
                 courseId:
-                  type: string
-                  description: ID курса
+                  type: integer
+                  example: 1
+                sectionId:
+                  type: integer
+                  example: 1
                 info:
                   type: object
-                  description: Содержимое урока
+                  example: "Содержание теста"
       responses:
         '201':
-          description: Успешное создание урока
+          description: Успешное создание теста
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  lessonId:
+                  testId:
                     type: integer
                   sectionId:
                     type: integer
@@ -109,28 +109,31 @@ paths:
                     type: integer
                     example: 500
                   message:
-                    type: string       
+                    type: string
 
-  /v1/lessons/list/{id}:
+  /api/v1/tests/list/{id}:
     get:
-      summary: Получить список всех уроков в секции
+      summary: Получение списка тестов в разделе по ID раздела
       tags:
-        - Lessons
+        - Tests
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
         - name: Authorization
           in: header
           required: true
           schema:
             type: string
-          description: Токен авторизации в формате Bearer.
+            example: Bearer your_token_here
+          description: Токен авторизации
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+          description: ID раздела курса
       responses:
-        "200":
-          description: Список уроков
+        '200':
+          description: Успешное получение списка тестов
           content:
             application/json:
               schema:
@@ -138,12 +141,14 @@ paths:
                 items:
                   type: object
                   properties:
-                    id:
+                    testId:
                       type: integer
-                      example: 1
-                    name:
-                      type: string
-                      example: "урок 1"
+                    sectionId:
+                      type: integer
+                    courseId:
+                      type: integer
+                    info:
+                      type: object
         "400":  
           description: Не все поля заполнены
           content:
@@ -181,35 +186,37 @@ paths:
                     type: integer
                     example: 500
                   message:
-                    type: string      
+                    type: string
 
-  /v1/lessons/info/{id}:
+  /api/v1/tests/info/{id}:
     get:
-      summary: Получить информацию о конкретном уроке
+      summary: Получение информации о тесте по ID теста
       tags:
-        - Lessons
-    
+        - Tests
       parameters:
         - name: Authorization
           in: header
           required: true
           schema:
             type: string
-          description: Токен авторизации в формате Bearer.
+            example: Bearer your_token_here
+          description: Токен авторизации
         - name: id
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+            example: 1
+          description: ID теста
       responses:
         '200':
-          description: Успешное создание урока
+          description: Успешное получение информации о тесте
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  lessonId:
+                  testId:
                     type: integer
                   sectionId:
                     type: integer
@@ -254,19 +261,21 @@ paths:
                     type: integer
                     example: 500
                   message:
-                    type: string     
-  /v1/lessons/redact:
+                    type: string
+                    
+  /api/v1/tests/redact:
     put:
-      summary: Обновить урок
+      summary: Обновление содержания теста
       tags:
-        - Lessons
+        - Tests
       parameters:
         - name: Authorization
           in: header
           required: true
           schema:
             type: string
-          description: Токен авторизации в формате Bearer.
+            example: Bearer your_token_here
+          description: Токен авторизации
       requestBody:
         required: true
         content:
@@ -274,36 +283,36 @@ paths:
             schema:
               type: object
               required:
-                - lessonId
+                - testId
                 - name
                 - sectionId
                 - courseId
                 - info
               properties:
-                lessonId:
-                  type: string
-                  description: ID урока
+                testId:
+                  type: integer
+                  description: ID теста
                 name:
                   type: string
-                  description: Название урока
+                  description: Название теста
                 sectionId:
-                  type: string
+                  type: integer
                   description: ID секции
                 courseId:
-                  type: string
+                  type: integer
                   description: ID курса
                 info:
                   type: object
-                  description: Содержимое урока
+                  description: Содержание теста
       responses:
         '200':
-          description: Успешное редактированние урока
+          description: Успешное редактирование теста
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  lessonId:
+                  testId:
                     type: integer
                   sectionId:
                     type: integer
@@ -348,40 +357,43 @@ paths:
                     type: integer
                     example: 500
                   message:
-                    type: string       
-  /v1/lessons:
+                    type: string
+
+  /api/v1/tests/{id}:
     delete:
-      summary: Удалить урок
+      summary: Удаление теста по ID теста
       tags:
-        - Lessons
+        - Tests
       parameters:
         - name: Authorization
           in: header
           required: true
           schema:
             type: string
-          description: Токен авторизации в формате Bearer.
-        - name: lessonId
-          in: query
+            example: Bearer your_token_here
+          description: Токен авторизации
+        - name: id
+          in: path
           required: true
           schema:
             type: integer
             example: 1
+          description: ID теста
         - name: sectionId
-          in: query
+          in: path
           required: true
           schema:
             type: integer
             example: 1
         - name: courseId
-          in: query
+          in: path
           required: true
           schema:
             type: integer
             example: 1
       responses:
         '200':
-          description: Успешное удаление урока
+          description: Успешное удаление теста
           content:
             application/json:
               schema:
@@ -389,8 +401,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Урок успешно удален"
-
+                    example: "Тест успешно удален"
         "400":  
           description: Не все поля заполнены
           content:
@@ -422,7 +433,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                type: object 
                 properties:
                   status:
                     type: integer
