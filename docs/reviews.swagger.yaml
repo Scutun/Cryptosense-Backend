@@ -281,7 +281,7 @@ paths:
                     type: string
                     example: 'Ошибка сервера'
 
-  /v1/reviews:
+  /v1/reviews/{id}:
     delete:
       tags:
         - Reviews
@@ -293,18 +293,13 @@ paths:
           schema:
             type: string
             example: Bearer your_token_here
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - reviewId
-              properties:
-                reviewId:
-                  type: integer
-                  example: 10
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: integer
+            example: 10
+
       responses:
         '200':
           description: Отзыв удалён
