@@ -172,7 +172,8 @@ class CoursesModel {
             LEFT JOIN course_tags ON courses.id = course_tags.course_id
             LEFT JOIN tags ON course_tags.tag_id = tags.id
             WHERE courses.title ILIKE $1 OR tags.name ILIKE $1
-            GROUP BY courses.id, users.name, users.surname`
+            GROUP BY courses.id, users.name, users.surname
+            ORDER BY courses.id`
 
             const params = [searchQuery]
 
@@ -215,6 +216,7 @@ class CoursesModel {
                  LEFT JOIN course_tags ON courses.id = course_tags.course_id
                  LEFT JOIN tags ON course_tags.tag_id = tags.id
                  WHERE courses.title ILIKE $1 OR tags.name ILIKE $1
+                 GROUP BY courses.id, users.name, users.surname
                  ORDER BY $2 ${order}`
 
             const params = [searchQuery, sort]
