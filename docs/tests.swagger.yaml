@@ -41,8 +41,7 @@ paths:
                   type: integer
                   example: 1
                 info:
-                  type: array
-                  example: "Содержание теста"
+                  type: object
       responses:
         '201':
           description: Успешное создание теста
