@@ -163,6 +163,7 @@ class CoursesModel {
             let query = `SELECT courses.id, CONCAT(users.name, ' ', users.surname) AS creator, 
                 courses.course_photo AS photo, 
                 courses.title,
+                courses.description,
                 courses.rating,
                 courses.reviews_count as reviews,
                 courses.subscribers, 
@@ -204,9 +205,12 @@ class CoursesModel {
 
             const total = parseInt(countResult.rows[0].total, 10)
 
+            const sortBy = 'courses.' + sort
+
             let query = `SELECT courses.id, CONCAT(users.name, ' ', users.surname) AS creator, 
                         courses.course_photo AS photo, 
                         courses.title,
+                        courses.description,
                         courses.rating,
                         courses.reviews_count as reviews,
                         courses.subscribers, 
@@ -217,12 +221,12 @@ class CoursesModel {
                  LEFT JOIN tags ON course_tags.tag_id = tags.id
                  WHERE courses.title ILIKE $1 OR tags.name ILIKE $1
                  GROUP BY courses.id, users.name, users.surname
-                 ORDER BY $2 ${order}`
+                 ORDER BY ${sortBy} ${order}`
 
-            const params = [searchQuery, sort]
+            const params = [searchQuery]
 
             if (limit !== 'ALL') {
-                query += ` LIMIT $3 OFFSET $4`
+                query += ` LIMIT $2 OFFSET $3`
                 params.push(Number(limit) || 10, Number(offset) || 0)
             }
 
