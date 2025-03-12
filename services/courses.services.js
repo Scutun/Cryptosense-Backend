@@ -108,14 +108,12 @@ class CoursesService {
         try {
             const limit = parseInt(query.limit, 10) || 'ALL'
             const offset = parseInt(query.offset, 10) || 0
-            const sort = query.sort
-            const order = query.order
             const search = query.search || ''
-            const sortCondition = ''
+            let sortCondition = ''
 
             if (
-                (sort !== 'follow' && sort !== 'creation') ||
-                (order !== 'asc' && order !== 'desc')
+                (query.sort !== 'follow' && query.sort !== 'creation') ||
+                (query.order !== 'asc' && query.order !== 'desc')
             ) {
                 const courses = await coursesModel.getAllCourses(limit, offset, search)
 
@@ -125,7 +123,7 @@ class CoursesService {
 
                 return courses
             } else {
-                if (sort === 'follow') {
+                if (query.sort === 'follow') {
                     sortCondition = 'subscribers'
                 } else {
                     sortCondition = 'course_duration'
@@ -135,7 +133,7 @@ class CoursesService {
                     limit,
                     offset,
                     sortCondition,
-                    order,
+                    query.order,
                     search,
                 )
 

@@ -163,6 +163,7 @@ class CoursesModel {
             let query = `SELECT courses.id, CONCAT(users.name, ' ', users.surname) AS creator, 
                 courses.course_photo AS photo, 
                 courses.title,
+                courses.description,
                 courses.rating,
                 courses.reviews_count as reviews,
                 courses.subscribers, 
@@ -172,7 +173,8 @@ class CoursesModel {
             LEFT JOIN course_tags ON courses.id = course_tags.course_id
             LEFT JOIN tags ON course_tags.tag_id = tags.id
             WHERE courses.title ILIKE $1 OR tags.name ILIKE $1
-            GROUP BY courses.id, users.name, users.surname`
+            GROUP BY courses.id, users.name, users.surname
+            ORDER BY courses.id`
 
             const params = [searchQuery]
 
@@ -203,10 +205,12 @@ class CoursesModel {
 
             const total = parseInt(countResult.rows[0].total, 10)
 
-            const info = await db.query(
-                `SELECT id, CONCAT(users.name, ' ', users.surname) AS creator, 
+            const sortBy = 'courses.' + sort
+
+            let query = `SELECT courses.id, CONCAT(users.name, ' ', users.surname) AS creator, 
                         courses.course_photo AS photo, 
                         courses.title,
+                        courses.description,
                         courses.rating,
                         courses.reviews_count as reviews,
                         courses.subscribers, 
@@ -216,10 +220,18 @@ class CoursesModel {
                  LEFT JOIN course_tags ON courses.id = course_tags.course_id
                  LEFT JOIN tags ON course_tags.tag_id = tags.id
                  WHERE courses.title ILIKE $1 OR tags.name ILIKE $1
-                 ORDER BY $1 $2
-                 LIMIT $3 OFFSET $4`,
-                [sort, order, limit, offset],
-            )
+                 GROUP BY courses.id, users.name, users.surname
+                 ORDER BY ${sortBy} ${order}`
+
+            const params = [searchQuery]
+
+            if (limit !== 'ALL') {
+                query += ` LIMIT $2 OFFSET $3`
+                params.push(Number(limit) || 10, Number(offset) || 0)
+            }
+
+            const info = await db.query(query, params)
+
             return { total, courses: info.rows }
         } catch (error) {
             throw error
