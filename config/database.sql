@@ -378,3 +378,29 @@ CREATE TRIGGER trg_recalculate_all_user_progress
 AFTER INSERT OR DELETE ON lessons
 FOR EACH ROW
 EXECUTE FUNCTION recalculate_all_user_progress();
+
+-- функция удаления всех пройденных уроков при отписке от курса 
+CREATE OR REPLACE FUNCTION delete_user_lessons_on_course_remove()
+RETURNS TRIGGER AS $$
+BEGIN
+    DELETE FROM user_lessons
+    WHERE user_id = OLD.user_id
+      AND lesson_id IN (
+          SELECT l.id
+          FROM lessons l
+          JOIN sections s ON l.section_id = s.id
+          WHERE s.course_id = OLD.course_id
+      );
+    
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Удаляем старый триггер, если существует
+DROP TRIGGER IF EXISTS trg_delete_user_lessons_on_course_remove ON user_courses;
+
+-- Создаем новый триггер
+CREATE TRIGGER trg_delete_user_lessons_on_course_remove
+AFTER DELETE ON user_courses
+FOR EACH ROW
+EXECUTE FUNCTION delete_user_lessons_on_course_remove();
