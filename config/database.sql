@@ -106,6 +106,7 @@ CREATE TABLE IF NOT EXISTS courses (
     reviews_count BIGINT DEFAULT 0,
     course_photo TEXT DEFAULT 'DefaultCoursePhoto.jpg',
     subscribers INTEGER DEFAULT 0,
+    lessons_count INT DEFAULT 0,
 
     difficulty_id BIGINT,
     
@@ -115,8 +116,8 @@ CREATE TABLE IF NOT EXISTS courses (
 -- таблица разделов
 CREATE TABLE IF NOT EXISTS sections (
   id SERIAL PRIMARY KEY,
-  name VARCHAR(255) UNIQUE NOT NULL,
-
+  name VARCHAR(255)  NOT NULL,
+  UNIQUE (name , course_id ),
   course_id BIGINT NOT NULL,
   
   FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
@@ -175,3 +176,41 @@ CREATE TABLE IF NOT EXISTS comments (
 
 -- Супер пользователь для теста
 INSERT INTO users (email, password, nickname, name, surname, activated, registration_date) VALUES ('admin@mail.ru', '$2b$10$qClaDFhQzCCFB4c6TkRxmecmGIXV75a2YO1Rf3cfRslY88zZnNieS', 'admin', 'admin', 'admin', true, NOW());
+
+-- Триггер для автоматического добавления и удаления счетчика уроков
+CREATE OR REPLACE FUNCTION update_lessons_count()
+RETURNS TRIGGER AS $$
+DECLARE
+    course_id INT;
+BEGIN
+    -- Определяем course_id в зависимости от типа операции
+    IF TG_OP = 'INSERT' THEN
+        SELECT s.course_id INTO course_id
+        FROM sections s
+        WHERE s.id = NEW.section_id;
+    ELSIF TG_OP = 'DELETE' THEN
+        SELECT s.course_id INTO course_id
+        FROM sections s
+        WHERE s.id = OLD.section_id;
+    END IF;
+
+    -- Обновляем lessons_count в таблице courses
+    UPDATE courses
+    SET lessons_count = (
+        SELECT COUNT(*)
+        FROM lessons l
+        JOIN sections s ON l.section_id = s.id
+        WHERE s.course_id = courses.id  
+    )
+    WHERE courses.id = course_id; 
+
+    RETURN NULL; 
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_update_lessons_count ON lessons;
+
+CREATE TRIGGER trg_update_lessons_count
+AFTER INSERT OR DELETE ON lessons
+FOR EACH ROW
+EXECUTE FUNCTION update_lessons_count();
