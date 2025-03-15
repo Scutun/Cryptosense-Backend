@@ -404,3 +404,75 @@ CREATE TRIGGER trg_delete_user_lessons_on_course_remove
 AFTER DELETE ON user_courses
 FOR EACH ROW
 EXECUTE FUNCTION delete_user_lessons_on_course_remove();
+
+-- Функция для обновления количества подписчиков
+CREATE OR REPLACE FUNCTION update_course_subscribers()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Увеличиваем количество подписчиков при добавлении
+    IF TG_OP = 'INSERT' THEN
+        UPDATE courses
+        SET subscribers = subscribers + 1
+        WHERE id = NEW.course_id;
+    -- Уменьшаем количество подписчиков при удалении
+    ELSIF TG_OP = 'DELETE' THEN
+        UPDATE courses
+        SET subscribers = subscribers - 1
+        WHERE id = OLD.course_id;
+    END IF;
+
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Удаляем старые триггеры, если существуют
+DROP TRIGGER IF EXISTS trg_update_course_subscribers_insert ON user_courses;
+DROP TRIGGER IF EXISTS trg_update_course_subscribers_delete ON user_courses;
+
+-- Создаем триггер для увеличения подписчиков при добавлении
+CREATE TRIGGER trg_update_course_subscribers_insert
+AFTER INSERT ON user_courses
+FOR EACH ROW
+EXECUTE FUNCTION update_course_subscribers();
+
+-- Создаем триггер для уменьшения подписчиков при удалении
+CREATE TRIGGER trg_update_course_subscribers_delete
+AFTER DELETE ON user_courses
+FOR EACH ROW
+EXECUTE FUNCTION update_course_subscribers();
+
+-- Функция для обновления количества подписчиков
+CREATE OR REPLACE FUNCTION update_course_subscribers()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Увеличиваем количество подписчиков при добавлении
+    IF TG_OP = 'INSERT' THEN
+        UPDATE courses
+        SET subscribers = subscribers + 1
+        WHERE id = NEW.course_id;
+    -- Уменьшаем количество подписчиков при удалении
+    ELSIF TG_OP = 'DELETE' THEN
+        UPDATE courses
+        SET subscribers = subscribers - 1
+        WHERE id = OLD.course_id;
+    END IF;
+
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Удаляем старые триггеры, если существуют
+DROP TRIGGER IF EXISTS trg_update_course_subscribers_insert ON user_courses;
+DROP TRIGGER IF EXISTS trg_update_course_subscribers_delete ON user_courses;
+
+-- Создаем триггер для увеличения подписчиков при добавлении
+CREATE TRIGGER trg_update_course_subscribers_insert
+AFTER INSERT ON user_courses
+FOR EACH ROW
+EXECUTE FUNCTION update_course_subscribers();
+
+-- Создаем триггер для уменьшения подписчиков при удалении
+CREATE TRIGGER trg_update_course_subscribers_delete
+AFTER DELETE ON user_courses
+FOR EACH ROW
+EXECUTE FUNCTION update_course_subscribers();
