@@ -114,6 +114,106 @@ paths:
                     example: 500
                   message:
                     type: string       
+  /v1/courses/sub:
+      post:
+        summary: "Подписаться на курс"
+        description: "Подпсывает пользователя на курс с переданным id. Требуется авторизация."
+        tags:
+          - Courses
+        parameters:
+          - name: Authorization
+            in: header
+            required: true
+            schema:
+              type: string
+            description: Токен авторизации в формате Bearer.
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+          
+                properties:
+                  id:
+                    type: integer 
+                    description: "id курса"
+
+        responses:
+          '200':
+            description: Успешная подписка на курс 
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      example: 'Вы подписаны на курс'
+                    
+          '400':
+            description: Не все поля заполнены
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: integer
+                      example: 400
+                    message:
+                      type: string    
+                      example: 'Не все поля заполнены'
+          "403":
+            description: Недействительный токен
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: integer
+                      example: 40102
+                    message:
+                      type: string
+                      example: "Недействительный токен"
+          '404':
+            description: Курс не найден
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: integer
+                      example: 404
+                    message:
+                      type: string
+          "409":
+            description: Пользователь уже подписан на этот курс
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: integer
+                      example: 409
+                    message:
+                      type: string
+                      example: "Пользователь уже подписан на этот курс"
+          '500':
+            description: Внутренняя ошибка сервера
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: integer
+                      example: 500
+                    message:
+                      type: string
 
   /v1/courses/chosen:
     get:
@@ -633,3 +733,73 @@ paths:
                     example: 500
                   message:
                     type: string
+  /v1/courses/unsub/{id}:
+      delete:
+        summary: "Отписаться от кура"
+        description: "ОТписывает пользователя от курса с переданным id. Требуется авторизация."
+        tags:
+          - Courses
+        parameters:
+          - name: Authorization
+            in: header
+            required: true
+            schema:
+              type: string
+            description: Токен авторизации в формате Bearer.
+          - name: CourseId
+            in: header
+            required: true
+            schema:
+              type: integer
+            description: id курса.
+
+        responses:
+          '200':
+            description: Успешная отписка от курса 
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      example: 'Вы отписаны от курса'
+                    
+          '400':
+            description: Не все поля заполнены
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: integer
+                      example: 400
+                    message:
+                      type: string    
+                      example: 'Не все поля заполнены'
+          "403":
+            description: Недействительный токен
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: integer
+                      example: 40102
+                    message:
+                      type: string
+                      example: "Недействительный токен"
+          '500':
+            description: Внутренняя ошибка сервера
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: integer
+                      example: 500
+                    message:
+                      type: string
