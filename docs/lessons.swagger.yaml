@@ -111,7 +111,7 @@ paths:
                   message:
                     type: string       
 
-  /v1/lessons/fin:
+  /v1/lessons/end:
     post:
       summary: Завершить урок
       tags:
@@ -187,6 +187,19 @@ paths:
                   message:
                     type: string
                     example: "Пользователь не подписан на данный курс"
+        "409":  
+          description: Пользователь уже завершил этот урок 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 409
+                  message:
+                    type: string
+                    example: "Урок уже завершен"
         '500':  
           description: Внутренняя ошибка сервера
           content:

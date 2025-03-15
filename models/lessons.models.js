@@ -138,7 +138,7 @@ class LessonsModel {
                        WHERE l.id = $2
                    )
                    AND active = TRUE
-                 ON CONFLICT DO NOTHING
+                 
                  RETURNING *`,
                 [userId, lessonId],
             )
@@ -147,6 +147,9 @@ class LessonsModel {
                 throw { status: 406, message: 'Пользователь не подписан на данный курс' }
             }
         } catch (error) {
+            if (error.code === '23505') {
+                throw { status: 409, message: 'Урок уже завершен' }
+            }
             throw error
         }
     }

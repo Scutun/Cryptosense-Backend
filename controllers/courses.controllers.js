@@ -68,7 +68,7 @@ class CoursesController {
         try {
             const userId = tokenUtils.getIdFromToken(req)
             await coursesService.addCourseSubscriber(req.body.id, userId)
-            res.status(200).json({ message: 'Вы подписаны на курс' })
+            res.status(200).json({ message: 'Вы подписались на курс' })
         } catch (error) {
             next(error)
         }
@@ -78,7 +78,7 @@ class CoursesController {
         try {
             const userId = tokenUtils.getIdFromToken(req)
             await coursesService.removeCourseSubscriber(req.params.id, userId)
-            res.status(200).json({ message: 'Вы отписаны от курса' })
+            res.status(200).json({ message: 'Вы отписались от курса' })
         } catch (error) {
             next(error)
         }

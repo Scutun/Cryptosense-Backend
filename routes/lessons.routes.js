@@ -5,7 +5,7 @@ const lessonsController = require('../controllers/lessons.controllers')
 const checkToken = require('../middlewares/checkToken')
 
 router.post('/v1/lessons/new', checkToken, lessonsController.createLesson)
-router.post('/v1/lessons/fin', checkToken, lessonsController.finishLesson)
+router.post('/v1/lessons/end', checkToken, lessonsController.finishLesson)
 
 router.get('/v1/lessons/list/:id', checkToken, lessonsController.getAllLessonsNames)
 router.get('/v1/lessons/info/:id', checkToken, lessonsController.getLessonById)
