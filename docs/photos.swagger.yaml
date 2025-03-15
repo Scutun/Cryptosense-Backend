@@ -56,6 +56,12 @@ paths:
       tags:
         - Photos
       parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer your_token_here"
         - name: filename
           in: path
           required: true
@@ -92,6 +98,12 @@ paths:
       tags:
         - Photos
       parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer your_token_here"
         - name: filename
           in: path
           required: true
