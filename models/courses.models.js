@@ -232,13 +232,11 @@ class CoursesModel {
                 values.push(`%${query}%`, `%${query}%`)
             }
 
-            // Фильтр по сложности (если передан)
             if (difficultyIds && difficultyIds.length > 0) {
                 sql += ` AND c.difficulty_id = ANY($${values.length + 1})`
                 values.push(difficultyIds)
             }
 
-            // Фильтр по тегам (если передан)
             if (tagIds && tagIds.length > 0) {
                 sql += ` AND c.id IN (
         SELECT course_id FROM course_tags
@@ -247,7 +245,6 @@ class CoursesModel {
                 values.push(tagIds)
             }
 
-            // Поддерживаем сортировку (по умолчанию по id)
             const allowedSortFields = ['creation_date', 'subscribers', 'id']
             const sortField = allowedSortFields.includes(sort) ? sort : 'id'
             const sortOrder = order && order.toLowerCase() === 'desc' ? 'DESC' : 'ASC'
@@ -257,7 +254,6 @@ class CoursesModel {
   ORDER BY c.${sortField} ${sortOrder}
 `
 
-            // Добавляем limit и offset, если переданы
             if (limit) {
                 sql += ` LIMIT $${values.length + 1}`
                 values.push(Number(limit))
