@@ -155,7 +155,7 @@ paths:
                 properties:
                   status:
                     type: integer
-                    example: 403
+                    example: 40102
                   message:
                     type: string
                     example: "Недействительный токен"

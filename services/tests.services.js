@@ -1,7 +1,8 @@
+const testsModel = require('../models/tests.models')
 const lessonsModel = require('../models/lessons.models')
 
-class LessonsService {
-    async createLesson(info, creatorId) {
+class TestsService {
+    async createTest(info, creatorId) {
         try {
             if (
                 !info.name ||
@@ -13,51 +14,61 @@ class LessonsService {
             ) {
                 throw { status: 400, message: 'Не все поля заполнены' }
             }
+
             await lessonsModel.checkAuthor(info.courseId, info.sectionId, creatorId)
-            const lesson = await lessonsModel.createLesson(
+
+            const test = await testsModel.createTest(
                 info.name,
                 info.sectionId,
                 info.courseId,
                 info.info,
             )
-            const { _id, ...rest } = lesson
-            const newLesson = { lessonId: _id, ...rest }
-            return newLesson
+
+            const { _id, ...rest } = test
+            const newTest = { testId: _id, ...rest }
+
+            return newTest
         } catch (error) {
             throw error
         }
     }
 
-    async getAllLessonsNameFromSection(sectionId) {
+    async getTestsBySectionId(sectionId) {
         try {
             if (!sectionId) {
                 throw { status: 400, message: 'Не передан id секции' }
             }
-            const lessons = await lessonsModel.getAllLessonsNameFromSection(sectionId)
-            return lessons
+
+            const tests = await testsModel.getTestsBySectionId(sectionId)
+            const modifiedTests = tests.map(({ _id, ...rest }) => ({ testId: _id, ...rest }))
+
+            return modifiedTests
         } catch (error) {
             throw error
         }
     }
 
-    async getLessonById(lessonId) {
+    async getTestInfoById(testId) {
         try {
-            if (!lessonId) {
-                throw { status: 400, message: 'Не передан id урока' }
+            if (!testId) {
+                throw { status: 400, message: 'Не передан id теста' }
             }
-            const lesson = await lessonsModel.getLessonById(lessonId)
-            const { _id, ...rest } = lesson
-            const newLesson = { lessonId: _id, ...rest }
-            return newLesson
+
+            const test = await testsModel.getTestInfoById(testId)
+
+            const { _id, ...rest } = test
+            const modifiedTest = { testId: _id, ...rest }
+
+            return modifiedTest
         } catch (error) {
             throw error
         }
     }
 
-    async updateLesson(info, creatorId) {
+    async updateTest(info, creatorId) {
         try {
             if (
-                !info.lessonId ||
+                !info.testId ||
                 !info.name ||
                 !info.sectionId ||
                 !info.courseId ||
@@ -67,36 +78,29 @@ class LessonsService {
             ) {
                 throw { status: 400, message: 'Не все поля заполнены' }
             }
+
             await lessonsModel.checkAuthor(info.courseId, info.sectionId, creatorId)
-            await lessonsModel.updateLesson(info.lessonId, info.name, info.sectionId, info.info)
+
+            await testsModel.updateTest(info.testId, info.name, info.sectionId, info.info)
             return info
         } catch (error) {
             throw error
         }
     }
 
-    async deleteLesson(info, creatorId) {
+    async deleteTest(info, creatorId) {
         try {
-            if (!info.lessonId || !creatorId || !info.sectionId || !info.courseId) {
+            if (!info.testId || !creatorId || !info.sectionId || !info.courseId) {
                 throw { status: 400, message: 'Не все поля заполнены' }
             }
-            await lessonsModel.checkAuthor(info.courseId, info.sectionId, creatorId)
-            await lessonsModel.deleteLesson(info.lessonId)
-        } catch (error) {
-            throw error
-        }
-    }
 
-    async finishLesson(lessonId, userId) {
-        try {
-            if (!userId || !lessonId) {
-                throw { status: 400, message: 'Не все поля заполнены' }
-            }
-            await lessonsModel.finishLesson(userId, lessonId)
+            await lessonsModel.checkAuthor(info.courseId, info.sectionId, creatorId)
+
+            await testsModel.deleteTest(info.testId)
         } catch (error) {
             throw error
         }
     }
 }
 
-module.exports = new LessonsService()
+module.exports = new TestsService()

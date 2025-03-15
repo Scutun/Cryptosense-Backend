@@ -43,7 +43,7 @@ class LessonsController {
     async deleteLesson(req, res, next) {
         try {
             const userId = tokenUtils.getIdFromToken(req)
-            await lessonsService.deleteLesson(req.body, userId)
+            await lessonsService.deleteLesson(req.query, userId)
             res.status(201).json({ message: 'Урок успешно удален' })
         } catch (error) {
             next(error)
