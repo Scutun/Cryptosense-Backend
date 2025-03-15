@@ -19,7 +19,7 @@ class LessonsModel {
 
             const mongoDb = await connectMongoDB()
             await mongoDb.collection('lessons').insertOne(newLesson)
-            
+
             return newLesson
         } catch (error) {
             if (error.code === '23503') {
@@ -120,6 +120,33 @@ class LessonsModel {
             const mongoDb = await connectMongoDB()
             await mongoDb.collection('lessons').deleteMany({ courseId: Number(courseId) })
         } catch (error) {
+            throw error
+        }
+    }
+
+    async finishLesson(userId, lessonId) {
+        try {
+            const result = await db.query(
+                `INSERT INTO user_lessons (user_id, lesson_id)
+                 SELECT $1, $2
+                 FROM user_courses
+                 WHERE user_id = $1 
+                   AND course_id = (
+                       SELECT s.course_id
+                       FROM lessons l
+                       JOIN sections s ON l.section_id = s.id
+                       WHERE l.id = $2
+                   )
+                   AND active = TRUE
+                 ON CONFLICT DO NOTHING
+                 RETURNING *`,
+                [userId, lessonId]
+            );
+    
+            if (result.rowCount === 0) {
+                throw { status: 403, message: 'Пользователь не подписан на данный курс' };
+            }
+            } catch (error) {
             throw error
         }
     }

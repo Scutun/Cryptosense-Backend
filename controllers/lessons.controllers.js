@@ -49,6 +49,15 @@ class LessonsController {
             next(error)
         }
     }
+    async finishLesson(req, res, next) {
+        try {
+            const userId = tokenUtils.getIdFromToken(req)
+            await lessonsService.finishLesson(req.body.id, userId)
+            res.status(201).json({ message: 'Урок успешно завершен' })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 module.exports = new LessonsController()
