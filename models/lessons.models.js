@@ -140,13 +140,13 @@ class LessonsModel {
                    AND active = TRUE
                  ON CONFLICT DO NOTHING
                  RETURNING *`,
-                [userId, lessonId]
-            );
-    
+                [userId, lessonId],
+            )
+
             if (result.rowCount === 0) {
-                throw { status: 403, message: 'Пользователь не подписан на данный курс' };
+                throw { status: 406, message: 'Пользователь не подписан на данный курс' }
             }
-            } catch (error) {
+        } catch (error) {
             throw error
         }
     }

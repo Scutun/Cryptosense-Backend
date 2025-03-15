@@ -98,6 +98,95 @@ paths:
                   message:
                     type: string       
 
+  /v1/lessons/fin:
+    post:
+      summary: Завершить урок
+      tags:
+        - Lessons
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Токен авторизации в формате Bearer.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  description: Id урока
+                  example: 2
+      responses:
+        '201':
+          description: Урок успешно завершен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: integer
+                    example: Урок успешно завершен
+
+        "400":  
+          description: Не все поля заполнены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: "Не все поля заполнены"
+
+        "403":
+            description: Недействительный токен
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: integer
+                      example: 40102
+                    message:
+                      type: string
+                      example: "Недействительный токен"
+
+        "406":  
+          description: Пользователь не подписан на данный курс
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 406
+                  message:
+                    type: string
+                    example: "Пользователь не подписан на данный курс"
+        '500':  
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string       
+
   /v1/lessons/list/{id}:
     get:
       summary: Получить список всех уроков в секции
