@@ -108,7 +108,7 @@ class CoursesService {
         try {
             const { query, difficulty, tags, sort = 'id', order = 'asc', limit, offset } = req
 
-            // Преобразуем параметры в массивы (если они есть)
+            // Преобразуем параметры в массивы
             const difficultyIds = difficulty ? difficulty.split(',').map(Number) : []
             const tagIds = tags ? tags.split(',').map(Number) : []
             let sortBy = ''
@@ -117,7 +117,6 @@ class CoursesService {
                 sortBy = 'creation_date'
             } else sortBy = sort
 
-            // Запрос к базе данных
             const courses = await coursesModel.getSortedCourses(
                 query,
                 difficultyIds,
