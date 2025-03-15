@@ -453,8 +453,8 @@ paths:
           required: false
           schema:
             type: string
-            enum: [follow, creation]
-          description: Тип сортировки (follow, creation), если  follow - по кол-ву подвисчиков, cretion - по дате создания.
+            enum: [subscribers, creation]
+          description: Тип сортировки (subscribers, creation), если  subscribers - по кол-ву подвисчиков, cretion - по дате создания.
         - name: order
           in: query
           required: false
@@ -462,13 +462,28 @@ paths:
             type: string
             enum: [asc, desc]
           description: Направление сортировки (asc, desc), если  asc - по возрастанию, desc - по убыванию.
-        - name: search
+        - name: query
           in: query
           required: false
           schema:
             type: string
           description: Поиск по названию тега или курса
-
+        - name: difficulty
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [1,2,3]
+          description: Id уровня сложности курса
+          example: 1,2,3
+        - name: tags
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [1,2,3]
+          description: Поиск по тегам
+          example: 1,2,3        
       responses:
         '200':
           description: Успешный ответ со списком курсов

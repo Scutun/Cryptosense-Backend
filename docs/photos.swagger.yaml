@@ -70,19 +70,6 @@ paths:
               schema:
                 type: string
                 format: binary
-        '403':
-          description: Неавторизованный пользователь
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 40102
-                  message:
-                    type: string
-                    example: "Недействительный токен"
 
 
   /v1/courses/photo/url/{filename}:
@@ -106,16 +93,3 @@ paths:
               schema:
                 type: string
                 format: binary
-        '403':
-          description: Неавторизованный пользователь
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 40102
-                  message:
-                    type: string
-                    example: "Недействительный токен"

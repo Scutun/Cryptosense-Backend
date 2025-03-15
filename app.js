@@ -10,7 +10,6 @@ const path = require('path')
 const yaml = require('js-yaml')
 const PORT = process.env.PORT || 3020
 const cookieParser = require('cookie-parser')
-const checkToken = require('./middlewares/checkToken')
 const errorHandler = require('./middlewares/errorHandler')
 
 const userRoutes = require('./routes/users.routes')
@@ -20,6 +19,7 @@ const sectionRoutes = require('./routes/sections.routes')
 const photosRoutes = require('./routes/photos.routes')
 const testsRoutes = require('./routes/tests.routes')
 const lessonsRoutes = require('./routes/lessons.routes')
+const additionsRoutes = require('./routes/additions.routes')
 
 app.use(cookieParser())
 app.use(express.json())
@@ -32,12 +32,14 @@ const swaggerSections = yaml.load(fs.readFileSync('./docs/sections.swagger.yaml'
 const swaggerPhoto = yaml.load(fs.readFileSync('./docs/photos.swagger.yaml', 'utf8'))
 const swaggerLesson = yaml.load(fs.readFileSync('./docs/lessons.swagger.yaml', 'utf8'))
 const swaggerTests = yaml.load(fs.readFileSync('./docs/tests.swagger.yaml', 'utf8'))
+const swaggerAdditions = yaml.load(fs.readFileSync('./docs/additions.swagger.yaml', 'utf8'))
 
 const mergedSwagger = {
     ...swaggerUsers,
     paths: {
         ...swaggerUsers.paths,
         ...swaggerCourses.paths,
+        ...swaggerAdditions.paths,
         ...swaggerReviews.paths,
         ...swaggerSections.paths,
         ...swaggerLesson.paths,
@@ -49,6 +51,7 @@ const mergedSwagger = {
         schemas: {
             ...swaggerUsers.components?.schemas,
             ...swaggerCourses.components?.schemas,
+            ...swaggerAdditions.components?.schemas,
             ...swaggerReviews.components?.schemas,
             ...swaggerSections.components?.schemas,
             ...swaggerPhoto.components?.schemas,
@@ -67,18 +70,11 @@ app.use('/api', sectionRoutes)
 app.use('/api', testsRoutes)
 app.use('/api', photosRoutes)
 app.use('/api', lessonsRoutes)
+app.use('/api', additionsRoutes)
 app.use(errorHandler)
 
-app.use(
-    '/api/v1/profiles/avatars/url/',
-    checkToken,
-    express.static(path.join(__dirname, 'uploads/avatars')),
-)
-app.use(
-    '/api/v1/courses/photo/url/',
-    checkToken,
-    express.static(path.join(__dirname, 'uploads/course')),
-)
+app.use('/api/v1/profiles/avatars/url/', express.static(path.join(__dirname, 'uploads/avatars')))
+app.use('/api/v1/courses/photo/url/', express.static(path.join(__dirname, 'uploads/course')))
 
 app.get('/server', (req, res) => {
     res.send('Server is running')

@@ -104,45 +104,34 @@ class CoursesService {
         }
     }
 
-    async getCourses(query) {
+    async getCourses(req) {
         try {
-            const limit = parseInt(query.limit, 10) || 'ALL'
-            const offset = parseInt(query.offset, 10) || 0
-            const search = query.search || ''
-            let sortCondition = ''
+            const { query, difficulty, tags, sort = 'id', order = 'asc', limit, offset } = req
 
-            if (
-                (query.sort !== 'follow' && query.sort !== 'creation') ||
-                (query.order !== 'asc' && query.order !== 'desc')
-            ) {
-                const courses = await coursesModel.getAllCourses(limit, offset, search)
+            // Преобразуем параметры в массивы
+            const difficultyIds = difficulty ? difficulty.split(',').map(Number) : []
+            const tagIds = tags ? tags.split(',').map(Number) : []
+            let sortBy = ''
 
-                if (courses.total === 0) {
-                    throw { status: 404, message: 'Курсы не найдены' }
-                }
+            if (sort === 'creation') {
+                sortBy = 'creation_date'
+            } else sortBy = sort
 
-                return courses
-            } else {
-                if (query.sort === 'follow') {
-                    sortCondition = 'subscribers'
-                } else {
-                    sortCondition = 'course_duration'
-                }
+            const courses = await coursesModel.getSortedCourses(
+                query,
+                difficultyIds,
+                tagIds,
+                sort,
+                order,
+                limit,
+                offset,
+            )
 
-                const courses = await coursesModel.getSortedCourses(
-                    limit,
-                    offset,
-                    sortCondition,
-                    query.order,
-                    search,
-                )
-
-                if (courses.total === 0) {
-                    throw { status: 404, message: 'Курсы не найдены' }
-                }
-
-                return courses
+            if (courses.total === 0) {
+                throw { status: 404, message: 'Курсы не найдены' }
             }
+
+            return courses
         } catch (error) {
             throw error
         }
