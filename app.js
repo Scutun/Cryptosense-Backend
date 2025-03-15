@@ -10,7 +10,6 @@ const path = require('path')
 const yaml = require('js-yaml')
 const PORT = process.env.PORT || 3020
 const cookieParser = require('cookie-parser')
-const checkToken = require('./middlewares/checkToken')
 const errorHandler = require('./middlewares/errorHandler')
 
 const userRoutes = require('./routes/users.routes')
@@ -69,16 +68,8 @@ app.use('/api', photosRoutes)
 app.use('/api', lessonsRoutes)
 app.use(errorHandler)
 
-app.use(
-    '/api/v1/profiles/avatars/url/',
-    checkToken,
-    express.static(path.join(__dirname, 'uploads/avatars')),
-)
-app.use(
-    '/api/v1/courses/photo/url/',
-    checkToken,
-    express.static(path.join(__dirname, 'uploads/course')),
-)
+app.use('/api/v1/profiles/avatars/url/', express.static(path.join(__dirname, 'uploads/avatars')))
+app.use('/api/v1/courses/photo/url/', express.static(path.join(__dirname, 'uploads/course')))
 
 app.get('/server', (req, res) => {
     res.send('Server is running')

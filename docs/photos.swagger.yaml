@@ -56,12 +56,6 @@ paths:
       tags:
         - Photos
       parameters:
-        - name: Authorization
-          in: header
-          required: true
-          schema:
-            type: string
-            example: "Bearer your_token_here"
         - name: filename
           in: path
           required: true
@@ -76,19 +70,6 @@ paths:
               schema:
                 type: string
                 format: binary
-        '403':
-          description: Неавторизованный пользователь
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 40102
-                  message:
-                    type: string
-                    example: "Недействительный токен"
 
 
   /v1/courses/photo/url/{filename}:
@@ -98,12 +79,6 @@ paths:
       tags:
         - Photos
       parameters:
-        - name: Authorization
-          in: header
-          required: true
-          schema:
-            type: string
-            example: "Bearer your_token_here"
         - name: filename
           in: path
           required: true
@@ -118,16 +93,3 @@ paths:
               schema:
                 type: string
                 format: binary
-        '403':
-          description: Неавторизованный пользователь
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 40102
-                  message:
-                    type: string
-                    example: "Недействительный токен"
