@@ -137,6 +137,34 @@ class CoursesService {
             throw error
         }
     }
+
+    async addCourseSubscriber(courseId, userId) {
+        try {
+            if (courseId.length === 0 || userId.length === 0) {
+                throw { status: 400, message: 'Не все поля заполнены' }
+            }
+            await coursesModel.addCourseSubscriber(userId, courseId)
+            return courseId
+        } catch (error) {
+            throw error.code === '23505'
+                ? { status: 409, message: 'Пользователь уже подписан на этот курс' }
+                : error.code === '23503'
+                  ? { status: 404, message: 'Курс не найден' }
+                  : error
+        }
+    }
+
+    async removeCourseSubscriber(courseId, userId) {
+        try {
+            if (courseId.length === 0 || userId.length === 0) {
+                throw { status: 400, message: 'Не все поля заполнены' }
+            }
+            await coursesModel.removeCourseSubscriber(userId, courseId)
+            return courseId
+        } catch (error) {
+            throw error
+        }
+    }
 }
 
 module.exports = new CoursesService()

@@ -86,6 +86,17 @@ class LessonsService {
             throw error
         }
     }
+
+    async finishLesson(lessonId, userId) {
+        try {
+            if (!userId || !lessonId) {
+                throw { status: 400, message: 'Не все поля заполнены' }
+            }
+            await lessonsModel.finishLesson(userId, lessonId)
+        } catch (error) {
+            throw error
+        }
+    }
 }
 
 module.exports = new LessonsService()

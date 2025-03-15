@@ -63,6 +63,26 @@ class CoursesController {
             next(error)
         }
     }
+
+    async addSubscription(req, res, next) {
+        try {
+            const userId = tokenUtils.getIdFromToken(req)
+            await coursesService.addCourseSubscriber(req.body.id, userId)
+            res.status(200).json({ message: 'Вы подписались на курс' })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async removeSubscription(req, res, next) {
+        try {
+            const userId = tokenUtils.getIdFromToken(req)
+            await coursesService.removeCourseSubscriber(req.params.id, userId)
+            res.status(200).json({ message: 'Вы отписались от курса' })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 module.exports = new CoursesController()

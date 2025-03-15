@@ -124,12 +124,13 @@ class CoursesModel {
                         courses.rating,
                         courses.reviews_count as reviews,
                         courses.subscribers, 
-                        courses.course_duration as duration
+                        courses.course_duration as duration,
+                        user_courses.progress
                  FROM user_courses
                  LEFT JOIN courses ON user_courses.course_id = courses.id                
                  LEFT JOIN users ON courses.creator_id = users.id
                  WHERE user_courses.user_id = $1 AND user_courses.active = $2
-                 GROUP BY courses.id, users.name, users.surname`
+                 GROUP BY courses.id, users.name, users.surname,user_courses.progress`
 
             const params = [id, status]
 
@@ -280,6 +281,28 @@ class CoursesModel {
             const info = await db.query(`SELECT creator_id FROM courses WHERE id = $1`, [id])
 
             return info
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async addCourseSubscriber(ueserId, courseId) {
+        try {
+            await db.query(`INSERT INTO user_courses (user_id, course_id) VALUES ($1,$2)`, [
+                ueserId,
+                courseId,
+            ])
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async removeCourseSubscriber(ueserId, courseId) {
+        try {
+            await db.query(`DELETE FROM user_courses WHERE user_id = $1 AND course_id = $2`, [
+                ueserId,
+                courseId,
+            ])
         } catch (error) {
             throw error
         }
