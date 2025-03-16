@@ -433,7 +433,7 @@ paths:
 
   /v1/courses/list:
     get:
-      summary: Получить список курсов с сортировкой или без. Используется для страницы поиска курсов.
+      summary: Получить список курсов с сортировкой, фильтрацией и поиском. Используется для страницы поиска курсов.
       description: Возвращает список курсов с поддержкой пагинации и сортировки по кол-ву подписчиков и по дате создание. Используется для страницы поиска курсов.
       tags:
         - Courses
@@ -543,6 +543,19 @@ paths:
                   message:
                     type: string
                     example: 'Курсы не найдены'
+        '414':
+          description: Запрос слишком большой
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 414
+                  message:
+                    type: string
+                    example: 'Слишком длинный запрос'
 
         '500':
           description: Внутренняя ошибка сервера

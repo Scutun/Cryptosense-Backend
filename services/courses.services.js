@@ -108,6 +108,10 @@ class CoursesService {
         try {
             const { query, difficulty, tags, sort = 'id', order = 'asc', limit, offset } = req
 
+            if (query.length > 255) {
+                throw { status: 414, message: 'Слишком длинный запрос' }
+            }
+
             // Преобразуем параметры в массивы
             const difficultyIds = difficulty ? difficulty.split(',').map(Number) : []
             const tagIds = tags ? tags.split(',').map(Number) : []
