@@ -117,7 +117,7 @@ class CoursesService {
                 sortBy = 'creation_date'
             } else sortBy = sort
 
-            const courses = await coursesModel.getSortedCourses(
+            const list = await coursesModel.getSortedCourses(
                 query,
                 difficultyIds,
                 tagIds,
@@ -127,11 +127,11 @@ class CoursesService {
                 offset,
             )
 
-            if (courses.total === 0) {
+            if (list.courses.length === 0) {
                 throw { status: 404, message: 'Курсы не найдены' }
             }
 
-            return courses
+            return list
         } catch (error) {
             throw error
         }

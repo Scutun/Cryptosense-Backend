@@ -193,19 +193,6 @@ class CoursesModel {
 
     async getSortedCourses(query, difficultyIds, tagIds, sort, order, limit, offset) {
         try {
-            const searchQuery = query ? `%${query}%` : `%`
-
-            const countResult = await db.query(
-                `SELECT COUNT(DISTINCT courses.id) AS total 
-                 FROM courses
-                 LEFT JOIN course_tags ON courses.id = course_tags.course_id
-                 LEFT JOIN tags ON course_tags.tag_id = tags.id
-                 WHERE courses.title ILIKE $1 OR tags.name ILIKE $1`,
-                [searchQuery],
-            )
-
-            const total = parseInt(countResult.rows[0].total, 10)
-
             let sql = `
   SELECT c.id,
          CONCAT(u.name, ' ', u.surname) AS creator,
@@ -253,6 +240,9 @@ class CoursesModel {
   GROUP BY c.id, u.name, u.surname, c.course_photo, c.title, c.description, c.rating, c.reviews_count, c.subscribers, c.course_duration
   ORDER BY c.${sortField} ${sortOrder}
 `
+            const countResult = await db.query(sql, values)
+
+            const total = parseInt(countResult.rowCount, 10)
 
             if (limit) {
                 sql += ` LIMIT $${values.length + 1}`
