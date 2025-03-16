@@ -56,12 +56,12 @@ paths:
 
   /v1/difficulties/list:
     get:
-      summary: Получение списка сложностей
+      summary: Получение списка уровней сложностей
       tags:
         - Difficulties
       responses:
         '200':
-          description: Успешный ответ со списком сложностей
+          description: Успешный ответ со списком уровней сложностей
           content:
             application/json:
               schema:
