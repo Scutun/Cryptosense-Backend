@@ -1,0 +1,103 @@
+#prettier-ignore
+openapi: 3.0.0
+info:
+  title: Additions API
+  version: 1.0.0
+  description: API для получения списков курсов
+
+paths:
+  /v1/tags/list:
+    get:
+      summary: Получение списка тегов
+      tags:
+        - Tags
+      responses:
+        '200':
+          description: Успешный ответ со списком тегов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    name:
+                      type: string
+                      example: 'Bitcoin'
+        '404': 
+          description: Теги не найдены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: 'Теги не найдены'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 'Внутренняя ошибка сервера'
+
+  /v1/difficulties/list:
+    get:
+      summary: Получение списка уровней сложностей
+      tags:
+        - Difficulties
+      responses:
+        '200':
+          description: Успешный ответ со списком уровней сложностей
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    name:
+                      type: string
+                      example: 'Легкая'
+        '404': 
+          description: Сложности не найдены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: 'Сложности не найдены'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 'Внутренняя ошибка сервера'

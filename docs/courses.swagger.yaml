@@ -113,7 +113,110 @@ paths:
                     type: integer
                     example: 500
                   message:
-                    type: string       
+                    type: string     
+                    example: 'Внутренняя ошибка сервера'
+
+  /v1/courses/sub:
+      post:
+        summary: "Подписаться на курс"
+        description: "Подпсывает пользователя на курс с переданным id. Требуется авторизация."
+        tags:
+          - Courses
+        parameters:
+          - name: Authorization
+            in: header
+            required: true
+            schema:
+              type: string
+            description: Токен авторизации в формате Bearer.
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+          
+                properties:
+                  id:
+                    type: integer 
+                    description: "id курса"
+
+        responses:
+          '200':
+            description: Успешная подписка на курс 
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      example: 'Вы подписались на курс'
+                    
+          '400':
+            description: Не все поля заполнены
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: integer
+                      example: 400
+                    message:
+                      type: string    
+                      example: 'Не все поля заполнены'
+          "403":
+            description: Недействительный токен
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: integer
+                      example: 40102
+                    message:
+                      type: string
+                      example: "Недействительный токен"
+          '404':
+            description: Курс не найден
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: integer
+                      example: 404
+                    message:
+                      type: string
+                      example: "Курс не найден"
+          "409":
+            description: Пользователь уже подписан на этот курс
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: integer
+                      example: 409
+                    message:
+                      type: string
+                      example: "Пользователь уже подписан на этот курс"
+          '500':
+            description: Внутренняя ошибка сервера
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: integer
+                      example: 500
+                    message:
+                      type: string
 
   /v1/courses/chosen:
     get:
@@ -326,10 +429,11 @@ paths:
                     example: 500
                   message:
                     type: string
+                    example: 'Внутренняя ошибка сервера'
 
   /v1/courses/list:
     get:
-      summary: Получить список курсов с сортировкой или без. Используется для страницы поиска курсов.
+      summary: Получить список курсов с сортировкой, фильтрацией и поиском. Используется для страницы поиска курсов.
       description: Возвращает список курсов с поддержкой пагинации и сортировки по кол-ву подписчиков и по дате создание. Используется для страницы поиска курсов.
       tags:
         - Courses
@@ -353,8 +457,8 @@ paths:
           required: false
           schema:
             type: string
-            enum: [follow, creation]
-          description: Тип сортировки (follow, creation), если  follow - по кол-ву подвисчиков, cretion - по дате создания.
+            enum: [subscribers, creation]
+          description: Тип сортировки (subscribers, creation), если  subscribers - по кол-ву подвисчиков, cretion - по дате создания.
         - name: order
           in: query
           required: false
@@ -362,13 +466,28 @@ paths:
             type: string
             enum: [asc, desc]
           description: Направление сортировки (asc, desc), если  asc - по возрастанию, desc - по убыванию.
-        - name: search
+        - name: query
           in: query
           required: false
           schema:
             type: string
           description: Поиск по названию тега или курса
-
+        - name: difficulty
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [1,2,3]
+          description: Id уровня сложности курса
+          example: 1,2,3
+        - name: tags
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [1,2,3]
+          description: Поиск по тегам
+          example: 1,2,3        
       responses:
         '200':
           description: Успешный ответ со списком курсов
@@ -424,6 +543,19 @@ paths:
                   message:
                     type: string
                     example: 'Курсы не найдены'
+        '414':
+          description: Запрос слишком большой
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 414
+                  message:
+                    type: string
+                    example: 'Слишком длинный запрос'
 
         '500':
           description: Внутренняя ошибка сервера
@@ -551,7 +683,79 @@ paths:
                     type: integer
                     example: 500
                   message:
-                    type: string        
+                    type: string     
+                    example: 'Внутренняя ошибка сервера'   
+                    
+  /v1/courses/unsub/{id}:
+      delete:
+        summary: "Отписаться от кура"
+        description: "ОТписывает пользователя от курса с переданным id. Требуется авторизация."
+        tags:
+          - Courses
+        parameters:
+          - name: Authorization
+            in: header
+            required: true
+            schema:
+              type: string
+            description: Токен авторизации в формате Bearer.
+          - name: CourseId
+            in: header
+            required: true
+            schema:
+              type: integer
+            description: id курса.
+
+        responses:
+          '200':
+            description: Успешная отписка от курса 
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      example: 'Вы отписались от курса'
+                    
+          '400':
+            description: Не все поля заполнены
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: integer
+                      example: 400
+                    message:
+                      type: string    
+                      example: 'Не все поля заполнены'
+          "403":
+            description: Недействительный токен
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: integer
+                      example: 40102
+                    message:
+                      type: string
+                      example: "Недействительный токен"
+          '500':
+            description: Внутренняя ошибка сервера
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: integer
+                      example: 500
+                    message:
+                      type: string
 
   /v1/courses/{id}:
     delete:
@@ -595,6 +799,7 @@ paths:
                     example: 400
                   message:
                     type: string
+                    example: 'Не все поля заполнены'
         '403':
           description: У вас недостаточно прав для удаления этого курса
           content:
@@ -608,9 +813,8 @@ paths:
                   message:
                     type: string
                     example: "У вас недостаточно прав для удаления этого курса"
-
         '404':
-          description: Курс не найден
+          description: Курс не найден
           content:
             application/json:
               schema:
@@ -620,7 +824,8 @@ paths:
                     type: integer
                     example: 404
                   message:
-                    type: string
+                    type: string  
+                    example: "Курс не найден"
         '500':
           description: Внутренняя ошибка сервера
           content:
@@ -633,3 +838,4 @@ paths:
                     example: 500
                   message:
                     type: string
+                    example: 'Внутренняя ошибка сервера'

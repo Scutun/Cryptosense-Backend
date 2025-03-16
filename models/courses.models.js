@@ -124,12 +124,13 @@ class CoursesModel {
                         courses.rating,
                         courses.reviews_count as reviews,
                         courses.subscribers, 
-                        courses.course_duration as duration
+                        courses.course_duration as duration,
+                        user_courses.progress
                  FROM user_courses
                  LEFT JOIN courses ON user_courses.course_id = courses.id                
                  LEFT JOIN users ON courses.creator_id = users.id
                  WHERE user_courses.user_id = $1 AND user_courses.active = $2
-                 GROUP BY courses.id, users.name, users.surname`
+                 GROUP BY courses.id, users.name, users.surname,user_courses.progress`
 
             const params = [id, status]
 
@@ -190,48 +191,71 @@ class CoursesModel {
         }
     }
 
-    async getSortedCourses(limit, offset, sort, order, search) {
+    async getSortedCourses(query, difficultyIds, tagIds, sort, order, limit, offset) {
         try {
-            const searchQuery = search ? `%${search}%` : `%`
+            let sql = `
+  SELECT c.id,
+         CONCAT(u.name, ' ', u.surname) AS creator,
+         c.course_photo AS photo,
+         c.title,
+         c.description,
+         c.rating,
+         c.reviews_count AS reviews,
+         c.subscribers,
+         c.course_duration AS duration,
+         c.creation_date as creationDate
+  FROM courses c
+  LEFT JOIN users u ON c.creator_id = u.id
+  LEFT JOIN course_tags ct ON c.id = ct.course_id
+  LEFT JOIN tags t ON ct.tag_id = t.id
+  WHERE 1 = 1
+`
 
-            const countResult = await db.query(
-                `SELECT COUNT(DISTINCT courses.id) AS total 
-                 FROM courses
-                 LEFT JOIN course_tags ON courses.id = course_tags.course_id
-                 LEFT JOIN tags ON course_tags.tag_id = tags.id
-                 WHERE courses.title ILIKE $1 OR tags.name ILIKE $1`,
-                [searchQuery],
-            )
+            const values = []
 
-            const total = parseInt(countResult.rows[0].total, 10)
-
-            const sortBy = 'courses.' + sort
-
-            let query = `SELECT courses.id, CONCAT(users.name, ' ', users.surname) AS creator, 
-                        courses.course_photo AS photo, 
-                        courses.title,
-                        courses.description,
-                        courses.rating,
-                        courses.reviews_count as reviews,
-                        courses.subscribers, 
-                        courses.course_duration as duration
-                 FROM courses                
-                 LEFT JOIN users ON courses.creator_id = users.id
-                 LEFT JOIN course_tags ON courses.id = course_tags.course_id
-                 LEFT JOIN tags ON course_tags.tag_id = tags.id
-                 WHERE courses.title ILIKE $1 OR tags.name ILIKE $1
-                 GROUP BY courses.id, users.name, users.surname
-                 ORDER BY ${sortBy} ${order}`
-
-            const params = [searchQuery]
-
-            if (limit !== 'ALL') {
-                query += ` LIMIT $2 OFFSET $3`
-                params.push(Number(limit) || 10, Number(offset) || 0)
+            // Поиск по названию курса и тегам
+            if (query) {
+                sql += ` AND (c.title ILIKE $${values.length + 1} OR t.name ILIKE $${values.length + 2})`
+                values.push(`%${query}%`, `%${query}%`)
             }
 
-            const info = await db.query(query, params)
+            if (difficultyIds && difficultyIds.length > 0) {
+                sql += ` AND c.difficulty_id = ANY($${values.length + 1})`
+                values.push(difficultyIds)
+            }
 
+            if (tagIds && tagIds.length > 0) {
+                sql += ` AND c.id IN (
+        SELECT course_id FROM course_tags
+        WHERE tag_id = ANY($${values.length + 1})
+    )`
+                values.push(tagIds)
+            }
+
+            const allowedSortFields = ['creation_date', 'subscribers', 'id']
+            const sortField = allowedSortFields.includes(sort) ? sort : 'id'
+            const sortOrder = order && order.toLowerCase() === 'desc' ? 'DESC' : 'ASC'
+
+            sql += `
+  GROUP BY c.id, u.name, u.surname, c.course_photo, c.title, c.description, c.rating, c.reviews_count, c.subscribers, c.course_duration
+  ORDER BY c.${sortField} ${sortOrder}
+`
+            const countResult = await db.query(sql, values)
+
+            const total = parseInt(countResult.rowCount, 10)
+
+            if (limit) {
+                sql += ` LIMIT $${values.length + 1}`
+                values.push(Number(limit))
+            }
+
+            if (offset) {
+                sql += ` OFFSET $${values.length + 1}`
+                values.push(Number(offset))
+            }
+
+            // Выполнение запроса
+            const info = await db.query(sql, values)
             return { total, courses: info.rows }
         } catch (error) {
             throw error
@@ -243,6 +267,28 @@ class CoursesModel {
             const info = await db.query(`SELECT creator_id FROM courses WHERE id = $1`, [id])
 
             return info
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async addCourseSubscriber(ueserId, courseId) {
+        try {
+            await db.query(`INSERT INTO user_courses (user_id, course_id) VALUES ($1,$2)`, [
+                ueserId,
+                courseId,
+            ])
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async removeCourseSubscriber(ueserId, courseId) {
+        try {
+            await db.query(`DELETE FROM user_courses WHERE user_id = $1 AND course_id = $2`, [
+                ueserId,
+                courseId,
+            ])
         } catch (error) {
             throw error
         }

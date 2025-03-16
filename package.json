@@ -6,7 +6,8 @@
     "scripts": {
         "dev": "nodemon app.js",
         "database": "node config/creationDB.js",
-        "start": "node app.js"
+        "start": "node app.js",
+        "merge-openapi": "node config/doc.js"
     },
     "keywords": [],
     "author": "",
