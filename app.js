@@ -25,43 +25,9 @@ app.use(cookieParser())
 app.use(express.json())
 app.use(cors())
 
-const swaggerUsers = yaml.load(fs.readFileSync('./docs/users.swagger.yaml', 'utf8'))
-const swaggerCourses = yaml.load(fs.readFileSync('./docs/courses.swagger.yaml', 'utf8'))
-const swaggerReviews = yaml.load(fs.readFileSync('./docs/reviews.swagger.yaml', 'utf8'))
-const swaggerSections = yaml.load(fs.readFileSync('./docs/sections.swagger.yaml', 'utf8'))
-const swaggerPhoto = yaml.load(fs.readFileSync('./docs/photos.swagger.yaml', 'utf8'))
-const swaggerLesson = yaml.load(fs.readFileSync('./docs/lessons.swagger.yaml', 'utf8'))
-const swaggerTests = yaml.load(fs.readFileSync('./docs/tests.swagger.yaml', 'utf8'))
-const swaggerAdditions = yaml.load(fs.readFileSync('./docs/additions.swagger.yaml', 'utf8'))
+const swaggerMain = yaml.load(fs.readFileSync('./docs/main.swagger.yaml', 'utf8'))
 
-const mergedSwagger = {
-    ...swaggerUsers,
-    paths: {
-        ...swaggerUsers.paths,
-        ...swaggerCourses.paths,
-        ...swaggerAdditions.paths,
-        ...swaggerReviews.paths,
-        ...swaggerSections.paths,
-        ...swaggerLesson.paths,
-        ...swaggerTests.paths,
-        ...swaggerPhoto.paths,
-    },
-    components: {
-        ...swaggerUsers.components,
-        schemas: {
-            ...swaggerUsers.components?.schemas,
-            ...swaggerCourses.components?.schemas,
-            ...swaggerAdditions.components?.schemas,
-            ...swaggerReviews.components?.schemas,
-            ...swaggerSections.components?.schemas,
-            ...swaggerPhoto.components?.schemas,
-            ...swaggerLesson.components?.schemas,
-            ...swaggerTests.components?.schemas,
-        },
-    },
-}
-
-app.use('/api/v1/swagger/docs', swaggerUi.serve, swaggerUi.setup(mergedSwagger))
+app.use('/api/v1/swagger/docs', swaggerUi.serve, swaggerUi.setup(swaggerMain))
 
 app.use('/api', userRoutes)
 app.use('/api', courseRoutes)
