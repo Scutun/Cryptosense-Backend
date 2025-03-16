@@ -36,4 +36,5 @@ npm install
 ```bash
 Для запуска готового приложения: npm run start
 Для запуска режима разработки приложения: npm run dev
+Для создания единой документации: npm run merge-openapi
 ```
