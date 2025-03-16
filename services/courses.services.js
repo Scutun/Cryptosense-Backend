@@ -104,45 +104,66 @@ class CoursesService {
         }
     }
 
-    async getCourses(query) {
+    async getCourses(req) {
         try {
-            const limit = parseInt(query.limit, 10) || 'ALL'
-            const offset = parseInt(query.offset, 10) || 0
-            const search = query.search || ''
-            let sortCondition = ''
+            const { query, difficulty, tags, sort = 'id', order = 'asc', limit, offset } = req
 
-            if (
-                (query.sort !== 'follow' && query.sort !== 'creation') ||
-                (query.order !== 'asc' && query.order !== 'desc')
-            ) {
-                const courses = await coursesModel.getAllCourses(limit, offset, search)
-
-                if (courses.total === 0) {
-                    throw { status: 404, message: 'Курсы не найдены' }
-                }
-
-                return courses
-            } else {
-                if (query.sort === 'follow') {
-                    sortCondition = 'subscribers'
-                } else {
-                    sortCondition = 'course_duration'
-                }
-
-                const courses = await coursesModel.getSortedCourses(
-                    limit,
-                    offset,
-                    sortCondition,
-                    query.order,
-                    search,
-                )
-
-                if (courses.total === 0) {
-                    throw { status: 404, message: 'Курсы не найдены' }
-                }
-
-                return courses
+            if (query.length > 255) {
+                throw { status: 414, message: 'Слишком длинный запрос' }
             }
+
+            // Преобразуем параметры в массивы
+            const difficultyIds = difficulty ? difficulty.split(',').map(Number) : []
+            const tagIds = tags ? tags.split(',').map(Number) : []
+            let sortBy = ''
+
+            if (sort === 'creation') {
+                sortBy = 'creation_date'
+            } else sortBy = sort
+
+            const list = await coursesModel.getSortedCourses(
+                query,
+                difficultyIds,
+                tagIds,
+                sort,
+                order,
+                limit,
+                offset,
+            )
+
+            if (list.courses.length === 0) {
+                throw { status: 404, message: 'Курсы не найдены' }
+            }
+
+            return list
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async addCourseSubscriber(courseId, userId) {
+        try {
+            if (courseId.length === 0 || userId.length === 0) {
+                throw { status: 400, message: 'Не все поля заполнены' }
+            }
+            await coursesModel.addCourseSubscriber(userId, courseId)
+            return courseId
+        } catch (error) {
+            throw error.code === '23505'
+                ? { status: 409, message: 'Пользователь уже подписан на этот курс' }
+                : error.code === '23503'
+                  ? { status: 404, message: 'Курс не найден' }
+                  : error
+        }
+    }
+
+    async removeCourseSubscriber(courseId, userId) {
+        try {
+            if (courseId.length === 0 || userId.length === 0) {
+                throw { status: 400, message: 'Не все поля заполнены' }
+            }
+            await coursesModel.removeCourseSubscriber(userId, courseId)
+            return courseId
         } catch (error) {
             throw error
         }

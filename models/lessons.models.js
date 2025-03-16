@@ -123,6 +123,36 @@ class LessonsModel {
             throw error
         }
     }
+
+    async finishLesson(userId, lessonId) {
+        try {
+            const result = await db.query(
+                `INSERT INTO user_lessons (user_id, lesson_id)
+                 SELECT $1, $2
+                 FROM user_courses
+                 WHERE user_id = $1 
+                   AND course_id = (
+                       SELECT s.course_id
+                       FROM lessons l
+                       JOIN sections s ON l.section_id = s.id
+                       WHERE l.id = $2
+                   )
+                   AND active = TRUE
+                 
+                 RETURNING *`,
+                [userId, lessonId],
+            )
+
+            if (result.rowCount === 0) {
+                throw { status: 406, message: 'Пользователь не подписан на данный курс' }
+            }
+        } catch (error) {
+            if (error.code === '23505') {
+                throw { status: 409, message: 'Урок уже завершен' }
+            }
+            throw error
+        }
+    }
 }
 
 module.exports = new LessonsModel()
