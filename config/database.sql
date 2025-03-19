@@ -106,7 +106,9 @@ CREATE TABLE IF NOT EXISTS courses (
     reviews_count BIGINT DEFAULT 0,
     course_photo TEXT DEFAULT 'DefaultCoursePhoto.jpg',
     subscribers INTEGER DEFAULT 0,
+
     lessons_count INT DEFAULT 0,
+    test_count INT DEFAULT 0,
 
     difficulty_id BIGINT,
     
@@ -223,11 +225,18 @@ BEGIN
 
     -- Обновляем lessons_count в таблице courses
     UPDATE courses
-    SET lessons_count = (
+    SET 
+    lessons_count = (
         SELECT COUNT(*)
         FROM lessons l
         JOIN sections s ON l.section_id = s.id
-        WHERE s.course_id = courses.id  
+        WHERE s.course_id = courses.id  AND is_test = FALSE
+    ),
+    test_count = (
+        SELECT COUNT(*)
+        FROM lessons l
+        JOIN sections s ON l.section_id = s.id
+        WHERE s.course_id = courses.id  AND is_test = TRUE
     )
     WHERE courses.id = course_id; 
 
@@ -243,36 +252,35 @@ AFTER INSERT OR DELETE ON lessons
 FOR EACH ROW
 EXECUTE FUNCTION update_lessons_count();
 
--- Функция для обновления прогресса при добавлении урока
+-- Функция для обновления прогресса при добавлении урока или теста
 CREATE OR REPLACE FUNCTION update_user_progress()
 RETURNS TRIGGER AS $$
 DECLARE
     course_id_var INT;
-    total_lessons INT;
-    completed_lessons INT;
+    total_lessons_tests INT;
+    completed_lessons_tests INT;
 BEGIN
-    -- Находим course_id и total_lessons через section_id -> courses
-    SELECT s.course_id, c.lessons_count
-    INTO course_id_var, total_lessons
+    -- Находим course_id и общее количество уроков + тестов
+    SELECT s.course_id, (c.lessons_count + c.test_count)
+    INTO course_id_var, total_lessons_tests
     FROM lessons l
     JOIN sections s ON l.section_id = s.id
     JOIN courses c ON s.course_id = c.id
     WHERE l.id = NEW.lesson_id;
 
-    -- Если курс найден
     IF course_id_var IS NOT NULL THEN
-        -- Считаем количество уже пройденных уроков пользователя
-        SELECT COUNT(*) INTO completed_lessons
+        -- Считаем все пройденные уроки + тесты пользователя
+        SELECT COUNT(*) INTO completed_lessons_tests
         FROM user_lessons ul
         JOIN lessons l ON ul.lesson_id = l.id
         JOIN sections s ON l.section_id = s.id
         WHERE ul.user_id = NEW.user_id AND s.course_id = course_id_var;
 
-        -- Обновляем количество пройденных уроков и прогресс
+        -- Обновляем lessons_num_fin и progress
         UPDATE user_courses
-        SET lessons_num_fin = completed_lessons,
+        SET lessons_num_fin = completed_lessons_tests,
             progress = CASE
-                WHEN total_lessons > 0 THEN CEIL((completed_lessons::DECIMAL / total_lessons) * 100)
+                WHEN total_lessons_tests > 0 THEN CEIL((completed_lessons_tests::DECIMAL / total_lessons_tests) * 100)
                 ELSE 0
             END
         WHERE user_id = NEW.user_id AND course_id = course_id_var;
@@ -282,35 +290,33 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Создание триггера для обновления прогресса при добавлении урока
+-- Триггер для обновления прогресса при добавлении урока/теста
 DROP TRIGGER IF EXISTS trg_update_user_progress ON user_lessons;
-
 CREATE TRIGGER trg_update_user_progress
 AFTER INSERT ON user_lessons
 FOR EACH ROW
 EXECUTE FUNCTION update_user_progress();
 
 
--- Функция для обновления прогресса при удалении урока
+-- Функция для обновления прогресса при удалении урока или теста
 CREATE OR REPLACE FUNCTION update_user_progress_on_delete()
 RETURNS TRIGGER AS $$
 DECLARE
     course_id_var INT;
-    total_lessons INT;
-    completed_lessons INT;
+    total_lessons_tests INT;
+    completed_lessons_tests INT;
 BEGIN
-    -- Находим course_id и total_lessons
-    SELECT s.course_id, c.lessons_count
-    INTO course_id_var, total_lessons
+    -- Находим course_id и общее количество уроков + тестов
+    SELECT s.course_id, (c.lessons_count + c.test_count)
+    INTO course_id_var, total_lessons_tests
     FROM lessons l
     JOIN sections s ON l.section_id = s.id
     JOIN courses c ON s.course_id = c.id
     WHERE l.id = OLD.lesson_id;
 
-    -- Если курс найден
     IF course_id_var IS NOT NULL THEN
-        -- Пересчитываем пройденные уроки пользователя
-        SELECT COUNT(*) INTO completed_lessons
+        -- Считаем все пройденные уроки + тесты пользователя
+        SELECT COUNT(*) INTO completed_lessons_tests
         FROM user_lessons ul
         JOIN lessons l ON ul.lesson_id = l.id
         JOIN sections s ON l.section_id = s.id
@@ -318,9 +324,9 @@ BEGIN
 
         -- Обновляем lessons_num_fin и progress
         UPDATE user_courses
-        SET lessons_num_fin = completed_lessons,
+        SET lessons_num_fin = completed_lessons_tests,
             progress = CASE
-                WHEN total_lessons > 0 THEN CEIL((completed_lessons::DECIMAL / total_lessons) * 100)
+                WHEN total_lessons_tests > 0 THEN CEIL((completed_lessons_tests::DECIMAL / total_lessons_tests) * 100)
                 ELSE 0
             END
         WHERE user_id = OLD.user_id AND course_id = course_id_var;
@@ -330,55 +336,44 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Создание триггера для обновления прогресса при удалении урока
+-- Триггер для обновления прогресса при удалении урока/теста
 DROP TRIGGER IF EXISTS trg_update_user_progress_on_delete ON user_lessons;
-
 CREATE TRIGGER trg_update_user_progress_on_delete
 AFTER DELETE ON user_lessons
 FOR EACH ROW
 EXECUTE FUNCTION update_user_progress_on_delete();
 
--- Функция для пересчёта прогресса всех пользователей в курсе
+-- Функция для пересчёта прогресса всех пользователей в курсе при изменении уроков
 CREATE OR REPLACE FUNCTION recalculate_all_user_progress()
 RETURNS TRIGGER AS $$
 DECLARE
-    user_record RECORD;
-    total_lessons INT;
+    course_id INT;
+    total_items INT; -- Общее количество элементов (уроки + тесты)
 BEGIN
-    -- Получаем общее количество уроков для курса
-    SELECT c.lessons_count INTO total_lessons
-    FROM courses c
-    WHERE c.id = (SELECT s.course_id FROM sections s WHERE s.id = COALESCE(NEW.section_id, OLD.section_id));
+    -- Определяем course_id и сумму уроков + тестов
+    SELECT s.course_id, (c.lessons_count + c.test_count) INTO course_id, total_items
+    FROM sections s
+    JOIN courses c ON s.course_id = c.id
+    WHERE s.id = COALESCE(NEW.section_id, OLD.section_id);
 
-    -- Обходим всех пользователей, подписанных на этот курс
-    FOR user_record IN
-        SELECT user_id FROM user_courses
-        WHERE course_id = (SELECT s.course_id FROM sections s WHERE s.id = COALESCE(NEW.section_id, OLD.section_id))
-    LOOP
-        -- Обновляем количество пройденных уроков
-        UPDATE user_courses
-        SET lessons_num_fin = (
-            SELECT COUNT(*)
-            FROM user_lessons ul
-            JOIN lessons l ON ul.lesson_id = l.id
-            JOIN sections s ON l.section_id = s.id
-            WHERE ul.user_id = user_record.user_id
-              AND s.course_id = (SELECT s.course_id FROM sections s WHERE s.id = COALESCE(NEW.section_id, OLD.section_id))
-        ),
+    -- Массовое обновление прогресса для всех пользователей курса
+    UPDATE user_courses uc
+    SET lessons_num_fin = ul.completed_items,
         progress = CASE
-            WHEN total_lessons > 0 THEN CEIL((
-                SELECT COUNT(*)
-                FROM user_lessons ul
-                JOIN lessons l ON ul.lesson_id = l.id
-                JOIN sections s ON l.section_id = s.id
-                WHERE ul.user_id = user_record.user_id
-                  AND s.course_id = (SELECT s.course_id FROM sections s WHERE s.id = COALESCE(NEW.section_id, OLD.section_id))
-            )::DECIMAL / total_lessons * 100)
+            WHEN total_items > 0 THEN CEIL((ul.completed_items::DECIMAL / total_items) * 100)
             ELSE 0
         END
-        WHERE user_id = user_record.user_id
-          AND course_id = (SELECT s.course_id FROM sections s WHERE s.id = COALESCE(NEW.section_id, OLD.section_id));
-    END LOOP;
+    FROM (
+        -- Считаем пройденные уроки и тесты
+        SELECT ul.user_id, COUNT(*) AS completed_items
+        FROM user_lessons ul
+        JOIN lessons l ON ul.lesson_id = l.id
+        JOIN sections s ON l.section_id = s.id
+        WHERE s.course_id = course_id
+        GROUP BY ul.user_id
+    ) ul
+    WHERE uc.user_id = ul.user_id
+      AND uc.course_id = course_id;
 
     RETURN NULL;
 END;
@@ -409,10 +404,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Удаляем старый триггер, если существует
+-- Триггер для удаления всех пройденных уроков при отписке от курса 
 DROP TRIGGER IF EXISTS trg_delete_user_lessons_on_course_remove ON user_courses;
-
--- Создаем новый триггер
 CREATE TRIGGER trg_delete_user_lessons_on_course_remove
 AFTER DELETE ON user_courses
 FOR EACH ROW
@@ -422,70 +415,25 @@ EXECUTE FUNCTION delete_user_lessons_on_course_remove();
 CREATE OR REPLACE FUNCTION update_course_subscribers()
 RETURNS TRIGGER AS $$
 BEGIN
-    -- Увеличиваем количество подписчиков при добавлении
-    IF TG_OP = 'INSERT' THEN
-        UPDATE courses
-        SET subscribers = subscribers + 1
-        WHERE id = NEW.course_id;
-    -- Уменьшаем количество подписчиков при удалении
-    ELSIF TG_OP = 'DELETE' THEN
-        UPDATE courses
-        SET subscribers = subscribers - 1
-        WHERE id = OLD.course_id;
-    END IF;
+    -- Обновляем количество подписчиков: +1 при INSERT, -1 при DELETE
+    UPDATE courses
+    SET subscribers = subscribers + CASE TG_OP
+        WHEN 'INSERT' THEN 1
+        WHEN 'DELETE' THEN -1
+        ELSE 0
+    END
+    WHERE id = COALESCE(NEW.course_id, OLD.course_id);
 
     RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
 
--- Удаляем старые триггеры, если существуют
-DROP TRIGGER IF EXISTS trg_update_course_subscribers_insert ON user_courses;
-DROP TRIGGER IF EXISTS trg_update_course_subscribers_delete ON user_courses;
+-- Удаляем старый триггер, если он существует
+DROP TRIGGER IF EXISTS trg_update_course_subscribers ON user_courses;
 
--- Создаем триггер для увеличения подписчиков при добавлении
-CREATE TRIGGER trg_update_course_subscribers_insert
-AFTER INSERT ON user_courses
+-- Создаём универсальный триггер для INSERT и DELETE
+CREATE TRIGGER trg_update_course_subscribers
+AFTER INSERT OR DELETE ON user_courses
 FOR EACH ROW
 EXECUTE FUNCTION update_course_subscribers();
 
--- Создаем триггер для уменьшения подписчиков при удалении
-CREATE TRIGGER trg_update_course_subscribers_delete
-AFTER DELETE ON user_courses
-FOR EACH ROW
-EXECUTE FUNCTION update_course_subscribers();
-
--- Функция для обновления количества подписчиков
-CREATE OR REPLACE FUNCTION update_course_subscribers()
-RETURNS TRIGGER AS $$
-BEGIN
-    -- Увеличиваем количество подписчиков при добавлении
-    IF TG_OP = 'INSERT' THEN
-        UPDATE courses
-        SET subscribers = subscribers + 1
-        WHERE id = NEW.course_id;
-    -- Уменьшаем количество подписчиков при удалении
-    ELSIF TG_OP = 'DELETE' THEN
-        UPDATE courses
-        SET subscribers = subscribers - 1
-        WHERE id = OLD.course_id;
-    END IF;
-
-    RETURN NULL;
-END;
-$$ LANGUAGE plpgsql;
-
--- Удаляем старые триггеры, если существуют
-DROP TRIGGER IF EXISTS trg_update_course_subscribers_insert ON user_courses;
-DROP TRIGGER IF EXISTS trg_update_course_subscribers_delete ON user_courses;
-
--- Создаем триггер для увеличения подписчиков при добавлении
-CREATE TRIGGER trg_update_course_subscribers_insert
-AFTER INSERT ON user_courses
-FOR EACH ROW
-EXECUTE FUNCTION update_course_subscribers();
-
--- Создаем триггер для уменьшения подписчиков при удалении
-CREATE TRIGGER trg_update_course_subscribers_delete
-AFTER DELETE ON user_courses
-FOR EACH ROW
-EXECUTE FUNCTION update_course_subscribers();
