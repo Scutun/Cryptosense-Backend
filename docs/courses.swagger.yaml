@@ -387,8 +387,8 @@ paths:
                   creation_date:
                     type: string
                     format: date-time
-                  course_duration:
-                    type: string
+                  duration:
+                    type: integer
                   difficulty:
                     type: string
                   tags:
