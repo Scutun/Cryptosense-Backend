@@ -168,6 +168,21 @@ class CoursesService {
             throw error
         }
     }
+
+    async courseCheckSubscription(courseId, userId) {
+        try {
+            if (courseId.length === 0) {
+                throw { status: 400, message: 'Id курса не предоставлен' }
+            }
+            const info = await coursesModel.courseCheckSubscription(courseId, userId)
+            if (!info.rows[0]) {
+                return { isSubscribed: false }
+            }
+            return { isSubscribed: true }
+        } catch (error) {
+            throw error
+        }
+    }
 }
 
 module.exports = new CoursesService()

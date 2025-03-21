@@ -89,7 +89,7 @@ class CoursesModel {
             const info = await db.query(
                 `SELECT 
                     courses.id, courses.id, courses.title, courses.description, 
-                    CONCAT(users.name, ' ', users.surname) AS creator, 
+                    courses.creator_id as creatorId, 
                     courses.creation_date as creationDate, courses.course_duration AS duration, difficulties.id AS difficultyId, difficulties.name AS difficulty, 
                     ARRAY_AGG(tags.name) AS tags,courses.lessons_count as lessonsCount,courses.test_count as testCount,courses.subscribers,
                     courses.course_photo as coursePhoto, courses.rating
@@ -99,7 +99,7 @@ class CoursesModel {
                   LEFT JOIN course_tags ON courses.id = course_tags.course_id
                   LEFT JOIN tags ON course_tags.tag_id = tags.id
                   WHERE courses.id = $1
-                  GROUP BY courses.id, users.name, users.surname, difficulties.name`,
+                  GROUP BY courses.id, users.name, users.surname, difficulties.id, difficulties.name`,
                 [id],
             )
             return info.rows[0]
@@ -290,6 +290,18 @@ class CoursesModel {
                 ueserId,
                 courseId,
             ])
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async courseCheckSubscription(courseId, userId) {
+        try {
+            const info = await db.query(
+                `SELECT * FROM user_courses WHERE course_id = $1 and user_id = $2`,
+                [courseId, userId],
+            )
+            return info
         } catch (error) {
             throw error
         }
