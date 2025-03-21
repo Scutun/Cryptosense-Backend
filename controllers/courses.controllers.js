@@ -83,6 +83,16 @@ class CoursesController {
             next(error)
         }
     }
+
+    async courseCheckSubscription(req, res, next) {
+        try {
+            const userId = tokenUtils.getIdFromToken(req)
+            const isSubscribed = await coursesService.courseCheckSubscription(req.params.id, userId)
+            res.status(200).json(isSubscribed)
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 module.exports = new CoursesController()

@@ -10,6 +10,7 @@ router.post('/v1/courses/sub', checkToken, coursesController.addSubscription)
 router.get('/v1/courses/info/:id', coursesController.getCourseInfoById)
 router.get('/v1/courses/chosen', checkToken, coursesController.getChosenCourses)
 router.get('/v1/courses/list', coursesController.getCourses)
+router.get('/v1/courses/check/sub/:id', checkToken, coursesController.courseCheckSubscription)
 
 router.put('/v1/courses', checkToken, coursesController.updateCourse)
 
