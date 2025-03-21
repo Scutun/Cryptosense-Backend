@@ -12,7 +12,7 @@ class AuthorsService {
                 throw { status: 404, message: 'Автор не найден' }
             }
 
-            return author
+            return author.rows[0]
         } catch (error) {
             throw error
         }
