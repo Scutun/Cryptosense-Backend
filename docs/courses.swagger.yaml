@@ -389,6 +389,8 @@ paths:
                     format: date-time
                   duration:
                     type: integer
+                  difficultyId:
+                    type: integer
                   difficulty:
                     type: string
                   tags:

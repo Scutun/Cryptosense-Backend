@@ -81,7 +81,7 @@ END $$;
 CREATE TABLE IF NOT EXISTS achievements (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) UNIQUE NOT NULL
-)
+);
 
 -- таблица пользовательских достижений
 CREATE TABLE IF NOT EXISTS user_achievements (
@@ -89,9 +89,11 @@ CREATE TABLE IF NOT EXISTS user_achievements (
   user_id BIGINT NOT NULL,
   achievement_id BIGINT NOT NULL,
 
+  UNIQUE (user_id, achievement_id),
+
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (achievement_id) REFERENCES achievements(id) ON DELETE CASCADE
-)
+);
 
 -- таблица пользователей
 CREATE TABLE IF NOT EXISTS users (
