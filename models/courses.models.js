@@ -90,8 +90,9 @@ class CoursesModel {
                 `SELECT 
                     courses.id, courses.id, courses.title, courses.description, 
                     CONCAT(users.name, ' ', users.surname) AS creator, 
-                    courses.creation_date, courses.course_duration, difficulties.name AS difficulty, 
-                    ARRAY_AGG(tags.name) AS tags
+                    courses.creation_date as creationDate, courses.course_duration AS duration, difficulties.name AS difficulty, 
+                    ARRAY_AGG(tags.name) AS tags,courses.lessons_count as lessonsCount,courses.test_count as testCount,courses.subscribers,
+                    courses.course_photo as coursePhoto, courses.rating
                   FROM courses
                   LEFT JOIN users ON courses.creator_id = users.id
                   LEFT JOIN difficulties ON courses.difficulty_id = difficulties.id
