@@ -73,7 +73,7 @@ class SectionsService {
         try {
             const section = await sectionsModel.getSectionById(id)
 
-            const course = await coursesModel.getCourseById(section.rows[0].courseId)
+            const course = await coursesModel.getCourseById(section.rows[0].courseid)
 
             if (course.rowCount === 0 || section.rowCount === 0) {
                 throw { status: 404, message: 'Курса или раздела с таким id не существует' }
