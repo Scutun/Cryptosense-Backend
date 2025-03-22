@@ -52,6 +52,9 @@ class SectionsModel {
 
             return section
         } catch (error) {
+            if (error.code === '23503') {
+                throw { status: 409, message: 'Раздел с таким названием уже существует' }
+            }
             throw error
         }
     }
