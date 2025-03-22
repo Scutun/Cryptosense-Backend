@@ -312,7 +312,19 @@ paths:
                   message:
                     type: string
                     example: 'Вы не являетесь создателем этого курса'
-
+        '409':
+          description: Раздел с таким названием уже существует
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 409
+                  message:
+                    type: string
+                    example: 'Раздел с таким названием уже существует'
         '500':
           description: Ошибка сервера
           content:
