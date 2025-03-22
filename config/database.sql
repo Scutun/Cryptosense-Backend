@@ -236,9 +236,14 @@ BEGIN
         FROM sections s
         WHERE s.id = NEW.section_id;
     ELSIF TG_OP = 'DELETE' THEN
-        SELECT s.course_id INTO course_id_var
-        FROM sections s
-        WHERE s.id = OLD.section_id;
+        -- Если удаляем из lessons или sections, ищем course_id
+        IF TG_TABLE_NAME = 'lessons' THEN
+            SELECT s.course_id INTO course_id_var
+            FROM sections s
+            WHERE s.id = OLD.section_id;
+        ELSIF TG_TABLE_NAME = 'sections' THEN
+            course_id_var := OLD.course_id;
+        END IF;
     END IF;
 
     -- Проверяем, что course_id определён
@@ -249,19 +254,19 @@ BEGIN
     -- Обновляем lessons_count и test_count в таблице courses
     UPDATE courses
     SET 
-    lessons_count = (
-        SELECT COUNT(*)
-        FROM lessons l
-        JOIN sections s ON l.section_id = s.id
-        WHERE s.course_id = courses.id AND is_test = FALSE
-    ),
-    test_count = (
-        SELECT COUNT(*)
-        FROM lessons l
-        JOIN sections s ON l.section_id = s.id
-        WHERE s.course_id = courses.id AND is_test = TRUE
-    )
-    WHERE courses.id = course_id_var;
+        lessons_count = (
+            SELECT COUNT(*)
+            FROM lessons l
+            JOIN sections s ON l.section_id = s.id
+            WHERE s.course_id = courses.id AND is_test = FALSE
+        ),
+        test_count = (
+            SELECT COUNT(*)
+            FROM lessons l
+            JOIN sections s ON l.section_id = s.id
+            WHERE s.course_id = courses.id AND is_test = TRUE
+        )
+    WHERE id = course_id_var;
 
     -- Вызов функции пересчёта прогресса для всех пользователей курса
     PERFORM recalculate_all_user_progress(course_id_var);
@@ -270,10 +275,18 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
 -- Триггер на обновления количества уроков и тестов в курсе
 DROP TRIGGER IF EXISTS trg_update_lessons_count ON lessons;
 CREATE TRIGGER trg_update_lessons_count
 AFTER INSERT OR DELETE ON lessons
+FOR EACH ROW
+EXECUTE FUNCTION update_lessons_count();
+
+-- Триггер для пересчёта уроков и тестов при удалении секции
+DROP TRIGGER IF EXISTS trg_update_lessons_count_on_section_delete ON sections;
+CREATE TRIGGER trg_update_lessons_count_on_section_delete
+AFTER DELETE ON sections
 FOR EACH ROW
 EXECUTE FUNCTION update_lessons_count();
 
@@ -346,31 +359,39 @@ RETURNS VOID AS $$
 DECLARE
     total_items INT;
 BEGIN
-    -- Определяем общее количество элементов
+    -- Определяем общее количество уроков и тестов в курсе
     SELECT (c.lessons_count + c.test_count) INTO total_items
     FROM courses c
-    WHERE c.id = course_id_var;  -- Используем переданный аргумент course_id
-    
+    WHERE c.id = course_id_var;
+
     -- Массовое обновление прогресса для всех пользователей курса
     UPDATE user_courses uc
-    SET lessons_num_fin = ul.completed_items,
+    SET lessons_num_fin = COALESCE(ul.completed_items, 0),
         progress = CASE
-            WHEN total_items > 0 THEN CEIL((ul.completed_items::DECIMAL / total_items) * 100)
+            WHEN total_items > 0 THEN CEIL(COALESCE(ul.completed_items, 0)::DECIMAL / total_items * 100)
             ELSE 0
         END
     FROM (
+        -- Считаем количество завершённых уроков для каждого пользователя
         SELECT ul.user_id, COUNT(*) AS completed_items
         FROM user_lessons ul
         JOIN lessons l ON ul.lesson_id = l.id
         JOIN sections s ON l.section_id = s.id
-        WHERE s.course_id = course_id_var  -- Здесь указываем столбец из таблицы sections
+        WHERE s.course_id = course_id_var
         GROUP BY ul.user_id
+
+        -- Включаем пользователей без завершённых уроков (прогресс = 0)
+        UNION
+        SELECT uc.user_id, 0 AS completed_items
+        FROM user_courses uc
+        WHERE uc.course_id = course_id_var
     ) ul
     WHERE uc.user_id = ul.user_id
-      AND uc.course_id = course_id_var;  -- Явно указываем переменную course_id
+      AND uc.course_id = course_id_var;
 
 END;
 $$ LANGUAGE plpgsql;
+
 
 -- функция удаления всех пройденных уроков при отписке от курса 
 CREATE OR REPLACE FUNCTION delete_user_lessons_on_course_remove()
