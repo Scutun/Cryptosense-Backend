@@ -24,7 +24,11 @@ class TestsController {
 
     async getTestInfoById(req, res, next) {
         try {
-            const test = await testsService.getTestInfoById(req.params.id)
+            const test = await testsService.getTestInfoById(
+                req.query.id,
+                parseInt(req.query.page, 10),
+                parseInt(req.query.limit, 10),
+            )
             res.status(200).json(test)
         } catch (error) {
             next(error)
