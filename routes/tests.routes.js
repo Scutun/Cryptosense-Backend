@@ -7,7 +7,7 @@ const checkToken = require('../middlewares/checkToken')
 router.post('/v1/tests/new', checkToken, testController.createTest)
 
 router.get('/v1/tests/list/:id', checkToken, testController.getTestsBySectionId)
-router.get('/v1/tests/info/:id', checkToken, testController.getTestInfoById)
+router.get('/v1/tests/info', checkToken, testController.getTestInfoById)
 
 router.put('/v1/tests/redact', checkToken, testController.updateTest)
 
