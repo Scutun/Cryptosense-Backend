@@ -129,6 +129,7 @@ CREATE TABLE IF NOT EXISTS courses (
 
     lessons_count INT DEFAULT 0,
     test_count INT DEFAULT 0,
+    unlock_all BOOLEAN DEFAULT TRUE,
 
     difficulty_id BIGINT,
     
@@ -141,7 +142,10 @@ CREATE TABLE IF NOT EXISTS sections (
   name VARCHAR(255)  NOT NULL,
   UNIQUE (name , course_id ),
   course_id BIGINT NOT NULL,
-  
+
+  position INT NOT NULL,        -- Порядок секции
+  is_unlocked BOOLEAN DEFAULT TRUE,
+
   FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
 );
 
@@ -184,6 +188,7 @@ CREATE TABLE IF NOT EXISTS user_courses (
     FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
 );
 
+-- таблица пройденных уроков пользователя 
 CREATE TABLE IF NOT EXISTS user_lessons (
     user_id INTEGER NOT NULL,
     lesson_id INTEGER NOT NULL,
@@ -206,6 +211,18 @@ CREATE TABLE IF NOT EXISTS comments (
     UNIQUE (user_nickname, course_id),
     
     FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
+);
+
+-- таблица секций пользователя
+CREATE TABLE IF NOT EXISTS user_sections (
+    user_id INT NOT NULL,
+    section_id INT NOT NULL,
+    is_unlocked BOOLEAN DEFAULT FALSE,
+    is_completed BOOLEAN DEFAULT FALSE,
+
+    PRIMARY KEY (user_id, section_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (section_id) REFERENCES sections(id) ON DELETE CASCADE
 );
 
 -- Супер пользователь для теста
@@ -441,3 +458,103 @@ AFTER INSERT OR DELETE ON user_courses
 FOR EACH ROW
 EXECUTE FUNCTION update_course_subscribers();
 
+-- Функция для проверки завершения секции и разблокировки следующей
+CREATE OR REPLACE FUNCTION check_and_unlock_next_section()
+RETURNS TRIGGER AS $$
+DECLARE
+    current_section_id INT;
+    next_section_id INT;
+    course_id_var INT;
+    unlock_type_var BOOLEAN;
+BEGIN
+    -- Определяем текущую секцию и курс
+    SELECT l.section_id, s.course_id, c.unlock_all INTO current_section_id, course_id_var, unlock_type_var
+    FROM lessons l
+    JOIN sections s ON l.section_id = s.id
+    JOIN courses c ON s.course_id = c.id
+    WHERE l.id = NEW.lesson_id;
+
+
+    -- Проверяем, все ли уроки в текущей секции завершены
+    IF NOT EXISTS (
+        SELECT 1
+        FROM lessons l
+        LEFT JOIN user_lessons ul ON l.id = ul.lesson_id AND ul.user_id = NEW.user_id
+        WHERE l.section_id = current_section_id AND (ul.lesson_id IS NULL)
+    ) THEN
+        -- Отмечаем секцию как завершенную
+        UPDATE user_sections
+        SET is_completed = TRUE
+        WHERE user_id = NEW.user_id AND section_id = current_section_id;
+
+
+
+        -- Находим следующую секцию
+        SELECT id INTO next_section_id
+        FROM sections
+        WHERE course_id = course_id_var
+          AND position = (SELECT position + 1 FROM sections WHERE id = current_section_id)
+        LIMIT 1;
+
+        -- Разблокируем следующую секцию
+        IF next_section_id IS NOT NULL THEN
+            INSERT INTO user_sections (user_id, section_id, is_unlocked)
+            VALUES (NEW.user_id, next_section_id, TRUE)
+            ON CONFLICT (user_id, section_id) DO UPDATE
+            SET is_unlocked = TRUE;
+        END IF;
+    END IF;
+
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Триггер на проверку и разблокировку секции
+DROP TRIGGER IF EXISTS trg_check_and_unlock_next_section ON user_lessons;
+CREATE TRIGGER trg_check_and_unlock_next_section
+AFTER INSERT ON user_lessons
+FOR EACH ROW
+EXECUTE FUNCTION check_and_unlock_next_section();
+
+
+-- Функция для автоматической разблокировки всех секций при подписке
+CREATE OR REPLACE FUNCTION unlock_all_sections_on_subscription()
+RETURNS TRIGGER AS $$
+DECLARE
+    first_section_id INT;
+BEGIN
+    -- Если курс настроен на автоматическую разблокировку всех секций
+    IF (SELECT unlock_all FROM courses WHERE id = NEW.course_id) = TRUE THEN
+        INSERT INTO user_sections (user_id, section_id, is_unlocked)
+        SELECT NEW.user_id, s.id, TRUE
+        FROM sections s
+        WHERE s.course_id = NEW.course_id
+        ON CONFLICT (user_id, section_id) DO UPDATE
+        SET is_unlocked = TRUE;
+    ELSE
+        -- Найти первую секцию (где position = 0) для курса
+        SELECT id INTO first_section_id
+        FROM sections
+        WHERE course_id = NEW.course_id AND position = 0
+        LIMIT 1;
+
+        -- Разблокировать первую секцию, если найдена
+        IF first_section_id IS NOT NULL THEN
+            INSERT INTO user_sections (user_id, section_id, is_unlocked)
+            VALUES (NEW.user_id, first_section_id, TRUE)
+            ON CONFLICT (user_id, section_id) DO UPDATE
+            SET is_unlocked = TRUE;
+        END IF;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- Триггер для автоматической разблокировки всех секций при подписке
+DROP TRIGGER IF EXISTS trg_unlock_sections_on_subscription ON user_courses;
+CREATE TRIGGER trg_unlock_sections_on_subscription
+AFTER INSERT ON user_courses
+FOR EACH ROW
+EXECUTE FUNCTION unlock_all_sections_on_subscription();
