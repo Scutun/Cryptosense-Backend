@@ -8,14 +8,14 @@ class TestsService {
                 !info.name ||
                 !info.sectionId ||
                 !info.courseId ||
-                !info.info ||
+                !info.questions ||
                 !creatorId ||
-                info.info.questions.length === 0
+                info.questions.length === 0
             ) {
                 throw { status: 400, message: 'Не все поля заполнены' }
             }
 
-            if (info.info?.questions?.length > 64) {
+            if (info.questions?.length > 64) {
                 throw {
                     status: 413,
                     message:
@@ -29,7 +29,7 @@ class TestsService {
                 info.name,
                 info.sectionId,
                 info.courseId,
-                info.info,
+                info.questions,
             )
 
             const { _id, ...rest } = test
@@ -48,15 +48,18 @@ class TestsService {
             }
 
             const tests = await testsModel.getTestsBySectionId(sectionId)
-            const modifiedTests = tests.map(({ _id, ...rest }) => ({ testId: _id, ...rest }))
 
-            return modifiedTests
+            if (tests.length === 0) {
+                throw { status: 404, message: 'В этом разделе нет тестов' }
+            }
+
+            return tests
         } catch (error) {
             throw error
         }
     }
 
-    async getTestInfoById(testId) {
+    async getTestInfoById(testId, page, limit) {
         try {
             if (!testId) {
                 throw { status: 400, message: 'Не передан id теста' }
@@ -64,10 +67,26 @@ class TestsService {
 
             const test = await testsModel.getTestInfoById(testId)
 
-            const { _id, ...rest } = test
+            if (!test) {
+                throw { status: 404, message: 'Тест не найден' }
+            }
+
+            const { _id, info, ...rest } = test
             const modifiedTest = { testId: _id, ...rest }
 
-            return modifiedTest
+            if (!page || !limit) {
+                return modifiedTest
+            }
+
+            // Пагинация
+            const questions = test.questions.slice(page * limit, (page + 1) * limit)
+
+            // Возвращаем тест с пагинированными вопросами
+            return {
+                ...modifiedTest,
+                questions,
+                totalQuestions: test.questions.length,
+            }
         } catch (error) {
             throw error
         }
@@ -80,14 +99,14 @@ class TestsService {
                 !info.name ||
                 !info.sectionId ||
                 !info.courseId ||
-                !info.info ||
+                !info.questions ||
                 !creatorId ||
-                info.info.questions.length === 0
+                info.questions.length === 0
             ) {
                 throw { status: 400, message: 'Не все поля заполнены' }
             }
 
-            if (info.info?.questions?.length > 64) {
+            if (info.questions?.length > 64) {
                 throw {
                     status: 413,
                     message:
@@ -97,7 +116,7 @@ class TestsService {
 
             await lessonsModel.checkAuthor(info.courseId, info.sectionId, creatorId)
 
-            await testsModel.updateTest(info.testId, info.name, info.sectionId, info.info)
+            await testsModel.updateTest(info.testId, info.name, info.sectionId, info.questions)
             return info
         } catch (error) {
             throw error

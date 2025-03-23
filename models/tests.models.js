@@ -13,7 +13,7 @@ class TestsModel {
                 _id: testId.rows[0].id,
                 sectionId: sectionId,
                 courseId: courseId,
-                info: info,
+                questions: info,
             }
 
             const mongoDb = await connectMongoDB()
@@ -30,12 +30,11 @@ class TestsModel {
 
     async getTestsBySectionId(sectionId) {
         try {
-            const mongoDb = await connectMongoDB()
-            const tests = await mongoDb
-                .collection('tests')
-                .find({ sectionId: Number(sectionId) })
-                .toArray()
-            return tests
+            const lessons = await db.query(
+                'SELECT id, name FROM lessons WHERE section_id=$1 AND is_test = true',
+                [sectionId],
+            )
+            return lessons.rows
         } catch (error) {
             throw error
         }
@@ -65,7 +64,10 @@ class TestsModel {
 
             await mongoDb
                 .collection('tests')
-                .updateOne({ _id: Number(testId) }, { $set: { info: info, sectionId: sectionId } })
+                .updateOne(
+                    { _id: Number(testId) },
+                    { $set: { questions: info, sectionId: sectionId } },
+                )
         } catch (error) {
             throw error
         }
