@@ -131,6 +131,19 @@ paths:
                   message:
                     type: string
                     example: "Раздела с таким id не существует"
+        '413':
+          description: Слишком много вопросов
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 413
+                  message:
+                    type: string
+                    example: "Слишком много вопросов. Максимально допустимое количество вопросов - 64"
         '500':
           description: Внутренняя ошибка сервера
           content:
@@ -445,6 +458,19 @@ paths:
                   message:
                     type: string
                     example: "У вас недостаточно прав для редактирования этого курса"
+        '413':
+          description: Слишком много вопросов
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 413
+                  message:
+                    type: string
+                    example: "Слишком много вопросов. Максимально допустимое количество вопросов - 64"
         '500':
           description: Внутренняя ошибка сервера
           content:

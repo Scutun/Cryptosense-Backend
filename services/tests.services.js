@@ -10,9 +10,17 @@ class TestsService {
                 !info.courseId ||
                 !info.info ||
                 !creatorId ||
-                Object.keys(info.info).length === 0
+                info.info.questions.length === 0
             ) {
                 throw { status: 400, message: 'Не все поля заполнены' }
+            }
+
+            if (info.info?.questions?.length > 64) {
+                throw {
+                    status: 413,
+                    message:
+                        'Слишком много вопросов. Максимально допустимое количество вопросов - 64',
+                }
             }
 
             await lessonsModel.checkAuthor(info.courseId, info.sectionId, creatorId)
@@ -74,9 +82,17 @@ class TestsService {
                 !info.courseId ||
                 !info.info ||
                 !creatorId ||
-                Object.keys(info.info).length === 0
+                info.info.questions.length === 0
             ) {
                 throw { status: 400, message: 'Не все поля заполнены' }
+            }
+
+            if (info.info?.questions?.length > 64) {
+                throw {
+                    status: 413,
+                    message:
+                        'Слишком много вопросов. Максимально допустимое количество вопросов - 64',
+                }
             }
 
             await lessonsModel.checkAuthor(info.courseId, info.sectionId, creatorId)
