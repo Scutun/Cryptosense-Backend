@@ -543,6 +543,7 @@ BEGIN
         SELECT id INTO first_section_id
         FROM sections
         WHERE course_id = NEW.course_id AND position = 0
+        ORDER BY id ASC
         LIMIT 1;
 
         -- Разблокировать первую секцию, если найдена
