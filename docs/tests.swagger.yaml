@@ -48,6 +48,9 @@ paths:
                       question:
                         type: string
                         example: "Вопрос 1"
+                      specialQuestion:
+                        type: string
+                        example: "print(bool([]))"
                       answers:
                         type: array
                         items:         
@@ -78,6 +81,9 @@ paths:
                         question:
                           type: string
                           example: "Вопрос 1"
+                        specialQuestion:
+                          type: string
+                          example: "print(bool([]))"
                         answers:
                           type: array
                           items:         
@@ -295,6 +301,9 @@ paths:
                         question:
                           type: string
                           example: "Вопрос 1"
+                        specialQuestion:
+                          type: string
+                          example: "print(bool([]))"
                         answers:
                           type: array
                           items:         
@@ -398,6 +407,9 @@ paths:
                       question:
                         type: string
                         example: "Вопрос 1"
+                      specialQuestion:
+                        type: string
+                        example: "print(bool([]))"
                       answers:
                         type: array
                         items:         
@@ -430,6 +442,9 @@ paths:
                         question:
                           type: string
                           example: "Вопрос 1"
+                        specialQuestion:
+                          type: string
+                          example: "print(bool([]))"
                         answers:
                           type: array
                           items:         
