@@ -144,7 +144,7 @@ CREATE TABLE IF NOT EXISTS sections (
   course_id BIGINT NOT NULL,
 
   position INT NOT NULL,        -- Порядок секции
-  is_unlocked BOOLEAN DEFAULT TRUE,
+  -- is_unlocked BOOLEAN DEFAULT TRUE, в текущих условиях не нужна т.к. все вычисляем динамически, понадобится если вводить новые условия разблокировки секций 
 
   FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
 );
