@@ -704,6 +704,9 @@ paths:
                   items:
                     type: integer
                   description: "Массив идентификаторов тегов"
+                unlockAll:
+                  type: boolean
+                  description: "Флаг, указывающий, требуется ли разблокировать все секции курса"
       responses:
         '200':
           description: Успешное получение информации о курсе

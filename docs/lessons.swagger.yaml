@@ -231,6 +231,21 @@ paths:
                   message:
                     type: string
                     example: "Урок уже завершен"
+
+        "423":  
+          description: Завершите предыдущую секцию для просмотра содержимого следующей
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 423
+                  message:
+                    type: string
+                    example: "Завершите предыдущую секцию для просмотра содержимого следующей"
+
         '500':  
           description: Внутренняя ошибка сервера
           content:
@@ -392,6 +407,19 @@ paths:
                   message:
                     type: string
                     example: 'Недействительный токен'
+        "423":  
+          description: Завершите предыдущую секцию для просмотра содержимого следующей
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 423
+                  message:
+                    type: string
+                    example: "Завершите предыдущую секцию для просмотра содержимого следующей"
         '500':
           description: Внутренняя ошибка сервера
           content:

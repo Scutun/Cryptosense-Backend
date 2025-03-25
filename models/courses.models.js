@@ -49,7 +49,8 @@ class CoursesModel {
                      description = $2, 
                      course_duration = $3, 
                      difficulty_id = $4,
-                     course_photo = $5  
+                     course_photo = $5,
+                     unlock_all = $8,   
                  WHERE id = $6 and creator_id = $7`,
                 [
                     info.title,
@@ -59,6 +60,7 @@ class CoursesModel {
                     info.coursePhoto,
                     info.courseId,
                     creatorId,
+                    unlockAll
                 ],
             )
         } catch (error) {
