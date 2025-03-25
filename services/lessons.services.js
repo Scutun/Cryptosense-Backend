@@ -40,12 +40,13 @@ class LessonsService {
         }
     }
 
-    async getLessonById(lessonId) {
+    async getLessonById(lessonId,userId) {
         try {
             if (!lessonId) {
                 throw { status: 400, message: 'Не передан id урока' }
             }
-            const lesson = await lessonsModel.getLessonById(lessonId)
+            await lessonsModel.checkLessonAccess(lessonId,userId)
+            const lesson = await lessonsModel.getLessonById(lessonId,userId)
             const { _id, ...rest } = lesson
             const newLesson = { lessonId: _id, ...rest }
             return newLesson
@@ -92,6 +93,7 @@ class LessonsService {
             if (!userId || !lessonId) {
                 throw { status: 400, message: 'Не все поля заполнены' }
             }
+            await lessonsModel.checkLessonAccess(lessonId,userId)
             await lessonsModel.finishLesson(userId, lessonId)
         } catch (error) {
             throw error

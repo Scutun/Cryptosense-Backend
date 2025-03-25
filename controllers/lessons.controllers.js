@@ -23,7 +23,8 @@ class LessonsController {
 
     async getLessonById(req, res, next) {
         try {
-            const lesson = await lessonsService.getLessonById(req.params.id)
+            const userId = tokenUtils.getIdFromToken(req)
+            const lesson = await lessonsService.getLessonById(req.params.id, userId)
             res.status(200).json(lesson)
         } catch (error) {
             next(error)

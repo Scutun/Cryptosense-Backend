@@ -153,6 +153,24 @@ class LessonsModel {
             throw error
         }
     }
+
+    async checkLessonAccess(lessonId, userId) {
+        try {
+            const lessonOpened = await db.query(
+                'SELECT us.is_unlocked FROM user_sections us LEFT JOIN lessons l ON l.section_id = us.section_id WHERE l.id = $1 AND us.user_id = $2',
+                [lessonId, userId],
+            )
+
+            if (lessonOpened.rowCount === 0) {
+                throw {
+                    status: 403,
+                    message: 'Завершите предыдущую секцию для просмотра следующего урока',
+                }
+            }
+        } catch (error) {
+            throw error
+        }
+    }
 }
 
 module.exports = new LessonsModel()
