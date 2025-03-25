@@ -164,7 +164,7 @@ class LessonsModel {
             if (lessonOpened.rowCount === 0) {
                 throw {
                     status: 403,
-                    message: 'Завершите предыдущую секцию для просмотра следующего урока',
+                    message: 'Завершите предыдущую секцию для просмотра содержимого следующей',
                 }
             }
         } catch (error) {

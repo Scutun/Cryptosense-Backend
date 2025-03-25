@@ -47,6 +47,7 @@ class TestsService {
                 throw { status: 400, message: 'Не передан id секции' }
             }
 
+
             const tests = await testsModel.getTestsBySectionId(sectionId)
 
             if (tests.length === 0) {
@@ -59,12 +60,12 @@ class TestsService {
         }
     }
 
-    async getTestInfoById(testId, page, limit) {
+    async getTestInfoById(testId, page, limit,userId) {
         try {
             if (!testId) {
                 throw { status: 400, message: 'Не передан id теста' }
             }
-
+            await lessonsModel.checkLessonAccess(testId,userId)
             const test = await testsModel.getTestInfoById(testId)
 
             if (!test) {
