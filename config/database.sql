@@ -423,6 +423,13 @@ BEGIN
           WHERE s.course_id = OLD.course_id
       );
     
+    DELETE FROM user_sections
+    WHERE user_id = OLD.user_id
+      AND section_id IN (
+          SELECT id
+          FROM sections
+          WHERE course_id = OLD.course_id
+      );
     RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
@@ -493,7 +500,7 @@ BEGIN
         SELECT id INTO next_section_id
         FROM sections
         WHERE course_id = course_id_var
-          AND position = (SELECT position + 1 FROM sections WHERE id = current_section_id)
+          AND  id > current_section_id           --position = (SELECT position + 1 FROM sections WHERE id = current_section_id)
         LIMIT 1;
 
         -- Разблокируем следующую секцию
