@@ -49,16 +49,28 @@ class LessonsModel {
         }
     }
 
-    async getAllLessonsNameFromSection(sectionId) {
+    async getAllLessonsNameFromSection(sectionId, userId) {
         try {
-            const lessons = await db.query('SELECT id, name FROM lessons WHERE section_id=$1', [
-                sectionId,
-            ])
-            return lessons.rows
+            const lessons = await db.query(
+                `SELECT 
+                    l.id, 
+                    l.name,
+                    CASE 
+                        WHEN ul.lesson_id IS NOT NULL THEN TRUE 
+                        ELSE FALSE 
+                    END AS isCompleted
+                FROM lessons l
+                LEFT JOIN user_lessons ul 
+                    ON l.id = ul.lesson_id AND ul.user_id = $2
+                WHERE l.section_id = $1;`,
+                [sectionId, userId]
+            );
+            return lessons.rows;
         } catch (error) {
-            throw error
+            throw error;
         }
     }
+    
 
     async getLessonById(lessonId) {
         try {

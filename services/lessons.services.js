@@ -28,12 +28,12 @@ class LessonsService {
         }
     }
 
-    async getAllLessonsNameFromSection(sectionId) {
+    async getAllLessonsNameFromSection(sectionId,userId) {
         try {
             if (!sectionId) {
                 throw { status: 400, message: 'Не передан id секции' }
             }
-            const lessons = await lessonsModel.getAllLessonsNameFromSection(sectionId)
+            const lessons = await lessonsModel.getAllLessonsNameFromSection(sectionId,userId)
             return lessons
         } catch (error) {
             throw error

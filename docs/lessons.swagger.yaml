@@ -261,7 +261,7 @@ paths:
 
   /v1/lessons/list/{id}:
     get:
-      summary: Получить список всех уроков в секции
+      summary: Получить список всех уроков и тестов в секции
       tags:
         - Lessons
       parameters:
@@ -292,6 +292,10 @@ paths:
                     name:
                       type: string
                       example: "урок 1"
+                    isCompleted:
+                      type: boolean
+                      example: false
+                      description: Является ли урок завершенным
         "400":  
           description: Не все поля заполнены
           content:
