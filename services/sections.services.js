@@ -55,7 +55,7 @@ class SectionsService {
             if (section.rowCount === 0) {
                 throw { status: 404, message: 'У этого курса пока нет раздела' }
             }
-            return section.rows[0]
+            return section.rows
         } catch (error) {
             throw error
         }
