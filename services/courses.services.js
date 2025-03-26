@@ -36,6 +36,7 @@ class CoursesService {
                 !info.coursePhoto ||
                 !info.courseId ||
                 !creatorId ||
+                !info.unlockAll ||
                 info.tags.length === 0
             ) {
                 throw { status: 400, message: 'Не все поля заполнены' }

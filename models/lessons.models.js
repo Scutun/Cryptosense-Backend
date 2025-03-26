@@ -49,16 +49,28 @@ class LessonsModel {
         }
     }
 
-    async getAllLessonsNameFromSection(sectionId) {
+    async getAllLessonsNameFromSection(sectionId, userId) {
         try {
-            const lessons = await db.query('SELECT id, name FROM lessons WHERE section_id=$1', [
-                sectionId,
-            ])
-            return lessons.rows
+            const lessons = await db.query(
+                `SELECT 
+                    l.id, 
+                    l.name,
+                    CASE 
+                        WHEN ul.lesson_id IS NOT NULL THEN TRUE 
+                        ELSE FALSE 
+                    END AS isCompleted
+                FROM lessons l
+                LEFT JOIN user_lessons ul 
+                    ON l.id = ul.lesson_id AND ul.user_id = $2
+                WHERE l.section_id = $1;`,
+                [sectionId, userId]
+            );
+            return lessons.rows;
         } catch (error) {
-            throw error
+            throw error;
         }
     }
+    
 
     async getLessonById(lessonId) {
         try {
@@ -150,6 +162,24 @@ class LessonsModel {
             if (error.code === '23505') {
                 throw { status: 409, message: 'Урок уже завершен' }
             }
+            throw error
+        }
+    }
+
+    async checkLessonAccess(lessonId, userId) {
+        try {
+            const lessonOpened = await db.query(
+                'SELECT us.is_unlocked FROM user_sections us LEFT JOIN lessons l ON l.section_id = us.section_id WHERE l.id = $1 AND us.user_id = $2',
+                [lessonId, userId],
+            )
+
+            if (lessonOpened.rowCount === 0) {
+                throw {
+                    status: 423,
+                    message: 'Завершите предыдущую секцию для просмотра содержимого следующей',
+                }
+            }
+        } catch (error) {
             throw error
         }
     }

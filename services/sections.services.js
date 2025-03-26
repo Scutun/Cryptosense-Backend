@@ -44,6 +44,23 @@ class SectionsService {
         }
     }
 
+    async getSectionByIdWithAuthorization(userId,courseId) {
+        try {
+            if (courseId.length === 0) {
+                throw { status: 400, message: 'Id курса не предоставлен' }
+            }
+
+            const section = await sectionsModel.getSectionByIdWithAuthorization(userId,courseId)
+
+            if (section.rowCount === 0) {
+                throw { status: 404, message: 'У этого курса пока нет раздела' }
+            }
+            return section.rows
+        } catch (error) {
+            throw error
+        }
+    }
+
     async updateSection(info, user) {
         try {
             const course = await coursesModel.getCourseById(info.courseId)

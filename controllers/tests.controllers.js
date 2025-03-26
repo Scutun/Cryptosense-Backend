@@ -24,10 +24,12 @@ class TestsController {
 
     async getTestInfoById(req, res, next) {
         try {
+            const userId = tokenUtils.getIdFromToken(req)
             const test = await testsService.getTestInfoById(
                 req.query.id,
                 parseInt(req.query.page, 10),
                 parseInt(req.query.limit, 10),
+                userId
             )
             res.status(200).json(test)
         } catch (error) {

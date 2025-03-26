@@ -49,7 +49,8 @@ class CoursesModel {
                      description = $2, 
                      course_duration = $3, 
                      difficulty_id = $4,
-                     course_photo = $5  
+                     course_photo = $5,
+                     unlock_all = $8   
                  WHERE id = $6 and creator_id = $7`,
                 [
                     info.title,
@@ -59,6 +60,7 @@ class CoursesModel {
                     info.coursePhoto,
                     info.courseId,
                     creatorId,
+                    info.unlockAll
                 ],
             )
         } catch (error) {
@@ -92,7 +94,7 @@ class CoursesModel {
                     courses.creator_id as creatorId, 
                     courses.creation_date as creationDate, courses.course_duration AS duration, difficulties.id AS difficultyId, difficulties.name AS difficulty, 
                     ARRAY_AGG(tags.name) AS tags,courses.lessons_count as lessonsCount,courses.test_count as testCount,courses.subscribers,
-                    courses.course_photo as coursePhoto, courses.rating
+                    courses.course_photo as coursePhoto, courses.rating , courses.unlock_all as unlockAll
                   FROM courses
                   LEFT JOIN users ON courses.creator_id = users.id
                   LEFT JOIN difficulties ON courses.difficulty_id = difficulties.id
