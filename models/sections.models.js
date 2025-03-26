@@ -49,7 +49,8 @@ class SectionsModel {
                 `SELECT 
                     s.id, 
                     s.name,
-                    s.course_id AS courseId, 
+                    s.course_id AS courseId,
+                    COALESCE(us.is_completed, FALSE) AS isCompleted, 
                     COUNT(l.id) AS lessonCount,
                     COUNT(ul.lesson_id) FILTER (WHERE ul.user_id = $2) AS lessonCountFin,
                     CASE 
@@ -61,7 +62,7 @@ class SectionsModel {
                 LEFT JOIN lessons l ON l.section_id = s.id
                 LEFT JOIN user_lessons ul ON ul.lesson_id = l.id
                 WHERE s.course_id = $1
-                GROUP BY s.id, s.name, us.section_id;`,
+                GROUP BY s.id, s.name, us.section_id,us.is_completed`,
                 [courseId, userId]
             );
             return section;

@@ -258,6 +258,10 @@ paths:
                       type: boolean
                       example: false
                       description: Является ли секция открытой
+                    isCompleted:
+                      type: boolean
+                      example: false
+                      description: Статус выполнения секции
         
         '400':
           description: Id курса не предоставлен
