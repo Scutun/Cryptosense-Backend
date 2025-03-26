@@ -43,6 +43,34 @@ class SectionsModel {
         }
     }
 
+    async getSectionByIdWithAuthorization(userId, courseId) {
+        try {
+            const section = await db.query(
+                `SELECT 
+                    s.id, 
+                    s.name,
+                    s.course_id AS courseId, 
+                    COUNT(l.id) AS lessonCount,
+                    COUNT(ul.lesson_id) FILTER (WHERE ul.user_id = $2) AS lessonCountFin,
+                    CASE 
+                        WHEN us.section_id IS NOT NULL THEN TRUE 
+                        ELSE FALSE 
+                    END AS isUnlocked
+                FROM sections s
+                LEFT JOIN user_sections us ON s.id = us.section_id
+                LEFT JOIN lessons l ON l.section_id = s.id
+                LEFT JOIN user_lessons ul ON ul.lesson_id = l.id
+                WHERE s.course_id = $1
+                GROUP BY s.id, s.name, us.section_id;`,
+                [courseId, userId]
+            );
+            return section;
+        } catch (error) {
+            throw error;
+        }
+    }
+    
+
     async updateSection(info) {
         try {
             const section = await db.query(
