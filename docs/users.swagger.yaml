@@ -523,19 +523,36 @@ paths:
                 properties:
                   name:
                     type: string
+                    example: 'John'
                   surname:
                     type: string
+                    example: 'Doe'
                   email:
                     type: string
+                    example: 'aBx5g@example.com'
                   nickname:
                     type: string
-                  registrationdate:
+                    example: 'johndoe'
+                  description:
                     type: string
-                    format: date-time
-                  reputation:
-                    type: string
+                    example: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
                   photo:
                     type: string
+                    example: 'photo.jpg'
+                  reputation:
+                    type: integer
+                    example: 0
+                  achievements:
+                    type: array
+                    items:
+                      type: string
+                      example: 'Achievement 1'
+                  registrationDate:
+                    type: string
+                    example: '2022-01-01T00:00:00.000Z'
+                  isAuthor:
+                    type: boolean
+                    example: true
         "404":
           description: Пользователь не найден
           content:
