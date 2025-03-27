@@ -97,7 +97,7 @@ class TestsModel {
     async deleteAllTestsByCoursesId(courseId) {
         try {
             const mongoDb = await connectMongoDB()
-            await mongoDb.collection('tests').deleteMany({ sectionId: Number(sectionId) })
+            await mongoDb.collection('tests').deleteMany({ sectionId: Number(courseId) })
         } catch (error) {
             throw error
         }

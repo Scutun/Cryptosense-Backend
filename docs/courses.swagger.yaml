@@ -102,6 +102,19 @@ paths:
                   message:
                     type: string
                     example: "Недействительный токен"
+        '409':
+          description: Этот пользователь не является автором и не может создавать курсы
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 409
+                  message:
+                    type: string
+                    example: "Этот пользователь не является автором и не может создавать курсы"
         '500':
           description: Внутренняя ошибка сервера
           content:
