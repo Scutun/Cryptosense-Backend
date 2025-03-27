@@ -17,6 +17,33 @@ class AuthorsModel {
             throw error
         }
     }
+
+    async becomeAuthor(description, userId) {
+        try {
+            await db.query(`UPDATE users SET description = $1, author = true WHERE id = $2`, [
+                description,
+                userId,
+            ])
+
+            await db.query(
+                `INSERT INTO user_achievements (user_id, achievement_id) VALUES ($1, $2)`,
+                [userId, 1],
+            )
+
+            const author = await db.query(
+                `SELECT users.name, users.surname, users.email, users.nickname, users.registration_date as registrationDate, users.reputation, photos.name as photo, users.description, ARRAY_AGG(achievements.name) AS achievements, users.author as isAuthor FROM users 
+                left join photos on users.photo_id = photos.id
+                left join user_achievements ON users.id = user_achievements.user_id 
+                left join achievements ON user_achievements.achievement_id = achievements.id 
+                WHERE users.id = $1
+                GROUP BY users.name, users.surname, photos.name, users.description, users.email, users.nickname, users.registration_date, users.reputation, users.author`,
+                [userId],
+            )
+            return author
+        } catch (error) {
+            throw error
+        }
+    }
 }
 
 module.exports = new AuthorsModel()
