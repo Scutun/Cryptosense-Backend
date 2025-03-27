@@ -1,5 +1,7 @@
 const sectionsModel = require('../models/sections.models')
 const coursesModel = require('../models/courses.models')
+const lessonsModel = require('../models/lessons.models')
+const testsModel = require('../models/tests.models')
 
 class SectionsService {
     async createSection(info, user) {
@@ -44,13 +46,13 @@ class SectionsService {
         }
     }
 
-    async getSectionByIdWithAuthorization(userId,courseId) {
+    async getSectionByIdWithAuthorization(userId, courseId) {
         try {
             if (courseId.length === 0) {
                 throw { status: 400, message: 'Id курса не предоставлен' }
             }
 
-            const section = await sectionsModel.getSectionByIdWithAuthorization(userId,courseId)
+            const section = await sectionsModel.getSectionByIdWithAuthorization(userId, courseId)
 
             if (section.rowCount === 0) {
                 throw { status: 404, message: 'У этого курса пока нет раздела' }
@@ -101,6 +103,8 @@ class SectionsService {
             }
 
             await sectionsModel.deleteSection(id)
+            await lessonsModel.deleteAllLessonsBySectionId(id)
+            await testsModel.deleteAllTestsBySectionId(id)
         } catch (error) {
             throw error
         }

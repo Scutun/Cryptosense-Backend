@@ -1,4 +1,7 @@
 const coursesModel = require('../models/courses.models')
+const lessonsModel = require('../models/lessons.models')
+const testsModel = require('../models/tests.models')
+const authorsModel = require('../models/authors.models')
 
 class CoursesService {
     async createCourse(info, creatorId) {
@@ -12,6 +15,14 @@ class CoursesService {
                 info.tags.length === 0
             ) {
                 throw { status: 400, message: 'Не все поля заполнены' }
+            }
+
+            const author = await authorsModel.getAuthorById(creatorId)
+            if (!author.rows[0]) {
+                throw {
+                    status: 409,
+                    message: 'Этот пользователь не является автором и не может создавать курсы',
+                }
             }
 
             const courseId = await coursesModel.createCourse(info, creatorId)
@@ -180,6 +191,27 @@ class CoursesService {
                 return { isSubscribed: false }
             }
             return { isSubscribed: true }
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async deleteAllUserCourses(id) {
+        try {
+            const userCourses = await coursesModel.getUserCreatedCourses(id)
+
+            if (id.length === 0) {
+                throw { status: 400, message: 'Id пользователя не предоставлен' }
+            }
+            await coursesModel.deleteAllUserCourses(id)
+
+            await Promise.all(
+                userCourses.rows.map((course) =>
+                    lessonsModel
+                        .deleteAllLessonsByCourseId(course.id)
+                        .then(() => testsModel.deleteAllTestsByCoursesId(course.id)),
+                ),
+            )
         } catch (error) {
             throw error
         }

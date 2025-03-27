@@ -62,15 +62,14 @@ class LessonsModel {
                 FROM lessons l
                 LEFT JOIN user_lessons ul 
                     ON l.id = ul.lesson_id AND ul.user_id = $2
-                WHERE l.section_id = $1;`,
-                [sectionId, userId]
-            );
-            return lessons.rows;
+                WHERE l.section_id = $1 and l.is_test=false;`,
+                [sectionId, userId],
+            )
+            return lessons.rows
         } catch (error) {
-            throw error;
+            throw error
         }
     }
-    
 
     async getLessonById(lessonId) {
         try {
@@ -118,8 +117,6 @@ class LessonsModel {
 
     async deleteAllLessonsBySectionId(sectionId) {
         try {
-            await db.query('DELETE FROM lessons WHERE section_id=$1', [sectionId])
-
             const mongoDb = await connectMongoDB()
             await mongoDb.collection('lessons').deleteMany({ sectionId: Number(sectionId) })
         } catch (error) {

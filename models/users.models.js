@@ -64,9 +64,13 @@ class UsersModel {
     async getUser(id) {
         try {
             const result = await db.query(
-                `SELECT users.name, users.surname, users.email, users.nickname, users.registration_date as registrationDate, users.reputation, photos.name as photo FROM users 
-                left join photos on users.photo_id = photos.id WHERE users.id = $1
-                `,
+                `SELECT users.name, users.surname, users.email, users.nickname, users.registration_date as registrationDate, users.reputation, photos.name as photo, ARRAY_AGG(achievements.name) AS achievements, users.description, users.author as isAuthor FROM users 
+                left join photos on users.photo_id = photos.id 
+                left join user_achievements ON users.id = user_achievements.user_id 
+                left join achievements ON user_achievements.achievement_id = achievements.id 
+                WHERE users.id = $1
+                GROUP BY users.name, users.surname, photos.name, users.description, users.email, users.nickname, users.registration_date, users.reputation, users.author`,
+
                 [id],
             )
             return result

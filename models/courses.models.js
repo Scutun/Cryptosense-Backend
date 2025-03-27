@@ -60,7 +60,7 @@ class CoursesModel {
                     info.coursePhoto,
                     info.courseId,
                     creatorId,
-                    info.unlockAll
+                    info.unlockAll,
                 ],
             )
         } catch (error) {
@@ -303,6 +303,23 @@ class CoursesModel {
                 `SELECT * FROM user_courses WHERE course_id = $1 and user_id = $2`,
                 [courseId, userId],
             )
+            return info
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async deleteAllUserCourses(id) {
+        try {
+            await db.query(`DELETE FROM courses WHERE creator_id = $1`, [id])
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async getUserCreatedCourses(id) {
+        try {
+            const info = await db.query(`SELECT id FROM courses WHERE creator_id = $1`, [id])
             return info
         } catch (error) {
             throw error
