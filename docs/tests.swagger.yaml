@@ -193,6 +193,10 @@ paths:
                     name:
                       type: string
                       example: "Тест 1"
+                    isCompleted:
+                      type: boolean
+                      example: false
+                      description: Является ли урок завершенным
         "400":  
           description: Не все поля заполнены
           content:

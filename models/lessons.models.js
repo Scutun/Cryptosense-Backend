@@ -62,7 +62,7 @@ class LessonsModel {
                 FROM lessons l
                 LEFT JOIN user_lessons ul 
                     ON l.id = ul.lesson_id AND ul.user_id = $2
-                WHERE l.section_id = $1;`,
+                WHERE l.section_id = $1 and l.is_test=false;`,
                 [sectionId, userId],
             )
             return lessons.rows
