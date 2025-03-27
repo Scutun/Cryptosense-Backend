@@ -83,6 +83,24 @@ class TestsModel {
             throw error
         }
     }
+
+    async deleteAllTestsByCoursesId(courseId) {
+        try {
+            const mongoDb = await connectMongoDB()
+            await mongoDb.collection('tests').deleteMany({ sectionId: Number(sectionId) })
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async deleteAllTestsBySectionId(sectionId) {
+        try {
+            const mongoDb = await connectMongoDB()
+            await mongoDb.collection('tests').deleteMany({ sectionId: Number(sectionId) })
+        } catch (error) {
+            throw error
+        }
+    }
 }
 
 module.exports = new TestsModel()

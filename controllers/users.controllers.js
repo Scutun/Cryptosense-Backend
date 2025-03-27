@@ -1,6 +1,7 @@
 const userService = require('../services/users.services')
 const tokenUtils = require('../utils/tokens.utils')
 const emailUtils = require('../utils/emails.utils')
+const courseService = require('../services/courses.services')
 
 class UsersController {
     async createUser(req, res, next) {
@@ -118,7 +119,9 @@ class UsersController {
 
             await userService.deleteUser(id)
 
-            res.status(200).json('Пользователь успешно удален')
+            await courseService.deleteAllUserCourses(id)
+
+            await res.status(200).json('Пользователь успешно удален')
         } catch (error) {
             next(error)
         }
