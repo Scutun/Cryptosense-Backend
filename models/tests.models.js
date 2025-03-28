@@ -50,13 +50,19 @@ class TestsModel {
         }
     }
 
-    async getTestInfoById(testId) {
+    async getTestInfoById(testId, userId) {
         try {
+            const isComplete = await db.query(
+                'SELECT * FROM user_lessons WHERE user_id = $1 AND lesson_id = $2',
+                [userId, testId],
+            )
+            const isCompleted = isComplete.rowCount > 0 ? true : false
+
             const mongoDb = await connectMongoDB()
             const test = await mongoDb.collection('tests').findOne({ _id: Number(testId) })
 
             if (!test) throw { status: 404, message: 'Тест не найден' }
-            return test
+            return Object.assign(test, { isCompleted: isCompleted })
         } catch (error) {
             throw error
         }

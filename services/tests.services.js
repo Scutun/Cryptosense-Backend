@@ -65,7 +65,7 @@ class TestsService {
                 throw { status: 400, message: 'Не передан id теста' }
             }
             await lessonsModel.checkLessonAccess(testId, userId)
-            const test = await testsModel.getTestInfoById(testId)
+            const test = await testsModel.getTestInfoById(testId,userId)
 
             if (!test) {
                 throw { status: 404, message: 'Тест не найден' }
