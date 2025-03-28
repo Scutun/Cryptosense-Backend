@@ -28,7 +28,7 @@ class TestsModel {
         }
     }
 
-    async getTestsBySectionId(sectionId) {
+    async getTestsBySectionId(sectionId, userId) {
         try {
             const lessons = await db.query(
                 `SELECT 
