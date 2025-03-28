@@ -41,14 +41,13 @@ class TestsService {
         }
     }
 
-    async getTestsBySectionId(sectionId) {
+    async getTestsBySectionId(sectionId, userId) {
         try {
             if (!sectionId) {
                 throw { status: 400, message: 'Не передан id секции' }
             }
 
-
-            const tests = await testsModel.getTestsBySectionId(sectionId)
+            const tests = await testsModel.getTestsBySectionId(sectionId, userId)
 
             if (tests.length === 0) {
                 throw { status: 404, message: 'В этом разделе нет тестов' }
@@ -60,12 +59,12 @@ class TestsService {
         }
     }
 
-    async getTestInfoById(testId, page, limit,userId) {
+    async getTestInfoById(testId, page, limit, userId) {
         try {
             if (!testId) {
                 throw { status: 400, message: 'Не передан id теста' }
             }
-            await lessonsModel.checkLessonAccess(testId,userId)
+            await lessonsModel.checkLessonAccess(testId, userId)
             const test = await testsModel.getTestInfoById(testId)
 
             if (!test) {
