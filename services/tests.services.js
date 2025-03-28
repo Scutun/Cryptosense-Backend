@@ -65,7 +65,7 @@ class TestsService {
                 throw { status: 400, message: 'Не передан id теста' }
             }
             await lessonsModel.checkLessonAccess(testId, userId)
-            const test = await testsModel.getTestInfoById(testId,userId)
+            const test = await testsModel.getTestInfoById(testId, userId)
 
             if (!test) {
                 throw { status: 404, message: 'Тест не найден' }
@@ -79,10 +79,11 @@ class TestsService {
             }
 
             // Пагинация
-            const questions = test.questions.slice(page * limit, (page + 1) * limit)
+            const questions = test.questions.slice((page - 1) * limit, page * limit)
 
             // Возвращаем тест с пагинированными вопросами
             return {
+                pages: Math.ceil(test.questions.length / limit),
                 ...modifiedTest,
                 questions,
                 totalQuestions: test.questions.length,

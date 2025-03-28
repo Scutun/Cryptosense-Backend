@@ -291,6 +291,8 @@ paths:
               schema:
                 type: object
                 properties:
+                  pages:
+                    type: integer
                   testId:
                     type: integer
                   sectionId:
