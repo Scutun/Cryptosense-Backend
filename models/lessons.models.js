@@ -71,12 +71,17 @@ class LessonsModel {
         }
     }
 
-    async getLessonById(lessonId) {
+    async getLessonById(lessonId, userId) {
         try {
+            const isComplete = await db.query(
+                'SELECT * FROM user_lessons WHERE user_id = $1 AND lesson_id = $2',
+                [userId, lessonId],
+            )
+            const isCompleted = isComplete.rowCount > 0 ? true : false
             const mongoDb = await connectMongoDB()
             const lesson = await mongoDb.collection('lessons').findOne({ _id: Number(lessonId) })
 
-            if (lesson) return lesson
+            if (lesson) return Object.assign(lesson, { isCompleted: isCompleted })
             throw { status: 404, message: 'Урок не найден' }
         } catch (error) {
             throw error

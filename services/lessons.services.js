@@ -46,6 +46,7 @@ class LessonsService {
                 throw { status: 400, message: 'Не передан id урока' }
             }
             await lessonsModel.checkLessonAccess(lessonId,userId)
+            
             const lesson = await lessonsModel.getLessonById(lessonId,userId)
             const { _id, ...rest } = lesson
             const newLesson = { lessonId: _id, ...rest }
