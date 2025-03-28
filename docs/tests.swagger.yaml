@@ -297,6 +297,9 @@ paths:
                     type: integer
                   courseId:
                     type: integer
+                  isCompleted:
+                    type: boolean
+                    example: false
                   questions:
                     type: array
                     items:
