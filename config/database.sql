@@ -398,10 +398,18 @@ BEGIN
         GROUP BY ul.user_id
 
         -- Включаем пользователей без завершённых уроков (прогресс = 0)
-        UNION
+        UNION All
         SELECT uc.user_id, 0 AS completed_items
         FROM user_courses uc
         WHERE uc.course_id = course_id_var
+        AND NOT EXISTS (
+            SELECT 1 FROM user_lessons ul
+            JOIN lessons l ON ul.lesson_id = l.id
+            JOIN sections s ON l.section_id = s.id
+            WHERE ul.user_id = uc.user_id
+            AND s.course_id = course_id_var
+        )
+        
     ) ul
     WHERE uc.user_id = ul.user_id
       AND uc.course_id = course_id_var;
