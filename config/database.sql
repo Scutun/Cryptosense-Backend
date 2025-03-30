@@ -83,18 +83,6 @@ CREATE TABLE IF NOT EXISTS achievements (
   name VARCHAR(255) UNIQUE NOT NULL
 );
 
--- таблица пользовательских достижений
-CREATE TABLE IF NOT EXISTS user_achievements (
-  id SERIAL PRIMARY KEY,
-  user_id BIGINT NOT NULL,
-  achievement_id BIGINT NOT NULL,
-
-  UNIQUE (user_id, achievement_id),
-
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  FOREIGN KEY (achievement_id) REFERENCES achievements(id) ON DELETE CASCADE
-);
-
 -- таблица пользователей
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
@@ -113,6 +101,20 @@ CREATE TABLE IF NOT EXISTS users (
 
     FOREIGN KEY (photo_id) REFERENCES photos(id) ON DELETE SET NULL
 );
+
+-- таблица пользовательских достижений
+CREATE TABLE IF NOT EXISTS user_achievements (
+  id SERIAL PRIMARY KEY,
+  user_id BIGINT NOT NULL,
+  achievement_id BIGINT NOT NULL,
+
+  UNIQUE (user_id, achievement_id),
+
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (achievement_id) REFERENCES achievements(id) ON DELETE CASCADE
+);
+
+-- 
 
 -- таблица всех курсов
 CREATE TABLE IF NOT EXISTS courses (
