@@ -85,8 +85,20 @@ BEGIN
     INSERT INTO tags (name) VALUES ('Криптокошельки');
   END IF;
 
-  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'ICO и IDO') THEN
-    INSERT INTO tags (name) VALUES ('ICO и IDO');
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'DAO (Децентрализованные автономные организации)') THEN
+    INSERT INTO tags (name) VALUES ('DAO (Децентрализованные автономные организации)');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'GameFi (Игровые проекты на блокчейне)') THEN
+    INSERT INTO tags (name) VALUES ('GameFi (Игровые проекты на блокчейне)');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Регуляция криптовалют') THEN
+    INSERT INTO tags (name) VALUES ('Регуляция криптовалют');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Криптостартапы') THEN
+    INSERT INTO tags (name) VALUES ('Криптостартапы');
   END IF;
 END $$;
 
