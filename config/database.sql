@@ -112,29 +112,31 @@ CREATE TABLE IF NOT EXISTS photos (
 -- Запись названий аватаров
 DO $$
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM photos WHERE name = 'cristalAvatar.jpg') THEN
-    INSERT INTO photos (name) VALUES ('cristalAvatar.jpg');
-  END IF;
-
-  IF NOT EXISTS (SELECT 1 FROM photos WHERE name = 'bitcoinPlusAvatar.jpg') THEN
-    INSERT INTO photos (name) VALUES ('bitcoinPlusAvatar.jpg');
-  END IF;
-
-  IF NOT EXISTS (SELECT 1 FROM photos WHERE name = 'bitpandaAvatar.jpg') THEN
-    INSERT INTO photos (name) VALUES ('bitpandaAvatar.jpg');
-  END IF;
-
-  IF NOT EXISTS (SELECT 1 FROM photos WHERE name = 'cDollarAvatar.jpg') THEN
-    INSERT INTO photos (name) VALUES ('cDollarAvatar.jpg');
-  END IF;
-
-  IF NOT EXISTS (SELECT 1 FROM photos WHERE name = 'rightsAvatar.jpg') THEN
-    INSERT INTO photos (name) VALUES ('rightsAvatar.jpg');
-  END IF;
-
-  IF NOT EXISTS (SELECT 1 FROM photos WHERE name = 'synthetixAvatar.jpg') THEN
-    INSERT INTO photos (name) VALUES ('synthetixAvatar.jpg');
-  END IF;
+  INSERT INTO photos (name)
+  SELECT file_name
+  FROM unnest(array[
+    '88mph (Mph).jpg',
+    'BakeryToken (BAKE).jpg',
+    'bitcoinPlusAvatar.jpg',
+    'bitpandaAvatar.jpg',
+    'cDollarAvatar.jpg',
+    'cristalAvatar.jpg',
+    'Dogecoin (DOGE).jpg',
+    'Function X (FX).jpg',
+    'Html Coin (Html).jpg',
+    'Newton (New).jpg',
+    'PancakeSwap (CAKE).jpg',
+    'rightsAvatar.jpg',
+    'Rise (Rise).jpg',
+    'Shroom Finance (Shroom).jpg',
+    'Small Love Potion (SLP).jpg',
+    'Storiqa (Stq).jpg',
+    'synthetixAvatar.jpg',
+    'Wings (Wings).jpg',
+    'WINkLink (WIN).jpg',
+    'yOUcash (YOUC).jpg'
+  ]) AS file_name
+  WHERE NOT EXISTS (SELECT 1 FROM photos WHERE photos.name = file_name);
 END $$;
 
 -- таблица достижений
