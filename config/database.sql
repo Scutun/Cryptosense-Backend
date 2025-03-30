@@ -29,64 +29,64 @@ CREATE TABLE IF NOT EXISTS tags (
 -- Запись названий тегов курсов
 DO $$
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Bitcoin') THEN
-    INSERT INTO tags (name) VALUES ('Bitcoin');
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Биткоин') THEN
+    INSERT INTO tags (name) VALUES ('Биткоин');
   END IF;
 
-  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Ethereum') THEN
-    INSERT INTO tags (name) VALUES ('Ethereum');
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Эфириум') THEN
+    INSERT INTO tags (name) VALUES ('Эфириум');
   END IF;
 
-  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Litecoin') THEN
-    INSERT INTO tags (name) VALUES ('Litecoin');
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Лайткоин') THEN
+    INSERT INTO tags (name) VALUES ('Лайткоин');
   END IF;
 
-  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Blockchain') THEN
-    INSERT INTO tags (name) VALUES ('Blockchain');
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Блокчейн') THEN
+    INSERT INTO tags (name) VALUES ('Блокчейн');
   END IF;
 
-  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Smart Contracts') THEN
-    INSERT INTO tags (name) VALUES ('Smart Contracts');
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Смарт-контракты') THEN
+    INSERT INTO tags (name) VALUES ('Смарт-контракты');
   END IF;
 
   IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'NFT') THEN
     INSERT INTO tags (name) VALUES ('NFT');
   END IF;
 
-  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Mining') THEN
-    INSERT INTO tags (name) VALUES ('Mining');
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Майнинг') THEN
+    INSERT INTO tags (name) VALUES ('Майнинг');
   END IF;
 
   IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'DeFi') THEN
     INSERT INTO tags (name) VALUES ('DeFi');
   END IF;
 
-  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Trading') THEN
-    INSERT INTO tags (name) VALUES ('Trading');
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Трейдинг') THEN
+    INSERT INTO tags (name) VALUES ('Трейдинг');
   END IF;
 
-  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Crypto Security') THEN
-    INSERT INTO tags (name) VALUES ('Crypto Security');
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Криптобезопасность') THEN
+    INSERT INTO tags (name) VALUES ('Криптобезопасность');
   END IF;
 
-  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Stablecoins') THEN
-    INSERT INTO tags (name) VALUES ('Stablecoins');
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Стейблкоины') THEN
+    INSERT INTO tags (name) VALUES ('Стейблкоины');
   END IF;
 
-  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Altcoins') THEN
-    INSERT INTO tags (name) VALUES ('Altcoins');
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Альткоины') THEN
+    INSERT INTO tags (name) VALUES ('Альткоины');
   END IF;
 
-  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Tokenomics') THEN
-    INSERT INTO tags (name) VALUES ('Tokenomics');
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Токеномика') THEN
+    INSERT INTO tags (name) VALUES ('Токеномика');
   END IF;
 
-  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Crypto Wallets') THEN
-    INSERT INTO tags (name) VALUES ('Crypto Wallets');
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Криптокошельки') THEN
+    INSERT INTO tags (name) VALUES ('Криптокошельки');
   END IF;
 
-  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'ICO & IDO') THEN
-    INSERT INTO tags (name) VALUES ('ICO & IDO');
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'ICO и IDO') THEN
+    INSERT INTO tags (name) VALUES ('ICO и IDO');
   END IF;
 END $$;
 
@@ -215,7 +215,7 @@ CREATE TABLE IF NOT EXISTS sections (
   UNIQUE (name , course_id ),
   course_id BIGINT NOT NULL,
 
-  position INT NOT NULL,        -- Порядок секции
+  -- position INT NOT NULL,        -- Порядок секции
   -- is_unlocked BOOLEAN DEFAULT TRUE, в текущих условиях не нужна т.к. все вычисляем динамически, понадобится если вводить новые условия разблокировки секций 
 
   FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
