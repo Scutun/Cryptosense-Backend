@@ -291,12 +291,17 @@ paths:
               schema:
                 type: object
                 properties:
+                  pages:
+                    type: integer
                   testId:
                     type: integer
                   sectionId:
                     type: integer
                   courseId:
                     type: integer
+                  isCompleted:
+                    type: boolean
+                    example: false
                   questions:
                     type: array
                     items:

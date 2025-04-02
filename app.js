@@ -30,6 +30,9 @@ const swaggerMain = yaml.load(fs.readFileSync('./docs/main.swagger.yaml', 'utf8'
 
 app.use('/api/v1/swagger/docs', swaggerUi.serve, swaggerUi.setup(swaggerMain))
 
+app.use('/api/v1/profiles/avatars/url/', express.static(path.join(__dirname, 'uploads/avatars')))
+app.use('/api/v1/courses/photo/url/', express.static(path.join(__dirname, 'uploads/course')))
+
 app.use('/api', userRoutes)
 app.use('/api', courseRoutes)
 app.use('/api', reviewRoutes)
@@ -40,9 +43,6 @@ app.use('/api', lessonsRoutes)
 app.use('/api', additionsRoutes)
 app.use('/api', authorsRoutes)
 app.use(errorHandler)
-
-app.use('/api/v1/profiles/avatars/url/', express.static(path.join(__dirname, 'uploads/avatars')))
-app.use('/api/v1/courses/photo/url/', express.static(path.join(__dirname, 'uploads/course')))
 
 app.get('/server', (req, res) => {
     res.send('Server is running')

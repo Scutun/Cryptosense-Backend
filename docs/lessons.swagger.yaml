@@ -367,6 +367,9 @@ paths:
                     type: integer
                   courseId:
                     type: integer
+                  isCompleted:
+                    type: boolean
+                    example: false
                   info:
                     type: object
                     description: Содержимое урока

@@ -18,7 +18,6 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM difficulties WHERE name = 'Сложная') THEN
     INSERT INTO difficulties (name) VALUES ('Сложная');
   END IF;
-
 END $$;
 
 -- таблица словарь с тегами для курсов
@@ -30,18 +29,79 @@ CREATE TABLE IF NOT EXISTS tags (
 -- Запись названий тегов курсов
 DO $$
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Bitcoin') THEN
-    INSERT INTO tags (name) VALUES ('Bitcoin');
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Биткоин') THEN
+    INSERT INTO tags (name) VALUES ('Биткоин');
   END IF;
 
-  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Ethereum') THEN
-    INSERT INTO tags (name) VALUES ('Ethereum');
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Эфириум') THEN
+    INSERT INTO tags (name) VALUES ('Эфириум');
   END IF;
 
-  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Litecoin') THEN
-    INSERT INTO tags (name) VALUES ('Litecoin');
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Лайткоин') THEN
+    INSERT INTO tags (name) VALUES ('Лайткоин');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Блокчейн') THEN
+    INSERT INTO tags (name) VALUES ('Блокчейн');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Смарт-контракты') THEN
+    INSERT INTO tags (name) VALUES ('Смарт-контракты');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'NFT') THEN
+    INSERT INTO tags (name) VALUES ('NFT');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Майнинг') THEN
+    INSERT INTO tags (name) VALUES ('Майнинг');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'DeFi') THEN
+    INSERT INTO tags (name) VALUES ('DeFi');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Трейдинг') THEN
+    INSERT INTO tags (name) VALUES ('Трейдинг');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Криптобезопасность') THEN
+    INSERT INTO tags (name) VALUES ('Криптобезопасность');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Стейблкоины') THEN
+    INSERT INTO tags (name) VALUES ('Стейблкоины');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Альткоины') THEN
+    INSERT INTO tags (name) VALUES ('Альткоины');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Токеномика') THEN
+    INSERT INTO tags (name) VALUES ('Токеномика');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Криптокошельки') THEN
+    INSERT INTO tags (name) VALUES ('Криптокошельки');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'DAO (Децентрализованные автономные организации)') THEN
+    INSERT INTO tags (name) VALUES ('DAO (Децентрализованные автономные организации)');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'GameFi (Игровые проекты на блокчейне)') THEN
+    INSERT INTO tags (name) VALUES ('GameFi (Игровые проекты на блокчейне)');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Регуляция криптовалют') THEN
+    INSERT INTO tags (name) VALUES ('Регуляция криптовалют');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM tags WHERE name = 'Криптостартапы') THEN
+    INSERT INTO tags (name) VALUES ('Криптостартапы');
   END IF;
 END $$;
+
 
 -- таблица словарь фотографий
 CREATE TABLE IF NOT EXISTS photos (
@@ -52,29 +112,31 @@ CREATE TABLE IF NOT EXISTS photos (
 -- Запись названий аватаров
 DO $$
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM photos WHERE name = 'cristalAvatar.jpg') THEN
-    INSERT INTO photos (name) VALUES ('cristalAvatar.jpg');
-  END IF;
-
-  IF NOT EXISTS (SELECT 1 FROM photos WHERE name = 'bitcoinPlusAvatar.jpg') THEN
-    INSERT INTO photos (name) VALUES ('bitcoinPlusAvatar.jpg');
-  END IF;
-
-  IF NOT EXISTS (SELECT 1 FROM photos WHERE name = 'bitpandaAvatar.jpg') THEN
-    INSERT INTO photos (name) VALUES ('bitpandaAvatar.jpg');
-  END IF;
-
-  IF NOT EXISTS (SELECT 1 FROM photos WHERE name = 'cDollarAvatar.jpg') THEN
-    INSERT INTO photos (name) VALUES ('cDollarAvatar.jpg');
-  END IF;
-
-  IF NOT EXISTS (SELECT 1 FROM photos WHERE name = 'rightsAvatar.jpg') THEN
-    INSERT INTO photos (name) VALUES ('rightsAvatar.jpg');
-  END IF;
-
-  IF NOT EXISTS (SELECT 1 FROM photos WHERE name = 'synthetixAvatar.jpg') THEN
-    INSERT INTO photos (name) VALUES ('synthetixAvatar.jpg');
-  END IF;
+  INSERT INTO photos (name)
+  SELECT file_name
+  FROM unnest(array[
+    '88mph (Mph).jpg',
+    'BakeryToken (BAKE).jpg',
+    'bitcoinPlusAvatar.jpg',
+    'bitpandaAvatar.jpg',
+    'cDollarAvatar.jpg',
+    'cristalAvatar.jpg',
+    'Dogecoin (DOGE).jpg',
+    'Function X (FX).jpg',
+    'Html Coin (Html).jpg',
+    'Newton (New).jpg',
+    'PancakeSwap (CAKE).jpg',
+    'rightsAvatar.jpg',
+    'Rise (Rise).jpg',
+    'Shroom Finance (Shroom).jpg',
+    'Small Love Potion (SLP).jpg',
+    'Storiqa (Stq).jpg',
+    'synthetixAvatar.jpg',
+    'Wings (Wings).jpg',
+    'WINkLink (WIN).jpg',
+    'yOUcash (YOUC).jpg'
+  ]) AS file_name
+  WHERE NOT EXISTS (SELECT 1 FROM photos WHERE photos.name = file_name);
 END $$;
 
 -- таблица достижений
@@ -83,17 +145,29 @@ CREATE TABLE IF NOT EXISTS achievements (
   name VARCHAR(255) UNIQUE NOT NULL
 );
 
--- таблица пользовательских достижений
-CREATE TABLE IF NOT EXISTS user_achievements (
-  id SERIAL PRIMARY KEY,
-  user_id BIGINT NOT NULL,
-  achievement_id BIGINT NOT NULL,
+-- Запись названий достижений
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM achievements WHERE name = 'Первый курс') THEN
+    INSERT INTO achievements (name) VALUES ('Первый курс');
+  END IF;
 
-  UNIQUE (user_id, achievement_id),
+  IF NOT EXISTS (SELECT 1 FROM achievements WHERE name = 'Популярный автор') THEN
+    INSERT INTO achievements (name) VALUES ('Популярный автор');
+  END IF;
 
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  FOREIGN KEY (achievement_id) REFERENCES achievements(id) ON DELETE CASCADE
-);
+  IF NOT EXISTS (SELECT 1 FROM achievements WHERE name = 'Эксперт рынка') THEN
+    INSERT INTO achievements (name) VALUES ('Эксперт рынка');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM achievements WHERE name = 'Обучение на практике') THEN
+    INSERT INTO achievements (name) VALUES ('Обучение на практике');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM achievements WHERE name = 'Гуру блокчейна') THEN
+    INSERT INTO achievements (name) VALUES ('Гуру блокчейна');
+  END IF;
+END $$;
 
 -- таблица пользователей
 CREATE TABLE IF NOT EXISTS users (
@@ -112,6 +186,18 @@ CREATE TABLE IF NOT EXISTS users (
     activated BOOLEAN DEFAULT FALSE,
 
     FOREIGN KEY (photo_id) REFERENCES photos(id) ON DELETE SET NULL
+);
+
+-- таблица пользовательских достижений
+CREATE TABLE IF NOT EXISTS user_achievements (
+  id SERIAL PRIMARY KEY,
+  user_id BIGINT NOT NULL,
+  achievement_id BIGINT NOT NULL,
+
+  UNIQUE (user_id, achievement_id),
+
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (achievement_id) REFERENCES achievements(id) ON DELETE CASCADE
 );
 
 -- таблица всех курсов
@@ -143,7 +229,7 @@ CREATE TABLE IF NOT EXISTS sections (
   UNIQUE (name , course_id ),
   course_id BIGINT NOT NULL,
 
-  position INT NOT NULL,        -- Порядок секции
+  -- position INT NOT NULL,        -- Порядок секции
   -- is_unlocked BOOLEAN DEFAULT TRUE, в текущих условиях не нужна т.к. все вычисляем динамически, понадобится если вводить новые условия разблокировки секций 
 
   FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
@@ -229,17 +315,27 @@ CREATE TABLE IF NOT EXISTS user_sections (
 DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM users WHERE email = 'admin1@mail.ru') THEN
-    INSERT INTO users (email, password, nickname, name, surname, activated, registration_date) VALUES ('admin1@mail.ru', '$2b$10$qClaDFhQzCCFB4c6TkRxmecmGIXV75a2YO1Rf3cfRslY88zZnNieS', 'admin1', 'admin1', 'admin1', true, NOW());
+    INSERT INTO users (email, password, nickname, name, surname, activated, registration_date, author, photo_id, description) 
+    VALUES ('admin1@mail.ru', '$2b$10$qClaDFhQzCCFB4c6TkRxmecmGIXV75a2YO1Rf3cfRslY88zZnNieS', 'CryptoGuru', 'Алексей', 'Краснов', true, NOW(), true, 5, 
+            'Я занимаюсь криптовалютами уже более 10 лет и специализируюсь на долгосрочных инвестициях. Изучаю рынок и помогаю другим разбираться в трендах и возможностях. Автор нескольких курсов по фундаментальному анализу и стратегии торговли.');
+    INSERT INTO user_achievements (user_id, achievement_id) VALUES (1, 1), (1, 2), (1, 5);
   END IF;
 
   IF NOT EXISTS (SELECT 1 FROM users WHERE email = 'admin2@mail.ru') THEN
-    INSERT INTO users (email, password, nickname, name, surname, activated, registration_date) VALUES ('admin2@mail.ru', '$2b$10$qClaDFhQzCCFB4c6TkRxmecmGIXV75a2YO1Rf3cfRslY88zZnNieS', 'admin2', 'admin2', 'admin2', true, NOW());
+    INSERT INTO users (email, password, nickname, name, surname, activated, registration_date, author, photo_id, description) 
+    VALUES ('admin2@mail.ru', '$2b$10$3vH76YDlL56TY6FQwZ/ruOLb5BjlN93zZujHMQewQxF1nF4p9pD52', 'TradeMaster', 'Марина', 'Хромова', true, NOW(), true, 2, 
+            'Я профессиональный трейдер и аналитик крипторынка. Обучаю новичков основам технического анализа и риск-менеджмента. Веду блог о криптотрейдинге, делюсь своими стратегиями и помогаю людям зарабатывать на цифровых активах.');
+    INSERT INTO user_achievements (user_id, achievement_id) VALUES (2, 3), (2, 4);
   END IF;
 
   IF NOT EXISTS (SELECT 1 FROM users WHERE email = 'admin3@mail.ru') THEN
-    INSERT INTO users (email, password, nickname, name, surname, activated, registration_date) VALUES ('admin3@mail.ru', '$2b$10$qClaDFhQzCCFB4c6TkRxmecmGIXV75a2YO1Rf3cfRslY88zZnNieS', 'admin3', 'admin3', 'admin3', true, NOW());
+    INSERT INTO users (email, password, nickname, name, surname, activated, registration_date, author, photo_id, description) 
+    VALUES ('admin3@mail.ru', '$2b$10$sdnfsdfGHTJYZwdsdsSdfsdHF5/2sdfwerwETKqDsdfsdf99D7eG', 'BlockchainDev', 'Денис', 'Зацарный', true, NOW(), true, 3, 
+            'Я блокчейн-разработчик и эксперт по смарт-контрактам. Создавал децентрализованные приложения и участвовал в разработке криптопроектов. Люблю делиться знаниями о программировании в блокчейне и безопасности цифровых активов.');
+    INSERT INTO user_achievements (user_id, achievement_id) VALUES (3, 2);
   END IF;
 END $$;
+
 
 -- Функция для автоматического добавления и удаления счетчика уроков и тестов
 CREATE OR REPLACE FUNCTION update_lessons_count()
@@ -398,10 +494,18 @@ BEGIN
         GROUP BY ul.user_id
 
         -- Включаем пользователей без завершённых уроков (прогресс = 0)
-        UNION
+        UNION All
         SELECT uc.user_id, 0 AS completed_items
         FROM user_courses uc
         WHERE uc.course_id = course_id_var
+        AND NOT EXISTS (
+            SELECT 1 FROM user_lessons ul
+            JOIN lessons l ON ul.lesson_id = l.id
+            JOIN sections s ON l.section_id = s.id
+            WHERE ul.user_id = uc.user_id
+            AND s.course_id = course_id_var
+        )
+        
     ) ul
     WHERE uc.user_id = ul.user_id
       AND uc.course_id = course_id_var;
