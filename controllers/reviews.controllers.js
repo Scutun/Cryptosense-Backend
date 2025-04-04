@@ -15,9 +15,9 @@ class ReviewsController {
         try {
             const user = tokenUtils.getIdFromToken(req)
 
-            await reviewsService.createReview(user, req.body)
+            const info = await reviewsService.createReview(user, req.body)
 
-            res.status(201).json({ message: 'Отзыв создан' })
+            res.status(201).json(info)
         } catch (error) {
             next(error)
         }

@@ -19,7 +19,9 @@ class ReviewsService {
                 courseId: info.courseId,
             }
 
-            await reviewsModel.createReview(reviewInfo)
+            const result = await reviewsModel.createReview(reviewInfo)
+
+            return result
         } catch (error) {
             throw error
         }

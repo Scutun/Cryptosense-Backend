@@ -46,9 +46,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
-                    type: string
-                    example: 'Отзыв создан'
+                  id:
+                    type: integer
+                    description: Уникальный идентификатор отзыва
 
         '400':
           description: Ошибка в передаче данных

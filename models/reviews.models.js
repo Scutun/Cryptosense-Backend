@@ -3,9 +3,9 @@ const db = require('../config/db').pool
 class ReviewsModel {
     async createReview(info) {
         try {
-            await db.query(
-                `INSERT INTO comments (rating, content, user_nickname, course_id) 
-                 VALUES ($1, $2, (SELECT nickname FROM users WHERE id = $3), $4)`,
+            const review = await db.query(
+                `INSERT INTO comments (rating, content, user_id, course_id) 
+                 VALUES ($1, $2, $3, $4) RETURNING id`,
                 [info.rating, info.content, info.userId, info.courseId],
             )
 
@@ -13,6 +13,8 @@ class ReviewsModel {
                 `UPDATE courses SET rating = (SELECT AVG(rating) FROM comments WHERE course_id = $1), reviews_count = (SELECT COUNT(*) FROM comments WHERE course_id = $1) WHERE id = $1`,
                 [info.courseId],
             )
+
+            return review.rows[0]
         } catch (error) {
             if (error.code === '23505') {
                 throw {
