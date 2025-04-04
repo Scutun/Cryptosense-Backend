@@ -62,17 +62,42 @@ class ReviewsService {
         }
     }
 
-    async getReviewByCourseId(id) {
+    async getReviewByCourseId(req) {
         try {
+            const { id, page, sort = 'rating', order = 'desc', limit } = req
+
             if (id.length === 0) {
                 throw { status: 400, message: 'Id курса не предоставлен' }
             }
 
-            const info = await reviewsModel.getReviewByCourseId(id)
+            const offset = (page - 1) * limit
+
+            const info = await reviewsModel.getReviewByCourseId(id, offset, limit, sort, order)
 
             if (!info[0]) {
-                throw { status: 404, message: 'Курс не найден' }
+                throw { status: 404, message: 'Отзыв не найден' }
             }
+            return {
+                pages: Math.ceil(info.length / limit),
+                reviews: info,
+            }
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async getReviewByUserId(userId, courseId) {
+        try {
+            if (userId.length === 0 || courseId.length === 0) {
+                throw { status: 400, message: 'Идентификаторы не переданы' }
+            }
+
+            const info = await reviewsModel.getReviewByUserId(userId, courseId)
+
+            if (!info[0]) {
+                throw { status: 404, message: 'Отзыв не найден' }
+            }
+
             return info
         } catch (error) {
             throw error

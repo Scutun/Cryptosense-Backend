@@ -26,12 +26,25 @@ class ReviewsModel {
         }
     }
 
-    async getReviewByCourseId(id) {
+    async getReviewByCourseId(courseId, offset, limit, sort, order) {
         try {
-            const review = await db.query(
-                `SELECT id, rating, content, user_nickname as nickname FROM comments WHERE course_id = $1`,
-                [id],
-            )
+            let sql = `SELECT comments.id, comments.rating, comments.content, user.user_nickname as nickname, photo.name as photo FROM comments 
+                LEFT JOIN users ON comments.user_id = users.id
+                LEFT JOIN photos as photo ON users.photo_id = photo.id
+                WHERE comments.course_id = $1`
+
+            const values = [courseId]
+
+            sql += `GROUP BY comments.id, users.name, users.surname, photo.name, comments.rating, comments.content, comments.user_nickname
+                    ORDER BY ${sort} ${order}`
+
+            if (offset && limit) {
+                sql += ` OFFSET $2 LIMIT $3`
+                values.push(Number(offset), Number(limit))
+            }
+
+            const review = await db.query(sql, values)
+
             return review.rows
         } catch (error) {
             throw error
@@ -71,6 +84,21 @@ class ReviewsModel {
             }
 
             return result.rows[0]
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async getReviewByUserId(userId, courseId) {
+        try {
+            const review = await db.query(
+                `SELECT id, rating, content, user_nickname as nickname, photo.name as photo FROM comments 
+                LEFT JOIN users ON comments.user_id = users.id
+                LEFT JOIN photos as photo ON users.photo_id = photo.id
+                WHERE user_id = $1 AND course_id = $2`,
+                [userId, courseId],
+            )
+            return review.rows
         } catch (error) {
             throw error
         }
