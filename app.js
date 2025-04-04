@@ -52,3 +52,5 @@ app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`)
     console.log(`Documentation is available on http://localhost:${PORT}/api/v1/swagger/docs`)
 })
+
+module.exports = app //Необходимо для тестирования
