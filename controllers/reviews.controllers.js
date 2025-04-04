@@ -4,7 +4,7 @@ const reviewsService = require('../services/reviews.services')
 class ReviewsController {
     async getReviewByCourseId(req, res, next) {
         try {
-            const info = await reviewsService.getReviewByCourseId(req.params.id)
+            const info = await reviewsService.getReviewByCourseId(req.query)
             res.json(info)
         } catch (error) {
             next(error)
@@ -15,9 +15,9 @@ class ReviewsController {
         try {
             const user = tokenUtils.getIdFromToken(req)
 
-            await reviewsService.createReview(user, req.body)
+            const info = await reviewsService.createReview(user, req.body)
 
-            res.status(201).json({ message: 'Отзыв создан' })
+            res.status(201).json(info)
         } catch (error) {
             next(error)
         }
@@ -38,6 +38,17 @@ class ReviewsController {
             const user = tokenUtils.getIdFromToken(req)
             await reviewsService.deleteReview(user, req.params.id)
             res.status(200).json({ message: 'Отзыв удален' })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async getReviewByUserId(req, res, next) {
+        try {
+            const user = tokenUtils.getIdFromToken(req)
+
+            const info = await reviewsService.getReviewByUserId(user, req.params.id)
+            res.json(info)
         } catch (error) {
             next(error)
         }
