@@ -227,18 +227,12 @@ paths:
           schema:
             type: integer
           description: Количество отзывов на странице.
-        - name: sort
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Сортировка отзывов (asc, desc).
         - name: order
           in: query
           required: false
           schema:
             type: string
-          description: Порядок сортировки (id, rating).
+          description: Сортировка отзывов (asc, desc).
       responses:
         '200':
           description: Успешный ответ со списком отзывов

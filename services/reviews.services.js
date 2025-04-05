@@ -64,7 +64,9 @@ class ReviewsService {
 
     async getReviewByCourseId(req) {
         try {
-            const { id, page, sort = 'rating', order = 'desc', limit } = req
+            const { id, page, order = 'desc', limit } = req
+
+            const sort = 'comments.rating'
 
             if (id.length === 0) {
                 throw { status: 400, message: 'Id курса не предоставлен' }
