@@ -80,7 +80,7 @@ class ReviewsService {
                 throw { status: 404, message: 'Отзыв не найден' }
             }
             return {
-                pages: Math.ceil(info.length / limit),
+                total: info.length,
                 reviews: info,
             }
         } catch (error) {

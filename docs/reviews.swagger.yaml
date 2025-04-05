@@ -241,9 +241,10 @@ paths:
               schema:
                 type: object
                 properties:
-                  pages:
+                  total:
                     type: integer
                     example: 2
+                    description: Общее количество отзывов
                   reviews:
                     type: array
                     items:
