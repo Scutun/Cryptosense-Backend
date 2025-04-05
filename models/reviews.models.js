@@ -91,10 +91,10 @@ class ReviewsModel {
     async getReviewByUserId(userId, courseId) {
         try {
             const review = await db.query(
-                `SELECT id, rating, content, user_nickname as nickname, photo.name as photo FROM comments 
+                `SELECT comments.id, comments.rating, comments.content, users.nickname, photo.name as photo FROM comments 
                 LEFT JOIN users ON comments.user_id = users.id
                 LEFT JOIN photos as photo ON users.photo_id = photo.id
-                WHERE user_id = $1 AND course_id = $2`,
+                WHERE comments.user_id = $1 AND comments.course_id = $2`,
                 [userId, courseId],
             )
             return review.rows
