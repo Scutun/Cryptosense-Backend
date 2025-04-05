@@ -100,7 +100,7 @@ class ReviewsService {
                 throw { status: 404, message: 'Отзыв не найден' }
             }
 
-            return info
+            return info[0]
         } catch (error) {
             throw error
         }
