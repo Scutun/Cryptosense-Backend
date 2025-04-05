@@ -28,15 +28,14 @@ class ReviewsModel {
 
     async getReviewByCourseId(courseId, offset, limit, sort, order) {
         try {
-            let sql = `SELECT comments.id, comments.rating, comments.content, user.user_nickname as nickname, photo.name as photo FROM comments 
+            let sql = `SELECT comments.id, comments.rating, comments.content, users.nickname, photo.name as photo FROM comments 
                 LEFT JOIN users ON comments.user_id = users.id
                 LEFT JOIN photos as photo ON users.photo_id = photo.id
                 WHERE comments.course_id = $1`
 
             const values = [courseId]
 
-            sql += `GROUP BY comments.id, users.name, users.surname, photo.name, comments.rating, comments.content, comments.user_nickname
-                    ORDER BY ${sort} ${order}`
+            sql += ` ORDER BY ${sort} ${order}`
 
             if (offset && limit) {
                 sql += ` OFFSET $2 LIMIT $3`
