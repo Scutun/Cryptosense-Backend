@@ -4,8 +4,8 @@ class ReviewsModel {
     async createReview(info) {
         try {
             const review = await db.query(
-                `INSERT INTO comments (rating, content, user_id, course_id) 
-                 VALUES ($1, $2, $3, $4) RETURNING id`,
+                `INSERT INTO comments (rating, content, user_id, course_id, user_nickname) 
+                 VALUES ($1, $2, $3, $4, (SELECT nickname FROM users WHERE id = $3)) RETURNING id`,
                 [info.rating, info.content, info.userId, info.courseId],
             )
 
@@ -52,15 +52,11 @@ class ReviewsModel {
 
     async deleteReview(userId, reviewId) {
         try {
-            const result = await db.query(
+            await db.query(
                 `DELETE FROM comments 
-                 WHERE id = $1 AND user_nickname = (SELECT nickname FROM users WHERE id = $2)`,
+                 WHERE id = $1 AND user_id = $2`,
                 [reviewId, userId],
             )
-
-            if (result.rowCount == 0) {
-                throw { status: 404, message: 'Комментарий не найден' }
-            }
         } catch (error) {
             throw error
         }
@@ -72,7 +68,7 @@ class ReviewsModel {
                 `UPDATE comments 
                  SET rating = $1, content = $2 
                  WHERE id = $3 
-                 AND user_nickname = (SELECT nickname FROM users WHERE id = $4) 
+                 AND user_id = $4 
                  
                  RETURNING *`,
                 [info.rating, info.content, info.commentId, info.userId],

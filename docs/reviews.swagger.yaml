@@ -415,7 +415,7 @@ paths:
             type: string
             example: Bearer your_token_here
         - name: id
-          in: query
+          in: path
           required: true
           schema:
             type: integer
@@ -446,20 +446,6 @@ paths:
                   message:
                     type: string
                     example: 'Недействительный токен'
-
-        '404':
-          description: Отзыв не найден
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 404
-                  message:
-                    type: string
-                    example: 'Отзыв не найден'
 
         '422':
           description: Идентификаторы не переданы
