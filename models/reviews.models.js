@@ -52,11 +52,24 @@ class ReviewsModel {
 
     async deleteReview(userId, reviewId) {
         try {
-            await db.query(
+            const result = await db.query(
                 `DELETE FROM comments 
-                 WHERE id = $1 AND user_id = $2`,
+                 WHERE id = $1 AND user_id = $2 
+                 RETURNING course_id`,
                 [reviewId, userId],
             )
+
+            const courseId = result.rows[0]?.course_id
+
+            if (courseId) {
+                await db.query(
+                    `UPDATE courses 
+                   SET rating = (SELECT AVG(rating) FROM comments WHERE course_id = $1),
+                       reviews_count = (SELECT COUNT(*) FROM comments WHERE course_id = $1)
+                   WHERE id = $1`,
+                    [courseId],
+                )
+            }
         } catch (error) {
             throw error
         }
