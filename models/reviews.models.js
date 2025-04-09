@@ -64,7 +64,7 @@ class ReviewsModel {
             if (courseId) {
                 await db.query(
                     `UPDATE courses 
-                   SET rating = (SELECT AVG(rating) FROM comments WHERE course_id = $1),
+                   SET rating = COALESCE((SELECT AVG(rating) FROM comments WHERE course_id = $1), 0),
                        reviews_count = (SELECT COUNT(*) FROM comments WHERE course_id = $1)
                    WHERE id = $1`,
                     [courseId],
@@ -89,6 +89,18 @@ class ReviewsModel {
 
             if (result.rowCount === 0) {
                 throw { status: 404, message: 'Комментарий не найден' }
+            }
+
+            const courseId = result.rows[0]?.course_id
+
+            if (courseId) {
+                await db.query(
+                    `UPDATE courses 
+                   SET rating = COALESCE((SELECT AVG(rating) FROM comments WHERE course_id = $1), 0),
+                       reviews_count = (SELECT COUNT(*) FROM comments WHERE course_id = $1)
+                   WHERE id = $1`,
+                    [courseId],
+                )
             }
 
             return result.rows[0]
