@@ -92,7 +92,7 @@ async function startServer() {
     app.use(errorHandler)
 
 
-    cron.schedule('08 10 * * *', async () => {
+    cron.schedule('08 3 * * *', async () => {
         console.log('[CRON] Запуск планового перезапуска всех контейнеров')
 
         try {
