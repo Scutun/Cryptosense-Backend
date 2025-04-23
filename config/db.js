@@ -19,7 +19,7 @@ const connectPostgres = async () => {
     })
 
     try {
-        await pool.query('SELECT 1')
+        await pool.connect()
         console.log('PostgreSQL connected successfully')
     } catch (error) {
         console.error('Ошибка подключения к PostgreSQL:', error.message)
@@ -36,7 +36,7 @@ const connectRedis = async () => {
         },
     })
 
-    redisClient.on('error', err => {
+    redisClient.on('error', (err) => {
         console.error('Redis error:', err.message)
     })
 
@@ -65,9 +65,7 @@ const connectMongoDB = async () => {
 
 // Подключение всех баз
 const connectDatabases = async () => {
-    await connectPostgres()
-    await connectRedis()
-    await connectMongoDB()
+    await Promise.all([connectPostgres(), connectRedis(), connectMongoDB()]);
 }
 
 // Отключение всех баз
@@ -76,7 +74,7 @@ const disconnectDatabases = async () => {
         Promise.race([
             promise,
             new Promise((unused, reject) =>
-                setTimeout(() => reject(new Error(`${name} timeout after ${ms}ms`)), ms)
+                setTimeout(() => reject(new Error(`${name} timeout after ${ms}ms`)), ms),
             ),
         ])
 
@@ -112,15 +110,42 @@ const disconnectDatabases = async () => {
     console.log('Все соединения закрыты')
 }
 
-// выключение сервера 
+// выключение сервера
 const shutdown = async () => {
     await disconnectDatabases()
     console.log('Завершение работы')
     process.exit(0)
 }
 
-
 process.on('SIGINT', shutdown)
 process.on('SIGTERM', shutdown)
 
-module.exports = { pool, redisClient, mongoDb, connectDatabases, shutdown, disconnectDatabases}
+module.exports = {
+    connectDatabases,
+    disconnectDatabases,
+    get pool() {
+        if (!pool) {
+            throw new Error(
+                'PostgreSQL pool не инициализирован',
+            )
+        }
+        return pool
+    },
+    get redisClient() {
+        if (!redisClient) {
+            throw new Error(
+                'Redis клиент не инициализирован',
+            )
+        }
+        return redisClient
+    },
+    get mongoDb() {
+        if (!mongoDb) {
+            
+            throw new Error(
+                'mongoDb клиент не инициализирован',
+            )
+        }
+        return mongoDb
+    },
+}
