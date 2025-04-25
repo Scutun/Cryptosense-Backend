@@ -64,7 +64,9 @@ class ReviewsService {
 
     async getReviewByCourseId(req) {
         try {
-            const { id, page, sort = 'rating', order = 'desc', limit } = req
+            const { id, page, order = 'desc', limit } = req
+
+            const sort = 'comments.rating'
 
             if (id.length === 0) {
                 throw { status: 400, message: 'Id курса не предоставлен' }
@@ -78,7 +80,7 @@ class ReviewsService {
                 throw { status: 404, message: 'Отзыв не найден' }
             }
             return {
-                pages: Math.ceil(info.length / limit),
+                total: info.length,
                 reviews: info,
             }
         } catch (error) {
@@ -98,7 +100,7 @@ class ReviewsService {
                 throw { status: 404, message: 'Отзыв не найден' }
             }
 
-            return info
+            return info[0]
         } catch (error) {
             throw error
         }

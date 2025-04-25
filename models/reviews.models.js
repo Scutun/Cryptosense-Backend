@@ -4,8 +4,8 @@ class ReviewsModel {
     async createReview(info) {
         try {
             const review = await db.query(
-                `INSERT INTO comments (rating, content, user_id, course_id) 
-                 VALUES ($1, $2, $3, $4) RETURNING id`,
+                `INSERT INTO comments (rating, content, user_id, course_id, user_nickname) 
+                 VALUES ($1, $2, $3, $4, (SELECT nickname FROM users WHERE id = $3)) RETURNING id`,
                 [info.rating, info.content, info.userId, info.courseId],
             )
 
@@ -28,15 +28,14 @@ class ReviewsModel {
 
     async getReviewByCourseId(courseId, offset, limit, sort, order) {
         try {
-            let sql = `SELECT comments.id, comments.rating, comments.content, user.user_nickname as nickname, photo.name as photo FROM comments 
+            let sql = `SELECT comments.id, comments.rating, comments.content, users.nickname, photo.name as photo FROM comments 
                 LEFT JOIN users ON comments.user_id = users.id
                 LEFT JOIN photos as photo ON users.photo_id = photo.id
                 WHERE comments.course_id = $1`
 
             const values = [courseId]
 
-            sql += `GROUP BY comments.id, users.name, users.surname, photo.name, comments.rating, comments.content, comments.user_nickname
-                    ORDER BY ${sort} ${order}`
+            sql += ` ORDER BY ${sort} ${order}`
 
             if (offset && limit) {
                 sql += ` OFFSET $2 LIMIT $3`
@@ -55,12 +54,21 @@ class ReviewsModel {
         try {
             const result = await db.query(
                 `DELETE FROM comments 
-                 WHERE id = $1 AND user_nickname = (SELECT nickname FROM users WHERE id = $2)`,
+                 WHERE id = $1 AND user_id = $2 
+                 RETURNING course_id`,
                 [reviewId, userId],
             )
 
-            if (result.rowCount == 0) {
-                throw { status: 404, message: 'Комментарий не найден' }
+            const courseId = result.rows[0]?.course_id
+
+            if (courseId) {
+                await db.query(
+                    `UPDATE courses 
+                   SET rating = COALESCE((SELECT AVG(rating) FROM comments WHERE course_id = $1), 0),
+                       reviews_count = (SELECT COUNT(*) FROM comments WHERE course_id = $1)
+                   WHERE id = $1`,
+                    [courseId],
+                )
             }
         } catch (error) {
             throw error
@@ -73,7 +81,7 @@ class ReviewsModel {
                 `UPDATE comments 
                  SET rating = $1, content = $2 
                  WHERE id = $3 
-                 AND user_nickname = (SELECT nickname FROM users WHERE id = $4) 
+                 AND user_id = $4 
                  
                  RETURNING *`,
                 [info.rating, info.content, info.commentId, info.userId],
@@ -81,6 +89,18 @@ class ReviewsModel {
 
             if (result.rowCount === 0) {
                 throw { status: 404, message: 'Комментарий не найден' }
+            }
+
+            const courseId = result.rows[0]?.course_id
+
+            if (courseId) {
+                await db.query(
+                    `UPDATE courses 
+                   SET rating = COALESCE((SELECT AVG(rating) FROM comments WHERE course_id = $1), 0),
+                       reviews_count = (SELECT COUNT(*) FROM comments WHERE course_id = $1)
+                   WHERE id = $1`,
+                    [courseId],
+                )
             }
 
             return result.rows[0]
@@ -92,10 +112,10 @@ class ReviewsModel {
     async getReviewByUserId(userId, courseId) {
         try {
             const review = await db.query(
-                `SELECT id, rating, content, user_nickname as nickname, photo.name as photo FROM comments 
+                `SELECT comments.id, comments.rating, comments.content, users.nickname, photo.name as photo FROM comments 
                 LEFT JOIN users ON comments.user_id = users.id
                 LEFT JOIN photos as photo ON users.photo_id = photo.id
-                WHERE user_id = $1 AND course_id = $2`,
+                WHERE comments.user_id = $1 AND comments.course_id = $2`,
                 [userId, courseId],
             )
             return review.rows
