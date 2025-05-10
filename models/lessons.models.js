@@ -12,6 +12,7 @@ class LessonsModel {
 
             const newLesson = {
                 _id: lessonId.rows[0].id,
+                name: name,
                 sectionId: sectionId,
                 courseId: courseId,
                 info: info,
@@ -78,10 +79,14 @@ class LessonsModel {
                 [userId, lessonId],
             )
             const isCompleted = isComplete.rowCount > 0 ? true : false
+
+            const info = await db.query(`SELECT name FROM lessons WHERE id = $1`, [lessonId])
+
             const mongoDb = await connectMongoDB()
             const lesson = await mongoDb.collection('lessons').findOne({ _id: Number(lessonId) })
 
-            if (lesson) return Object.assign(lesson, { isCompleted: isCompleted })
+            if (lesson)
+                return Object.assign({ name: info.rows[0].name, isCompleted: isCompleted }, lesson)
             throw { status: 404, message: 'Урок не найден' }
         } catch (error) {
             throw error

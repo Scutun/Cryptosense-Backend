@@ -58,11 +58,13 @@ class TestsModel {
             )
             const isCompleted = isComplete.rowCount > 0 ? true : false
 
+            const info = await db.query(`SELECT name FROM lessons WHERE id = $1`, [testId])
+
             const mongoDb = await connectMongoDB()
             const test = await mongoDb.collection('tests').findOne({ _id: Number(testId) })
 
             if (!test) throw { status: 404, message: 'Тест не найден' }
-            return Object.assign(test, { isCompleted: isCompleted })
+            return Object.assign({ name: info.rows[0].name, isCompleted: isCompleted }, test)
         } catch (error) {
             throw error
         }
