@@ -299,6 +299,9 @@ paths:
                     type: integer
                   courseId:
                     type: integer
+                  name:
+                    type: string
+                    example: "Название урока"
                   isCompleted:
                     type: boolean
                     example: false
@@ -321,6 +324,9 @@ paths:
                         rightAnswer:
                           type: integer
                           example: 1
+                  totalQuestions:
+                    type: integer
+                    example: 1        
         "400":  
           description: Не все поля заполнены
           content:
