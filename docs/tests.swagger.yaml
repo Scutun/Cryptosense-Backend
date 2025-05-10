@@ -69,6 +69,8 @@ paths:
                 properties:
                   testId:
                     type: integer
+                  name:
+                    type: string
                   sectionId:
                     type: integer
                   courseId:
