@@ -2,12 +2,19 @@ const db = require('../config/db').pool
 const redis = require('../config/db').redisClient
 
 class CoursesModel {
-    async createCourse(info, creatorId) {
+    async createCourse(info, creatorId, coursePhoto) {
         try {
             const result = await db.query(
-                `INSERT INTO courses (title, description, creator_id, course_duration, difficulty_id, creation_date) 
-                 VALUES ($1, $2, $3, $4, $5, NOW()) RETURNING id`,
-                [info.title, info.description, creatorId, info.courseDuration, info.difficultyId],
+                `INSERT INTO courses (title, description, creator_id, course_duration, difficulty_id, creation_date, course_photo) 
+                 VALUES ($1, $2, $3, $4, $5, NOW(), $6) RETURNING id`,
+                [
+                    info.title,
+                    info.description,
+                    creatorId,
+                    info.courseDuration,
+                    info.difficultyId,
+                    coursePhoto,
+                ],
             )
 
             return result.rows[0].id

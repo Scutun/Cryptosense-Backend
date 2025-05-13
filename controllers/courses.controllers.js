@@ -5,7 +5,7 @@ class CoursesController {
     async createCourse(req, res, next) {
         try {
             const userId = tokenUtils.getIdFromToken(req)
-            const courseId = await coursesService.createCourse(req.body, userId)
+            const courseId = await coursesService.createCourse(req.body, userId, req.file.filename)
             const info = await coursesService.getCourseInfoById(courseId)
             res.json(info)
         } catch (error) {

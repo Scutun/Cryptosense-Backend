@@ -30,6 +30,7 @@ paths:
                 - courseDuration
                 - difficultyId
                 - tags
+                - photo
               properties:
                 title:
                   type: string
@@ -48,6 +49,10 @@ paths:
                   items:
                     type: integer
                   description: "Массив идентификаторов тегов"
+                photo:
+                  type: string
+                  format: binary
+                  example: Обложка курса (файл)
       responses:
         '200':
           description: Успешное получение информации о курсе
