@@ -94,6 +94,11 @@ class UsersModel {
                 [name, surname, nickname, photoId.rows[0].id, id],
             )
 
+            await db.query(`UPDATE comments set user_nickname = $1 WHERE user_id = $2`, [
+                nickname,
+                id,
+            ])
+
             return {
                 ...newUser.rows[0],
                 photo,

@@ -68,6 +68,8 @@ paths:
                 properties:
                   lessonId:
                     type: integer
+                  name:
+                    type: string
                   sectionId:
                     type: integer
                   courseId:
@@ -363,6 +365,8 @@ paths:
                 properties:
                   lessonId:
                     type: integer
+                  name:
+                    type: string
                   sectionId:
                     type: integer
                   courseId:
@@ -504,6 +508,8 @@ paths:
                 properties:
                   lessonId:
                     type: integer
+                  name:
+                    type: string
                   sectionId:
                     type: integer
                   courseId:

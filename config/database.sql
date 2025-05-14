@@ -291,12 +291,13 @@ CREATE TABLE IF NOT EXISTS comments (
     rating INT CHECK (rating > 0 AND rating <= 5),
     content TEXT NOT NULL,
     user_id INT NOT NULL,
+    user_nickname VARCHAR(255) NOT NULL,
 
     course_id INT NOT NULL,
 
     UNIQUE (user_id, course_id),
     
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
     FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
 );
 
