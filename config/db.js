@@ -20,7 +20,6 @@ const connectPostgres = async () => {
 
     try {
         await pool.connect()
-        console.log('PostgreSQL connected successfully')
     } catch (error) {
         console.error('Ошибка подключения к PostgreSQL:', error.message)
         setTimeout(connectPostgres, 10000)
@@ -42,7 +41,6 @@ const connectRedis = async () => {
 
     try {
         await redisClient.connect()
-        console.log('Redis connected successfully')
     } catch (error) {
         console.error('Ошибка подключения к Redis:', error.message)
         setTimeout(connectRedis, 10000)
@@ -56,7 +54,6 @@ const connectMongoDB = async () => {
     try {
         await mongoClient.connect()
         mongoDb = mongoClient.db(process.env.MONGO_DB_NAME)
-        console.log('MongoDB connected successfully')
     } catch (error) {
         console.error('Ошибка подключения к MongoDB:', error.message)
         setTimeout(connectMongoDB, 10000)
@@ -65,7 +62,7 @@ const connectMongoDB = async () => {
 
 // Подключение всех баз
 const connectDatabases = async () => {
-    await Promise.all([connectPostgres(), connectRedis(), connectMongoDB()]);
+    await Promise.all([connectPostgres(), connectRedis(), connectMongoDB()])
 }
 
 // Отключение всех баз
@@ -83,7 +80,6 @@ const disconnectDatabases = async () => {
     try {
         if (pool) {
             await withTimeout(pool.end(), 'PostgreSQL')
-            console.log('PostgreSQL закрыт')
         }
     } catch (e) {
         console.warn('PostgreSQL завершение:', e.message)
@@ -92,7 +88,6 @@ const disconnectDatabases = async () => {
     try {
         if (redisClient) {
             await withTimeout(redisClient.quit(), 'Redis')
-            console.log('Redis закрыт')
         }
     } catch (e) {
         console.warn('Redis завершение:', e.message)
@@ -101,7 +96,6 @@ const disconnectDatabases = async () => {
     try {
         if (mongoClient) {
             await withTimeout(mongoClient.close(), 'MongoDB')
-            console.log('MongoDB закрыт')
         }
     } catch (e) {
         console.warn('MongoDB завершение:', e.message)
@@ -125,26 +119,19 @@ module.exports = {
     disconnectDatabases,
     get pool() {
         if (!pool) {
-            throw new Error(
-                'PostgreSQL pool не инициализирован',
-            )
+            throw new Error('PostgreSQL pool не инициализирован')
         }
         return pool
     },
     get redisClient() {
         if (!redisClient) {
-            throw new Error(
-                'Redis клиент не инициализирован',
-            )
+            throw new Error('Redis клиент не инициализирован')
         }
         return redisClient
     },
     get mongoDb() {
         if (!mongoDb) {
-            
-            throw new Error(
-                'mongoDb клиент не инициализирован',
-            )
+            throw new Error('mongoDb клиент не инициализирован')
         }
         return mongoDb
     },

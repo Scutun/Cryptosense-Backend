@@ -13,45 +13,7 @@ const cookieParser = require('cookie-parser')
 const errorHandler = require('./middlewares/errorHandler')
 const { exec } = require('child_process')
 const cron = require('node-cron')
-
-function restartAllContainers() {
-    return new Promise((resolve, reject) => {
-        exec('docker ps -q', (error, stdout, stderr) => {
-            if (error) {
-                console.error(`Ошибка при получении контейнеров: ${error.message}`)
-                return reject(error)
-            }
-
-            if (stderr) {
-                console.error(`stderr: ${stderr}`)
-                return reject(stderr)
-            }
-
-            const containerIds = stdout.trim().split('\n')
-            if (containerIds.length > 0) {
-                const restartCommand = `powershell -Command "docker restart ${containerIds.join(' ')}"`
-                exec(restartCommand, (restartError, restartStdout, restartStderr) => {
-                    if (restartError) {
-                        console.error(
-                            `Ошибка при перезапуске контейнеров: ${restartError.message}`,
-                        )
-                        return reject(restartError)
-                    }
-                    if (restartStderr) {
-                        console.error(`stderr: ${restartStderr}`)
-                        return reject(restartStderr)
-                    }
-                    console.log(`Контейнеры перезапущены: \n${restartStdout}`)
-                    resolve(restartStdout)
-                })
-            } else {
-                console.log('Нет запущенных контейнеров для перезапуска.')
-                resolve('Нет контейнеров')
-            }
-        })
-    })
-}
-
+const docker = require('./config/docker')
 
 async function startServer() {
     await connectDatabases()
@@ -91,7 +53,6 @@ async function startServer() {
     app.use('/api', authorsRoutes)
     app.use(errorHandler)
 
-
     cron.schedule('08 3 * * *', async () => {
         console.log('[CRON] Запуск планового перезапуска всех контейнеров')
 
@@ -100,7 +61,7 @@ async function startServer() {
             await disconnectDatabases()
 
             // Перезапускаем контейнеры
-            await restartAllContainers()
+            await docker.restartAllContainers()
 
             // После перезапуска контейнеров переподключаемся к базам данных
             await connectDatabases()
@@ -114,15 +75,21 @@ async function startServer() {
         res.send('Server is running')
     })
 
-    app.listen(PORT, () => {
-        console.log(`Server is running on port ${PORT}`)
-        console.log(`Documentation is available on http://localhost:${PORT}/api/v1/swagger/docs`)
-    })
+    if (process.env.NODE_ENV !== 'test') {
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`)
+            console.log(
+                `Documentation is available on http://localhost:${PORT}/api/v1/swagger/docs`,
+            )
+        })
+    }
+
     return app
 }
+
 startServer().catch((err) => {
     console.error('Ошибка запуска сервера:', err)
     process.exit(1)
 })
 
-module.exports = app //Необходимо для тестирования
+module.exports = { app, startServer } //Необходимо для тестирования
