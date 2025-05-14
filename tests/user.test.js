@@ -1,9 +1,17 @@
 const request = require('supertest')
-const { describe, it, expect } = require('@jest/globals')
-const app = require('../app')
+const { describe, it, expect, beforeAll,afterAll } = require('@jest/globals')
+const { startServer } = require('../app')
+
+
+let app
+
+beforeAll(async () => {
+    app = await startServer()
+})
+
 
 const token =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQzNzU5MjUxLCJleHAiOjE3NDM3NjY0NTF9.qSMESBSJnvXZBkZn-xSl2Of0O7_QO1dXawnr9Vgm3WQ'
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ3MjM2OTcyLCJleHAiOjE3NDcyNDQxNzJ9.mwlsGKcfoIWiFZXo5L5jyq8BfWd1WPlyl30vRMCr0no'
 
 describe('Тестирование API /v1/users/me', () => {
     it('Должен вернуть информацию о пользователе', async () => {
