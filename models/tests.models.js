@@ -1,5 +1,5 @@
 const db = require('../config/db').pool
-const { connectMongoDB } = require('../config/db')
+const mongoDb = require('../config/db').mongoDb
 
 class TestsModel {
     async createTest(name, sectionId, courseId, info) {
@@ -16,7 +16,6 @@ class TestsModel {
                 questions: info,
             }
 
-            const mongoDb = await connectMongoDB()
             await mongoDb.collection('tests').insertOne(newTest)
 
             return newTest
@@ -60,7 +59,6 @@ class TestsModel {
 
             const info = await db.query(`SELECT name FROM lessons WHERE id = $1`, [testId])
 
-            const mongoDb = await connectMongoDB()
             const test = await mongoDb.collection('tests').findOne({ _id: Number(testId) })
 
             if (!test) throw { status: 404, message: 'Тест не найден' }
@@ -78,8 +76,6 @@ class TestsModel {
                 sectionId,
             ])
 
-            const mongoDb = await connectMongoDB()
-
             await mongoDb
                 .collection('tests')
                 .updateOne(
@@ -95,7 +91,6 @@ class TestsModel {
         try {
             await db.query('DELETE FROM lessons WHERE id=$1', [testId])
 
-            const mongoDb = await connectMongoDB()
             await mongoDb.collection('tests').deleteOne({ _id: Number(testId) })
         } catch (error) {
             throw error
@@ -104,7 +99,6 @@ class TestsModel {
 
     async deleteAllTestsByCoursesId(courseId) {
         try {
-            const mongoDb = await connectMongoDB()
             await mongoDb.collection('tests').deleteMany({ sectionId: Number(courseId) })
         } catch (error) {
             throw error
@@ -113,7 +107,6 @@ class TestsModel {
 
     async deleteAllTestsBySectionId(sectionId) {
         try {
-            const mongoDb = await connectMongoDB()
             await mongoDb.collection('tests').deleteMany({ sectionId: Number(sectionId) })
         } catch (error) {
             throw error
