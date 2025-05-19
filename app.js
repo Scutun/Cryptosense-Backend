@@ -18,6 +18,7 @@ const docker = require('./config/docker')
 async function startServer() {
     await connectDatabases()
 
+    const coursePhotoRoutes = require('./routes/photos.routes')
     const userRoutes = require('./routes/users.routes')
     const courseRoutes = require('./routes/courses.routes')
     const reviewRoutes = require('./routes/reviews.routes')
@@ -40,7 +41,7 @@ async function startServer() {
         '/api/v1/profiles/avatars/url/',
         express.static(path.join(__dirname, 'uploads/avatars')),
     )
-    app.use('/api/v1/courses/photo/url/', express.static(path.join(__dirname, 'uploads/course')))
+    app.use('/api/v1/courses/photo/url', coursePhotoRoutes)
 
     app.use('/api', userRoutes)
     app.use('/api', courseRoutes)
