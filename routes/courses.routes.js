@@ -16,7 +16,7 @@ router.post('/v1/courses/sub', coursesController.addSubscription)
 router.get('/v1/courses/chosen', coursesController.getChosenCourses)
 router.get('/v1/courses/check/sub/:id', coursesController.courseCheckSubscription)
 
-router.put('/v1/courses', coursesController.updateCourse)
+router.put('/v1/courses', uploadCourseImage, coursesController.updateCourse)
 
 router.delete('/v1/courses/:id', coursesController.deleteCourse)
 router.delete('/v1/courses/unsub/:id', coursesController.removeSubscription)

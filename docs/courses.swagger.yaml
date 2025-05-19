@@ -718,7 +718,11 @@ paths:
                 - tags
                 - coursePhoto
                 - description
+                - courseId
               properties:
+                courseId:
+                  type: integer
+                  description: "Идентификатор курса"
                 coursePhoto:
                   type: string
                   description: "Ссылка на изображение курса в формате JPG"

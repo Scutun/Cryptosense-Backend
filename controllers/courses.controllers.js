@@ -1,5 +1,7 @@
 const coursesService = require('../services/courses.services')
 const tokenUtils = require('../utils/tokens.utils')
+const fs = require('fs')
+const path = require('path')
 
 class CoursesController {
     async createCourse(req, res, next) {
@@ -27,7 +29,24 @@ class CoursesController {
     async updateCourse(req, res, next) {
         try {
             const userId = tokenUtils.getIdFromToken(req)
-            await coursesService.getCourseInfoById(req.body.courseId)
+            const existingCourse = await coursesService.getCourseInfoById(req.body.courseId)
+
+            if (req.file) {
+                const oldPhotoFileName = existingCourse.coursephoto
+
+                if (oldPhotoFileName && typeof oldPhotoFileName === 'string') {
+                    const oldPhotoPath = path.join('uploads/course', oldPhotoFileName)
+
+                    if (fs.existsSync(oldPhotoPath)) {
+                        fs.unlinkSync(oldPhotoPath)
+                    }
+                }
+
+                req.body.coursePhoto = req.file.filename
+            } else {
+                req.body.coursePhoto = existingCourse.coursephoto || null
+            }
+
             const courseId = await coursesService.updateCourse(req.body, userId)
             const info = await coursesService.getCourseInfoById(courseId)
             res.json(info)
