@@ -30,6 +30,7 @@ paths:
                 - courseDuration
                 - difficultyId
                 - tags
+                - photo
               properties:
                 title:
                   type: string
@@ -48,6 +49,10 @@ paths:
                   items:
                     type: integer
                   description: "Массив идентификаторов тегов"
+                photo:
+                  type: string
+                  format: binary
+                  example: Обложка курса (файл)
       responses:
         '200':
           description: Успешное получение информации о курсе
@@ -62,13 +67,15 @@ paths:
                     type: string
                   description:
                     type: string
-                  creator:
+                  creatorId:
                     type: string
-                  creation_date:
+                  creationDate:
                     type: string
                     format: date-time
-                  course_duration:
+                  duration:
                     type: string
+                  difficultyId:
+                    type: integer
                   difficulty:
                     type: string
                   tags:
@@ -76,6 +83,18 @@ paths:
                     items:
                       type: string
                       nullable: true
+                  lessonsCount:
+                    type: integer
+                  testCount:
+                    type: integer
+                  subscribers:
+                    type: integer
+                  coursePhoto:
+                    type: string
+                  rating:
+                    type: string
+                  unlockAll:
+                    type: boolean  
         '400':
           description: Не все поля заполнены
           content:
@@ -699,7 +718,11 @@ paths:
                 - tags
                 - coursePhoto
                 - description
+                - courseId
               properties:
+                courseId:
+                  type: integer
+                  description: "Идентификатор курса"
                 coursePhoto:
                   type: string
                   description: "Ссылка на изображение курса в формате JPG"

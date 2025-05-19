@@ -4,7 +4,7 @@ const testsModel = require('../models/tests.models')
 const authorsModel = require('../models/authors.models')
 
 class CoursesService {
-    async createCourse(info, creatorId) {
+    async createCourse(info, creatorId, coursePhoto) {
         try {
             if (
                 !info.title ||
@@ -12,7 +12,8 @@ class CoursesService {
                 !info.courseDuration ||
                 !info.difficultyId ||
                 !info.courseDuration ||
-                info.tags.length === 0
+                info.tags.length === 0 ||
+                !coursePhoto
             ) {
                 throw { status: 400, message: 'Не все поля заполнены' }
             }
@@ -25,7 +26,7 @@ class CoursesService {
                 }
             }
 
-            const courseId = await coursesModel.createCourse(info, creatorId)
+            const courseId = await coursesModel.createCourse(info, creatorId, coursePhoto)
 
             const tags = info.tags.map((num) => [courseId, num])
 

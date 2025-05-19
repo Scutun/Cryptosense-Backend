@@ -1,6 +1,5 @@
 const db = require('../config/db').pool
 const mongoDb = require('../config/db').mongoDb
-const { connectMongoDB } = require('../config/db')
 
 class LessonsModel {
     async createLesson(name, sectionId, courseId, info) {
@@ -18,7 +17,6 @@ class LessonsModel {
                 info: info,
             }
 
-            const mongoDb = await connectMongoDB()
             await mongoDb.collection('lessons').insertOne(newLesson)
 
             return newLesson
@@ -82,7 +80,6 @@ class LessonsModel {
 
             const info = await db.query(`SELECT name FROM lessons WHERE id = $1`, [lessonId])
 
-            const mongoDb = await connectMongoDB()
             const lesson = await mongoDb.collection('lessons').findOne({ _id: Number(lessonId) })
 
             if (lesson)
@@ -101,8 +98,6 @@ class LessonsModel {
                 sectionId,
             ])
 
-            const mongoDb = await connectMongoDB()
-
             await mongoDb
                 .collection('lessons')
                 .updateOne(
@@ -118,7 +113,6 @@ class LessonsModel {
         try {
             await db.query('DELETE FROM lessons WHERE id=$1', [lessonId])
 
-            const mongoDb = await connectMongoDB()
             await mongoDb.collection('lessons').deleteOne({ _id: Number(lessonId) })
         } catch (error) {
             throw error
@@ -127,7 +121,6 @@ class LessonsModel {
 
     async deleteAllLessonsBySectionId(sectionId) {
         try {
-            const mongoDb = await connectMongoDB()
             await mongoDb.collection('lessons').deleteMany({ sectionId: Number(sectionId) })
         } catch (error) {
             throw error
@@ -136,7 +129,6 @@ class LessonsModel {
 
     async deleteAllLessonsByCourseId(courseId) {
         try {
-            const mongoDb = await connectMongoDB()
             await mongoDb.collection('lessons').deleteMany({ courseId: Number(courseId) })
         } catch (error) {
             throw error

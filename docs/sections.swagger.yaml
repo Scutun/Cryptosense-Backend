@@ -345,6 +345,9 @@ paths:
                 name:
                   type: string
                   example: "Раздел 1"
+                courseId:
+                  type: integer
+                  example: 1
                 
       responses:
         '200':
@@ -466,10 +469,10 @@ paths:
             schema:
               type: object
               required:
-                - reviewId
+                - id
               properties:
                 reviewId:
-                  type: integer
+                  type: id
                   example: 10
       responses:
         '200':
