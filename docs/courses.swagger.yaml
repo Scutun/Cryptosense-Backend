@@ -424,12 +424,11 @@ paths:
                     type: integer
                   difficultyId:
                     type: integer
-                  difficulty:
-                    type: string
+
                   tags:
                     type: array
                     items:
-                      type: string
+                      type: integer
                       nullable: true
                   lessonСount:
                     type: integer

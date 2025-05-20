@@ -99,8 +99,8 @@ class CoursesModel {
                 `SELECT 
                     courses.id, courses.id, courses.title, courses.description, 
                     courses.creator_id as creatorId, 
-                    courses.creation_date as creationDate, courses.course_duration AS duration, difficulties.id AS difficultyId, difficulties.name AS difficulty, 
-                    ARRAY_AGG(tags.name) AS tags,courses.lessons_count as lessonsCount,courses.test_count as testCount,courses.subscribers,
+                    courses.creation_date as creationDate, courses.course_duration AS duration, difficulties.id AS difficultyId,  
+                    ARRAY_AGG(tags.id) AS tags,courses.lessons_count as lessonsCount,courses.test_count as testCount,courses.subscribers,
                     courses.course_photo as photo, courses.rating , courses.unlock_all as unlockAll,courses.is_released as published
                   FROM courses
                   LEFT JOIN users ON courses.creator_id = users.id
