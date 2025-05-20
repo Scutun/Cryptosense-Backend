@@ -8,6 +8,7 @@ const uploadCourseImage = require('../middlewares/uploadCourseImage')
 router.get('/v1/courses/info/:id', coursesController.getCourseInfoById)
 router.get('/v1/courses/list', coursesController.getCourses)
 
+
 router.use('/v1/courses', checkToken)
 
 router.post('/v1/courses/new', uploadCourseImage, coursesController.createCourse)
@@ -15,6 +16,7 @@ router.post('/v1/courses/sub', coursesController.addSubscription)
 
 router.get('/v1/courses/chosen', coursesController.getChosenCourses)
 router.get('/v1/courses/check/sub/:id', coursesController.courseCheckSubscription)
+router.get('/v1/courses/authors/boba', coursesController.getCoursesByAuthorId)
 
 router.put('/v1/courses', uploadCourseImage, coursesController.updateCourse)
 

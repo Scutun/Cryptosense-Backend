@@ -217,6 +217,8 @@ CREATE TABLE IF NOT EXISTS courses (
     test_count INT DEFAULT 0,
     unlock_all BOOLEAN DEFAULT TRUE,
 
+    is_released BOOLEAN DEFAULT FALSE,
+ 
     difficulty_id BIGINT,
     
     FOREIGN KEY (difficulty_id) REFERENCES difficulties(id) ON DELETE SET NULL

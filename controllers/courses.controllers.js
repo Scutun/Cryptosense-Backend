@@ -112,6 +112,19 @@ class CoursesController {
             next(error)
         }
     }
+
+    async getCoursesByAuthorId(req, res, next)   
+    {
+        try {
+            
+            const userId = tokenUtils.getIdFromToken(req)
+            const courses = await coursesService.getCoursesByAuthorId(userId,req.query)
+            
+            res.json(courses)
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 module.exports = new CoursesController()

@@ -121,6 +121,15 @@ class UsersModel {
             throw error
         }
     }
+
+    async isAuthor(id) {
+        try {
+            const result = await db.query(`SELECT author FROM users WHERE id = $1`, [id])
+            return result.rows[0].author
+        } catch (error) {
+            throw error
+        }
+    }
 }
 
 module.exports = new UsersModel()

@@ -2,6 +2,7 @@ const coursesModel = require('../models/courses.models')
 const lessonsModel = require('../models/lessons.models')
 const testsModel = require('../models/tests.models')
 const authorsModel = require('../models/authors.models')
+const usersModel = require('../models/users.models')
 
 class CoursesService {
     async createCourse(info, creatorId, coursePhoto) {
@@ -213,6 +214,39 @@ class CoursesService {
                         .then(() => testsModel.deleteAllTestsByCoursesId(course.id)),
                 ),
             )
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async getCoursesByAuthorId(id, query) {
+        try {
+            const authorId = query.id != null ? parseInt(query.id, 10) : '';
+
+            console.log(authorId)
+            if (authorId.length === 0 || authorId === id) {
+                const isAuthor = await usersModel.isAuthor(id)
+                if (!isAuthor) {
+                    throw {
+                        status: 404,
+                        message: 'Пользователь не является автором, предоставьте id автора',
+                    }
+                }
+                const info = await coursesModel.getCoursesByAuthorId(id, false) //вернет все курсы автора
+                return info
+            }
+
+            const isAuthor = await usersModel.isAuthor(authorId)
+            if (!isAuthor) {
+                throw {
+                    status: 404,
+                    message: 'Пользователь не является автором, предоставьте id автора',
+                }
+            }
+
+            const info = await coursesModel.getCoursesByAuthorId(authorId, true) //вернет опубликованные курсы автора
+            return info
+
         } catch (error) {
             throw error
         }
