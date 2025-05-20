@@ -333,9 +333,13 @@ class CoursesModel {
         }
     }
 
-    async getCoursesByAuthorId(id,owner) {
+    async getCoursesByAuthorId(id, owner) {
         try {
-            const info = await db.query(`select * from courses where creator_id = $1 and is_released=$2`, [id,owner])
+            console.log(id, owner)
+            const info = await db.query(
+                `select * from courses where creator_id = $1 and is_released=$2`,
+                [id, owner],
+            )
             return info.rows
         } catch (error) {
             throw error

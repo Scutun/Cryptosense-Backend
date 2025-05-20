@@ -621,6 +621,121 @@ paths:
                     type: string
                     example: 'Внутренняя ошибка сервера'
 
+  /v1/courses/authors :
+    get:
+      summary: "посмотреть курсы автора"
+      description: "посмотреть курчсы автора. Требуется авторизация."
+      tags:
+        - Courses
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Токен авторизации в формате Bearer.
+        - name: id
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: ID автора, который нужно предоставить для получения курсов автора которые опуликованы. Если не указан то возвращает  все курсы пользователя если он является автором 
+      responses:
+        '200':
+          description: Успешный ответ со списком курсов
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  courses:
+                    type: array
+                    description: Список курсов
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: ID курса
+                        creator:
+                          type: string
+                          description: Фамилия и имя создателя курса
+                        photo:
+                          type: string
+                          description: Название фото курса в формате JPG
+                        title:
+                          type: string
+                          description: Название курса
+                        duration:
+                          type: integer
+                          description: Продолжительность курса (в часах)
+                        rating:
+                          type: string
+                          description: Рейтинг курса
+                        reviews:
+                          type: string
+                          description: Количество отзывов
+                        subscribers:
+                          type: integer
+                          description: Количество подписчиков
+                        progress:
+                          type: string
+                          description: Процент завершенности курса
+                  
+        '400':  
+          description: Пользователь не является автором, предоставьте id автора
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 'Пользователь не является автором, предоставьте id автора'
+        "403":
+            description: Недействительный токен
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status:
+                      type: integer
+                      example: 40102
+                    message:
+                      type: string
+                      example: "Недействительный токен"
+        '404':  
+          description: Пользователь не найден
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: 'Пользователь не найден'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 'Внутренняя ошибка сервера'
+
+
   /v1/courses/check/sub/{id}:
     get:
       summary: "Проверить подписку на курс"

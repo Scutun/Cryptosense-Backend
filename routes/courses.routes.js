@@ -8,7 +8,6 @@ const uploadCourseImage = require('../middlewares/uploadCourseImage')
 router.get('/v1/courses/info/:id', coursesController.getCourseInfoById)
 router.get('/v1/courses/list', coursesController.getCourses)
 
-
 router.use('/v1/courses', checkToken)
 
 router.post('/v1/courses/new', uploadCourseImage, coursesController.createCourse)

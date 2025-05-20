@@ -221,14 +221,13 @@ class CoursesService {
 
     async getCoursesByAuthorId(id, query) {
         try {
-            const authorId = query.id != null ? parseInt(query.id, 10) : '';
+            const authorId = query.id != null ? parseInt(query.id, 10) : ''
 
-            console.log(authorId)
             if (authorId.length === 0 || authorId === id) {
                 const isAuthor = await usersModel.isAuthor(id)
                 if (!isAuthor) {
                     throw {
-                        status: 404,
+                        status: 400,
                         message: 'Пользователь не является автором, предоставьте id автора',
                     }
                 }
@@ -237,16 +236,16 @@ class CoursesService {
             }
 
             const isAuthor = await usersModel.isAuthor(authorId)
+
             if (!isAuthor) {
                 throw {
-                    status: 404,
+                    status: 400,
                     message: 'Пользователь не является автором, предоставьте id автора',
                 }
             }
 
             const info = await coursesModel.getCoursesByAuthorId(authorId, true) //вернет опубликованные курсы автора
-            return info
-
+            return { courses: info }
         } catch (error) {
             throw error
         }

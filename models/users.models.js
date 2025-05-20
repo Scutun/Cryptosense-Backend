@@ -125,6 +125,12 @@ class UsersModel {
     async isAuthor(id) {
         try {
             const result = await db.query(`SELECT author FROM users WHERE id = $1`, [id])
+            if (result.rowCount === 0) {
+                throw {
+                    status: 404,
+                    message: 'Пользователь не найден',
+                }
+            }
             return result.rows[0].author
         } catch (error) {
             throw error
