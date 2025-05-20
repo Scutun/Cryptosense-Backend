@@ -358,7 +358,7 @@ class CoursesModel {
                 [authorId, id],
             )
             if (course.rowCount < 1) {
-                throw { status: 403, message: 'У вас недостаточно прав для удаления этого курса' }
+                throw { status: 403, message: 'У вас недостаточно прав для публикации этого курса' }
             }
 
             const released = await db.query(
