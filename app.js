@@ -27,7 +27,6 @@ async function startServer() {
     const lessonsRoutes = require('./routes/lessons.routes')
     const additionsRoutes = require('./routes/additions.routes')
     const authorsRoutes = require('./routes/authors.routes')
-    const coursePhotoRoutes = require('./routes/photos.routes')
 
     app.use(cookieParser())
     app.use(express.json())
@@ -42,12 +41,12 @@ async function startServer() {
         express.static(path.join(__dirname, 'uploads/avatars')),
     )
 
+    app.use('/api', photosRoutes)
     app.use('/api', userRoutes)
     app.use('/api', courseRoutes)
     app.use('/api', reviewRoutes)
     app.use('/api', sectionRoutes)
     app.use('/api', testsRoutes)
-    app.use('/api', photosRoutes)
     app.use('/api', lessonsRoutes)
     app.use('/api', additionsRoutes)
     app.use('/api', authorsRoutes)

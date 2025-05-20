@@ -32,7 +32,7 @@ class CoursesController {
             const existingCourse = await coursesService.getCourseInfoById(req.body.courseId)
 
             if (req.file) {
-                const oldPhotoFileName = existingCourse.coursephoto
+                const oldPhotoFileName = existingCourse.photo
 
                 if (oldPhotoFileName && typeof oldPhotoFileName === 'string') {
                     const oldPhotoPath = path.join('uploads/course', oldPhotoFileName)
@@ -44,7 +44,7 @@ class CoursesController {
 
                 req.body.coursePhoto = req.file.filename
             } else {
-                req.body.coursePhoto = existingCourse.coursephoto || null
+                req.body.coursePhoto = existingCourse.photo || null
             }
 
             const courseId = await coursesService.updateCourse(req.body, userId)
