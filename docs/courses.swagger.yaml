@@ -95,6 +95,7 @@ paths:
                     type: string
                   unlockAll:
                     type: boolean  
+                  
         '400':
           description: Не все поля заполнены
           content:
@@ -656,31 +657,42 @@ paths:
                       properties:
                         id:
                           type: integer
-                          description: ID курса
-                        creator:
-                          type: string
-                          description: Фамилия и имя создателя курса
-                        photo:
-                          type: string
-                          description: Название фото курса в формате JPG
                         title:
                           type: string
-                          description: Название курса
+                        description:
+                          type: string
+                        creatorId:
+                          type: string
+                        creation_date:
+                          type: string
+                          format: date-time
                         duration:
                           type: integer
-                          description: Продолжительность курса (в часах)
+                        difficultyId:
+                          type: integer
+                        difficulty:
+                          type: string
+                        tags:
+                          type: array
+                          items:
+                            type: string
+                            nullable: true
+                        lessonСount:
+                          type: integer
+                        testСount:
+                          type: integer
+                        subscribers: 
+                          type: integer
+                        coursePhoto:
+                          type: string
                         rating:
                           type: string
-                          description: Рейтинг курса
-                        reviews:
-                          type: string
-                          description: Количество отзывов
-                        subscribers:
-                          type: integer
-                          description: Количество подписчиков
-                        progress:
-                          type: string
-                          description: Процент завершенности курса
+                        unlockAll:
+                          type: boolean
+                          description: "Флаг, указывающий, требуется ли разблокировать все секции курса"
+                        published:
+                          type: boolean
+
                   
         '400':  
           description: Пользователь не является автором, предоставьте id автора
