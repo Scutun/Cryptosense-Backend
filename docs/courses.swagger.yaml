@@ -446,8 +446,7 @@ paths:
                     description: "Флаг, указывающий, требуется ли разблокировать все секции курса"
                   published:
                     type: boolean
-                  creator:
-                    type: string
+
         '400':
           description: ID курса не предоставлен
           content:
@@ -696,7 +695,8 @@ paths:
                           description: "Флаг, указывающий, требуется ли разблокировать все секции курса"
                         published:
                           type: boolean
-
+                        creator:
+                          type: string
                   
         '400':  
           description: Пользователь не является автором, предоставьте id автора
