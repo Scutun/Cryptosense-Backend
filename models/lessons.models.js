@@ -171,8 +171,8 @@ class LessonsModel {
                 'SELECT us.is_unlocked FROM user_sections us LEFT JOIN lessons l ON l.section_id = us.section_id WHERE l.id = $1 AND us.user_id = $2',
                 [lessonId, userId],
             )
-
-            if (lessonOpened.rowCount === 0) {
+            const isAuthor = await db.query('select count(*) from lessons l left join sections s on l.section_id = s.id left join courses c on s.course_id = c.id where l.id = $1 and c.creator_id = $2', [lessonId,userId])
+            if (lessonOpened.rowCount === 0 && isAuthor.rows[0].count < 1) {
                 throw {
                     status: 423,
                     message: 'Завершите предыдущую секцию для просмотра содержимого следующей',
