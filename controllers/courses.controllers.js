@@ -117,8 +117,7 @@ class CoursesController {
         try {
             const userId = tokenUtils.getIdFromToken(req)
             const courses = await coursesService.getCoursesByAuthorId(userId, req.query)
-
-            res.status(200).json(courses)
+            res.status(200).json({courses:courses})
         } catch (error) {
             next(error)
         }

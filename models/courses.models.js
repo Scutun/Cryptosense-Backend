@@ -335,14 +335,45 @@ class CoursesModel {
 
     async getCoursesByAuthorId(id, owner) {
         try {
-            let query = `SELECT * FROM courses WHERE creator_id = $1`
+            let query = `
+            SELECT 
+                courses.id,
+                courses.title,
+                courses.description,
+                courses.creator_id AS creatorId,
+                courses.creation_date AS creationDate,
+                courses.course_duration AS duration,
+                difficulties.id AS difficultyId,
+                difficulties.name AS difficulty,
+                ARRAY_AGG(tags.name) AS tags,
+                courses.lessons_count AS lessonsCount,
+                courses.test_count AS testCount,
+                courses.subscribers,
+                courses.course_photo AS coursePhoto,
+                courses.rating,
+                courses.unlock_all AS unlockAll,
+                courses.is_released as published
+            FROM courses
+            LEFT JOIN users ON courses.creator_id = users.id
+            LEFT JOIN difficulties ON courses.difficulty_id = difficulties.id
+            LEFT JOIN course_tags ON courses.id = course_tags.course_id
+            LEFT JOIN tags ON course_tags.tag_id = tags.id
+            WHERE courses.creator_id = $1
+        `
+
             const params = [id]
 
-            if (!owner) {
-                // если НЕ владелец — показать только опубликованные
-                query += ` AND is_released = $2`
+            if (owner) {
+                query += ` AND courses.is_released = $2`
                 params.push(true)
             }
+
+            query += `
+            GROUP BY 
+                courses.id, 
+                difficulties.id, 
+                difficulties.name
+        `
 
             const info = await db.query(query, params)
             return info.rows

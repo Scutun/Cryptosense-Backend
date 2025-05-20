@@ -245,7 +245,7 @@ class CoursesService {
             }
 
             const info = await coursesModel.getCoursesByAuthorId(authorId, true) //вернет опубликованные курсы автора
-            return { courses: info }
+            return  info 
         } catch (error) {
             throw error
         }
