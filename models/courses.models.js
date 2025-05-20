@@ -333,9 +333,9 @@ class CoursesModel {
         }
     }
 
-    async getCoursesByAuthorId(id, owner) {
-        try {
-            let query = `
+async getCoursesByAuthorId(id, owner) {
+    try {
+        let query = `
             SELECT 
                 courses.id,
                 courses.title,
@@ -345,42 +345,45 @@ class CoursesModel {
                 courses.course_duration AS duration,
                 difficulties.id AS difficultyId,
                 difficulties.name AS difficulty,
-                ARRAY_AGG(tags.name) AS tags,
+                ARRAY_AGG(DISTINCT tags.name) AS tags,
                 courses.lessons_count AS lessonsCount,
                 courses.test_count AS testCount,
                 courses.subscribers,
                 courses.course_photo AS coursePhoto,
                 courses.rating,
                 courses.unlock_all AS unlockAll,
-                courses.is_released as published
+                courses.is_released AS published,
+                CONCAT(users.name, ' ', users.surname) AS creator
             FROM courses
             LEFT JOIN users ON courses.creator_id = users.id
             LEFT JOIN difficulties ON courses.difficulty_id = difficulties.id
             LEFT JOIN course_tags ON courses.id = course_tags.course_id
             LEFT JOIN tags ON course_tags.tag_id = tags.id
             WHERE courses.creator_id = $1
-        `
+        `;
 
-            const params = [id]
+        const params = [id];
 
-            if (owner) {
-                query += ` AND courses.is_released = $2`
-                params.push(true)
-            }
-
-            query += `
-            GROUP BY 
-                courses.id, 
-                difficulties.id, 
-                difficulties.name
-        `
-
-            const info = await db.query(query, params)
-            return info.rows
-        } catch (error) {
-            throw error
+        if (owner) {
+            query += ` AND courses.is_released = $2`;
+            params.push(true);
         }
+
+        query += `
+            GROUP BY 
+                courses.id,
+                difficulties.id,
+                difficulties.name,
+                users.name,
+                users.surname
+        `;
+
+        const info = await db.query(query, params);
+        return info.rows;
+    } catch (error) {
+        throw error;
     }
+}
 
     async changeReleasedStatus(id, authorId) {
         try {
