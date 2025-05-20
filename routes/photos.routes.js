@@ -7,9 +7,9 @@ const expressStatic = require('express').static
 
 const { serveCoursePhoto, courseUploadsPath } = require('../utils/photos.utils')
 
-router.use('/', serveCoursePhoto)
+router.use('/v1/courses/photo/url', serveCoursePhoto)
 
-router.use('/', expressStatic(courseUploadsPath))
+router.use('/v1/courses/photo/url', expressStatic(courseUploadsPath))
 
 router.get('/v1/profiles/avatars/all', checkToken, photosUtils.getPhotos)
 

@@ -16,7 +16,7 @@ router.post('/v1/courses/sub', coursesController.addSubscription)
 
 router.get('/v1/courses/chosen', coursesController.getChosenCourses)
 router.get('/v1/courses/check/sub/:id', coursesController.courseCheckSubscription)
-router.get('/v1/courses/authors/boba', coursesController.getCoursesByAuthorId)
+router.get('/v1/courses/authors', coursesController.getCoursesByAuthorId)
 
 router.put('/v1/courses', uploadCourseImage, coursesController.updateCourse)
 
