@@ -335,12 +335,38 @@ class CoursesModel {
 
     async getCoursesByAuthorId(id, owner) {
         try {
-            console.log(id, owner)
-            const info = await db.query(
-                `select * from courses where creator_id = $1 and is_released=$2`,
-                [id, owner],
-            )
+            let query = `SELECT * FROM courses WHERE creator_id = $1`
+            const params = [id]
+
+            if (!owner) {
+                // если НЕ владелец — показать только опубликованные
+                query += ` AND is_released = $2`
+                params.push(true)
+            }
+
+            const info = await db.query(query, params)
             return info.rows
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async changeReleasedStatus(id, authorId) {
+        try {
+            const course = await db.query(
+                `SELECT * FROM courses where creator_id = $1 and id = $2`,
+                [authorId, id],
+            )
+            if (course.rowCount < 1) {
+                throw { status: 403, message: 'У вас недостаточно прав для удаления этого курса' }
+            }
+
+            const released = await db.query(
+                `UPDATE courses SET is_released = NOT is_released WHERE id = $1 and creator_id = $2 RETURNING is_released`,
+                [id, authorId],
+            )
+
+            return released.rows[0].is_released
         } catch (error) {
             throw error
         }

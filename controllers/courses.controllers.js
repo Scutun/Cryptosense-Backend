@@ -118,7 +118,19 @@ class CoursesController {
             const userId = tokenUtils.getIdFromToken(req)
             const courses = await coursesService.getCoursesByAuthorId(userId, req.query)
 
-            res.json(courses)
+            res.status(200).json(courses)
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async changeReleasedStatus(req, res, next) {
+        try {
+            const userId = tokenUtils.getIdFromToken(req)
+            const released = await coursesService.changeReleasedStatus(req.body.courseId, userId)
+            res.status(200).json({
+                message: released ? 'Курс опубликован' : 'Курс снят с публикации',
+            })
         } catch (error) {
             next(error)
         }

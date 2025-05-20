@@ -250,6 +250,18 @@ class CoursesService {
             throw error
         }
     }
+
+    async changeReleasedStatus(id, authorId) {
+        try {
+            if (id.length === 0) {
+                throw { status: 400, message: 'Id курса не предоставлен' }
+            }
+
+            return await coursesModel.changeReleasedStatus(id, authorId)
+        } catch (error) {
+            throw error
+        }
+    }
 }
 
 module.exports = new CoursesService()

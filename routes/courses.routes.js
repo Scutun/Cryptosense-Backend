@@ -18,6 +18,7 @@ router.get('/v1/courses/check/sub/:id', coursesController.courseCheckSubscriptio
 router.get('/v1/courses/authors', coursesController.getCoursesByAuthorId)
 
 router.put('/v1/courses', uploadCourseImage, coursesController.updateCourse)
+router.put('/v1/courses/status', coursesController.changeReleasedStatus)
 
 router.delete('/v1/courses/:id', coursesController.deleteCourse)
 router.delete('/v1/courses/unsub/:id', coursesController.removeSubscription)
