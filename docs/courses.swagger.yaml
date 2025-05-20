@@ -417,7 +417,7 @@ paths:
                     type: string
                   creatorId:
                     type: string
-                  creation_date:
+                  creationdate:
                     type: string
                     format: date-time
                   duration:
@@ -663,7 +663,7 @@ paths:
                           type: string
                         creatorId:
                           type: string
-                        creation_date:
+                        creationdate:
                           type: string
                           format: date-time
                         duration:
