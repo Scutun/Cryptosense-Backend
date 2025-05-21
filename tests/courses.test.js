@@ -4,7 +4,7 @@ const { startServer } = require('../app');
 
 let app;
 
-const validToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ3NzUxOTgxLCJleHAiOjE3NDc3NTkxODF9.QdkLrA-Uai6_NmH8CjwRU088szW9l2EmbwsLUykfHsY';
+const validToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiaWF0IjoxNzQ3ODE3ODc3LCJleHAiOjE3NDc4MjUwNzd9.j6K6qy-LfBJIs2cwqk3fJ3RrZU-c1AxBOgaVEimi0o0';
 const invalidToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ3NzUwNTgxLCJleHAiOjE3NDc3NTc3ODF9.Awre9YoVvPtLEwIiWtDgAI5dhYNEsdE5jzHhj9fsalf';
 const notAuthorToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ3NzUwNTgxLCJleHAiOjE3NDc3NTc3ODF9.Awre9YoVvPtLEwIiWtDgAI5dhYNEsdE5jzHhj9fsal0';
 
@@ -22,7 +22,7 @@ describe('POST /api/v1/courses/new', () => {
             .field('courseDuration', 16)
             .field('difficultyId', 1)
             .field('tags[]', 2)
-            .attach('photo', 'tests/test.jpg'); // путь до изображения
+            .attach('photo', 'tests/test.jpg'); 
 
 
         expect(response.statusCode).toBe(200);
@@ -30,46 +30,49 @@ describe('POST /api/v1/courses/new', () => {
         id: expect.any(Number),
         title: 'Курс по JavaScript',
         description: 'Основы языка JS',
-        creatorid: expect.any(String),                        // строка
-        creationdate: expect.any(String),      // дата в строковом формате ISO
+        creatorid: expect.any(String),                       
+        creationdate: expect.any(String),      
         duration: 16,
         difficultyid: 1,
-        difficulty: 'Легкая',
-        tags: ['Эфириум'],
+        tags: [2],
         lessonscount: 0,
         testcount: 0,
         subscribers: 0,
-        coursephoto: expect.any(String),       // строка с именем файла
-        rating: '0.0',                         // строка (если это число — можно проверить через Number)
-        unlockall: true
+        rating: '0.0',                         
+        unlockall: true,
+        published:false,
+        photo: expect.any(String)
         });
 
     });
 
-    // it('Ошибка: отсутствуют обязательные поля', async () => {
-    //     const response = await request(app)
-    //         .post('/api/v1/courses/new')
-    //         .set('Authorization', `Bearer ${validToken}`)
-    //         .field('title', '') // пустое поле
-    //         .field('courseDuration', 0); // невалидное значение
+    it('Ошибка: отсутствуют обязательные поля', async () => {
+        const response = await request(app)
+            .post('/api/v1/courses/new')
+            .set('Authorization', `Bearer ${validToken}`)
+            .field('title', 'Курс по JavaScript')
+            .field('description', 'Основы языка JS')
+            .field('courseDuration','' )
+            .field('difficultyId', 10)
+            .field('tags[]', 2)
+            .attach('photo', 'tests/test.jpg'); 
+        expect(response.statusCode).toBe(400);
+        expect(response.body.message).toBe('Не все поля заполнены');
+    });
 
-    //     expect(response.statusCode).toBe(400);
-    //     expect(response.body.message).toBe('Не все поля заполнены');
-    // });
+    it('Ошибка: невалидный токен', async () => {
+        const response = await request(app)
+            .post('/api/v1/courses/new')
+            .set('Authorization', `Bearer ${invalidToken}`)
+            .field('title', 'JS')
+            .field('courseDuration', 10)
+            .field('difficultyId', 1)
+            .field('tags', [1])
+            .attach('photo', 'cryptosense_backend/uploads/course/DefaultCoursePhoto.jpg');
 
-    // it('Ошибка: невалидный токен', async () => {
-    //     const response = await request(app)
-    //         .post('/api/v1/courses/new')
-    //         .set('Authorization', `Bearer ${invalidToken}`)
-    //         .field('title', 'JS')
-    //         .field('courseDuration', 10)
-    //         .field('difficultyId', 1)
-    //         .field('tags', [1])
-    //         .attach('photo', 'cryptosense_backend/uploads/course/DefaultCoursePhoto.jpg');
-
-    //     expect(response.statusCode).toBe(403);
-    //     expect(response.body.message).toBe('Недействительный токен');
-    // });
+        expect(response.statusCode).toBe(403);
+        expect(response.body.message).toBe('Недействительный токен');
+    });
 
     // it('Ошибка: пользователь не автор', async () => {
     //     const response = await request(app)
