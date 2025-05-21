@@ -34,7 +34,11 @@ class CoursesController {
             if (req.file) {
                 const oldPhotoFileName = existingCourse.photo
 
-                if (oldPhotoFileName && typeof oldPhotoFileName === 'string') {
+                if (
+                    oldPhotoFileName &&
+                    typeof oldPhotoFileName === 'string' &&
+                    oldPhotoFileName !== 'DefaultCoursePhoto.jpg'
+                ) {
                     const oldPhotoPath = path.join('uploads/course', oldPhotoFileName)
 
                     if (fs.existsSync(oldPhotoPath)) {
@@ -117,7 +121,7 @@ class CoursesController {
         try {
             const userId = tokenUtils.getIdFromToken(req)
             const courses = await coursesService.getCoursesByAuthorId(userId, req.query)
-            res.status(200).json({courses:courses})
+            res.status(200).json({ courses: courses })
         } catch (error) {
             next(error)
         }
