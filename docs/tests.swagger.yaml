@@ -40,8 +40,25 @@ paths:
                 sectionId:
                   type: integer
                   example: 1
-                info:
-                  type: object
+                questions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      question:
+                        type: string
+                        example: "Вопрос 1"
+                      specialQuestion:
+                        type: string
+                        example: "print(bool([]))"
+                      answers:
+                        type: array
+                        items:         
+                          type: string
+                        example: ["Ответ 1", "Ответ 2", "Ответ 3", "Ответ 4"]
+                      rightAnswer:
+                        type: integer
+                        example: 1
       responses:
         '201':
           description: Успешное создание теста
@@ -52,12 +69,31 @@ paths:
                 properties:
                   testId:
                     type: integer
+                  name:
+                    type: string
                   sectionId:
                     type: integer
                   courseId:
                     type: integer
-                  info:
-                    type: object
+                  questions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        question:
+                          type: string
+                          example: "Вопрос 1"
+                        specialQuestion:
+                          type: string
+                          example: "print(bool([]))"
+                        answers:
+                          type: array
+                          items:         
+                            type: string
+                          example: ["Ответ 1", "Ответ 2", "Ответ 3", "Ответ 4"]
+                        rightAnswer:
+                          type: integer
+                          example: 1
         "400":  
           description: Не все поля заполнены
           content:
@@ -97,6 +133,19 @@ paths:
                   message:
                     type: string
                     example: "Раздела с таким id не существует"
+        '413':
+          description: Слишком много вопросов
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 413
+                  message:
+                    type: string
+                    example: "Слишком много вопросов. Максимально допустимое количество вопросов - 64"
         '500':
           description: Внутренняя ошибка сервера
           content:
@@ -140,14 +189,16 @@ paths:
                 items:
                   type: object
                   properties:
-                    testId:
+                    id:
                       type: integer
-                    sectionId:
-                      type: integer
-                    courseId:
-                      type: integer
-                    info:
-                      type: object
+                      example: 1
+                    name:
+                      type: string
+                      example: "Тест 1"
+                    isCompleted:
+                      type: boolean
+                      example: false
+                      description: Является ли урок завершенным
         "400":  
           description: Не все поля заполнены
           content:
@@ -174,6 +225,19 @@ paths:
                   message:
                     type: string
                     example: 'Недействительный токен'
+        '404':
+          description: В этом разделе нет тестов
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: "В этом разделе нет тестов"
         '500':
           description: Внутренняя ошибка сервера
           content:
@@ -187,7 +251,7 @@ paths:
                   message:
                     type: string
 
-  /api/v1/tests/info/{id}:
+  /api/v1/tests/info:
     get:
       summary: Получение информации о тесте по ID теста
       tags:
@@ -201,12 +265,26 @@ paths:
             example: Bearer your_token_here
           description: Токен авторизации
         - name: id
-          in: path
+          in: query
           required: true
           schema:
             type: integer
             example: 1
           description: ID теста
+        - name: page
+          in: query
+          required: true
+          schema:
+            type: integer
+            example: 1
+          description: Номер страницы
+        - name: limit
+          in: query
+          required: true
+          schema:
+            type: integer
+            example: 10
+          description: Количество элементов на странице
       responses:
         '200':
           description: Успешное получение информации о тесте
@@ -215,14 +293,42 @@ paths:
               schema:
                 type: object
                 properties:
+                  pages:
+                    type: integer
                   testId:
                     type: integer
                   sectionId:
                     type: integer
                   courseId:
                     type: integer
-                  info:
-                    type: object
+                  name:
+                    type: string
+                    example: "Название урока"
+                  isCompleted:
+                    type: boolean
+                    example: false
+                  questions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        question:
+                          type: string
+                          example: "Вопрос 1"
+                        specialQuestion:
+                          type: string
+                          example: "print(bool([]))"
+                        answers:
+                          type: array
+                          items:         
+                            type: string
+                          example: ["Ответ 1", "Ответ 2", "Ответ 3", "Ответ 4"]
+                        rightAnswer:
+                          type: integer
+                          example: 1
+                  totalQuestions:
+                    type: integer
+                    example: 1        
         "400":  
           description: Не все поля заполнены
           content:
@@ -249,6 +355,33 @@ paths:
                   message:
                     type: string
                     example: 'Недействительный токен'
+        '404':
+          description: Тест не найден
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: "Тест не найден"
+
+        "423":  
+          description: Завершите предыдущую секцию для просмотра содержимого следующей
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 423
+                  message:
+                    type: string
+                    example: "Завершите предыдущую секцию для просмотра содержимого следующей"
         '500':
           description: Внутренняя ошибка сервера
           content:
@@ -288,21 +421,34 @@ paths:
                 - courseId
                 - info
               properties:
-                testId:
-                  type: integer
-                  description: ID теста
                 name:
                   type: string
-                  description: Название теста
-                sectionId:
-                  type: integer
-                  description: ID секции
+                  example: "Тест 1"
                 courseId:
                   type: integer
-                  description: ID курса
-                info:
-                  type: object
-                  description: Содержание теста
+                  example: 1
+                sectionId:
+                  type: integer
+                  example: 1
+                questions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      question:
+                        type: string
+                        example: "Вопрос 1"
+                      specialQuestion:
+                        type: string
+                        example: "print(bool([]))"
+                      answers:
+                        type: array
+                        items:         
+                          type: string
+                        example: ["Ответ 1", "Ответ 2", "Ответ 3", "Ответ 4"]
+                      rightAnswer:
+                        type: integer
+                        example: 1
       responses:
         '200':
           description: Успешное редактирование теста
@@ -319,8 +465,25 @@ paths:
                     type: integer
                   courseId:
                     type: integer
-                  info:
-                    type: object
+                  questions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        question:
+                          type: string
+                          example: "Вопрос 1"
+                        specialQuestion:
+                          type: string
+                          example: "print(bool([]))"
+                        answers:
+                          type: array
+                          items:         
+                            type: string
+                          example: ["Ответ 1", "Ответ 2", "Ответ 3", "Ответ 4"]
+                        rightAnswer:
+                          type: integer
+                          example: 1
         "400":  
           description: Не все поля заполнены
           content:
@@ -347,6 +510,19 @@ paths:
                   message:
                     type: string
                     example: "У вас недостаточно прав для редактирования этого курса"
+        '413':
+          description: Слишком много вопросов
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 413
+                  message:
+                    type: string
+                    example: "Слишком много вопросов. Максимально допустимое количество вопросов - 64"
         '500':
           description: Внутренняя ошибка сервера
           content:

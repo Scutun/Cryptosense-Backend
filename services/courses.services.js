@@ -1,7 +1,10 @@
 const coursesModel = require('../models/courses.models')
+const lessonsModel = require('../models/lessons.models')
+const testsModel = require('../models/tests.models')
+const authorsModel = require('../models/authors.models')
 
 class CoursesService {
-    async createCourse(info, creatorId) {
+    async createCourse(info, creatorId, coursePhoto) {
         try {
             if (
                 !info.title ||
@@ -9,12 +12,21 @@ class CoursesService {
                 !info.courseDuration ||
                 !info.difficultyId ||
                 !info.courseDuration ||
-                info.tags.length === 0
+                info.tags.length === 0 ||
+                !coursePhoto
             ) {
                 throw { status: 400, message: 'Не все поля заполнены' }
             }
 
-            const courseId = await coursesModel.createCourse(info, creatorId)
+            const author = await authorsModel.getAuthorById(creatorId)
+            if (!author.rows[0]) {
+                throw {
+                    status: 409,
+                    message: 'Этот пользователь не является автором и не может создавать курсы',
+                }
+            }
+
+            const courseId = await coursesModel.createCourse(info, creatorId, coursePhoto)
 
             const tags = info.tags.map((num) => [courseId, num])
 
@@ -36,6 +48,7 @@ class CoursesService {
                 !info.coursePhoto ||
                 !info.courseId ||
                 !creatorId ||
+                !info.unlockAll ||
                 info.tags.length === 0
             ) {
                 throw { status: 400, message: 'Не все поля заполнены' }
@@ -164,6 +177,42 @@ class CoursesService {
             }
             await coursesModel.removeCourseSubscriber(userId, courseId)
             return courseId
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async courseCheckSubscription(courseId, userId) {
+        try {
+            if (courseId.length === 0) {
+                throw { status: 400, message: 'Id курса не предоставлен' }
+            }
+            const info = await coursesModel.courseCheckSubscription(courseId, userId)
+            if (!info.rows[0]) {
+                return { isSubscribed: false }
+            }
+            return { isSubscribed: true }
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async deleteAllUserCourses(id) {
+        try {
+            const userCourses = await coursesModel.getUserCreatedCourses(id)
+
+            if (id.length === 0) {
+                throw { status: 400, message: 'Id пользователя не предоставлен' }
+            }
+            await coursesModel.deleteAllUserCourses(id)
+
+            await Promise.all(
+                userCourses.rows.map((course) =>
+                    lessonsModel
+                        .deleteAllLessonsByCourseId(course.id)
+                        .then(() => testsModel.deleteAllTestsByCoursesId(course.id)),
+                ),
+            )
         } catch (error) {
             throw error
         }

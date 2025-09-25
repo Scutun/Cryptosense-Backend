@@ -35,14 +35,29 @@ paths:
                   type: string
                   description: Название урока
                 sectionId:
-                  type: string
+                  type: integer
                   description: ID секции
                 courseId:
-                  type: string
+                  type: integer
                   description: ID курса
                 info:
                   type: object
                   description: Содержимое урока
+                  properties:
+                    title:
+                      type: string
+                      description: Заголовок урока
+                      example: "Заголовок урока"
+                    content:
+                      type: string
+                      description: Содержимое урока
+                      example: "Содержимое урока"
+                    url:
+                      type: array
+                      items:
+                        type: string
+                      description: Ссылки на видео
+                      example: ["https://www.youtube.com/watch?v=123", "https://www.youtube.com/watch?v=456"]
       responses:
         '201':
           description: Успешное создание урока
@@ -53,12 +68,30 @@ paths:
                 properties:
                   lessonId:
                     type: integer
+                  name:
+                    type: string
                   sectionId:
                     type: integer
                   courseId:
                     type: integer
                   info:
                     type: object
+                    description: Содержимое урока
+                    properties:
+                      title:
+                        type: string
+                        description: Заголовок урока
+                        example: "Заголовок урока"
+                      content:
+                        type: string
+                        description: Содержимое урока
+                        example: "Содержимое урока"
+                      url:
+                        type: array
+                        items:
+                          type: string
+                        description: Ссылки на видео
+                        example: ["https://www.youtube.com/watch?v=123", "https://www.youtube.com/watch?v=456"]
         "400":  
           description: Не все поля заполнены
           content:
@@ -200,6 +233,21 @@ paths:
                   message:
                     type: string
                     example: "Урок уже завершен"
+
+        "423":  
+          description: Завершите предыдущую секцию для просмотра содержимого следующей
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 423
+                  message:
+                    type: string
+                    example: "Завершите предыдущую секцию для просмотра содержимого следующей"
+
         '500':  
           description: Внутренняя ошибка сервера
           content:
@@ -215,7 +263,7 @@ paths:
 
   /v1/lessons/list/{id}:
     get:
-      summary: Получить список всех уроков в секции
+      summary: Получить список всех уроков и тестов в секции
       tags:
         - Lessons
       parameters:
@@ -246,6 +294,10 @@ paths:
                     name:
                       type: string
                       example: "урок 1"
+                    isCompleted:
+                      type: boolean
+                      example: false
+                      description: Является ли урок завершенным
         "400":  
           description: Не все поля заполнены
           content:
@@ -313,12 +365,33 @@ paths:
                 properties:
                   lessonId:
                     type: integer
+                  name:
+                    type: string
                   sectionId:
                     type: integer
                   courseId:
                     type: integer
+                  isCompleted:
+                    type: boolean
+                    example: false
                   info:
                     type: object
+                    description: Содержимое урока
+                    properties:
+                      title:
+                        type: string
+                        description: Заголовок урока
+                        example: "Заголовок урока"
+                      content:
+                        type: string
+                        description: Содержимое урока
+                        example: "Содержимое урока"
+                      url:
+                        type: array
+                        items:
+                          type: string
+                        description: Ссылки на видео
+                        example: ["https://www.youtube.com/watch?v=123", "https://www.youtube.com/watch?v=456"]
         "400":  
           description: Не все поля заполнены
           content:
@@ -345,6 +418,19 @@ paths:
                   message:
                     type: string
                     example: 'Недействительный токен'
+        "423":  
+          description: Завершите предыдущую секцию для просмотра содержимого следующей
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 423
+                  message:
+                    type: string
+                    example: "Завершите предыдущую секцию для просмотра содержимого следующей"
         '500':
           description: Внутренняя ошибка сервера
           content:
@@ -383,20 +469,35 @@ paths:
                 - info
               properties:
                 lessonId:
-                  type: string
+                  type: integer
                   description: ID урока
                 name:
                   type: string
                   description: Название урока
                 sectionId:
-                  type: string
+                  type: integer
                   description: ID секции
                 courseId:
-                  type: string
+                  type: integer
                   description: ID курса
                 info:
                   type: object
                   description: Содержимое урока
+                  properties:
+                    title:
+                      type: string
+                      description: Заголовок урока
+                      example: "Заголовок урока"
+                    content:
+                      type: string
+                      description: Содержимое урока
+                      example: "Содержимое урока"
+                    url:
+                      type: array
+                      items:
+                        type: string
+                      description: Ссылки на видео
+                      example: ["https://www.youtube.com/watch?v=123", "https://www.youtube.com/watch?v=456"]
       responses:
         '200':
           description: Успешное редактированние урока
@@ -407,12 +508,30 @@ paths:
                 properties:
                   lessonId:
                     type: integer
+                  name:
+                    type: string
                   sectionId:
                     type: integer
                   courseId:
                     type: integer
                   info:
                     type: object
+                    description: Содержимое урока
+                    properties:
+                      title:
+                        type: string
+                        description: Заголовок урока
+                        example: "Заголовок урока"
+                      content:
+                        type: string
+                        description: Содержимое урока
+                        example: "Содержимое урока"
+                      url:
+                        type: array
+                        items:
+                          type: string
+                        description: Ссылки на видео
+                        example: ["https://www.youtube.com/watch?v=123", "https://www.youtube.com/watch?v=456"]
         "400":  
           description: Не все поля заполнены
           content:

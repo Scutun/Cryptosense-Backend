@@ -4,13 +4,15 @@ const router = new Router()
 const testController = require('../controllers/tests.controllers')
 const checkToken = require('../middlewares/checkToken')
 
-router.post('/v1/tests/new', checkToken, testController.createTest)
+router.use('/v1/tests', checkToken)
 
-router.get('/v1/tests/list/:id', checkToken, testController.getTestsBySectionId)
-router.get('/v1/tests/info/:id', checkToken, testController.getTestInfoById)
+router.post('/v1/tests/new', testController.createTest)
 
-router.put('/v1/tests/redact', checkToken, testController.updateTest)
+router.get('/v1/tests/list/:id', testController.getTestsBySectionId)
+router.get('/v1/tests/info', testController.getTestInfoById)
 
-router.delete('/v1/tests', checkToken, testController.deleteTest)
-// /v1/tests?lessonId=1&sectionId=1&courseId=1
+router.put('/v1/tests/redact', testController.updateTest)
+
+router.delete('/v1/tests', testController.deleteTest)
+
 module.exports = router

@@ -2,12 +2,19 @@ const db = require('../config/db').pool
 const redis = require('../config/db').redisClient
 
 class CoursesModel {
-    async createCourse(info, creatorId) {
+    async createCourse(info, creatorId, coursePhoto) {
         try {
             const result = await db.query(
-                `INSERT INTO courses (title, description, creator_id, course_duration, difficulty_id, creation_date) 
-                 VALUES ($1, $2, $3, $4, $5, NOW()) RETURNING id`,
-                [info.title, info.description, creatorId, info.courseDuration, info.difficultyId],
+                `INSERT INTO courses (title, description, creator_id, course_duration, difficulty_id, creation_date, course_photo) 
+                 VALUES ($1, $2, $3, $4, $5, NOW(), $6) RETURNING id`,
+                [
+                    info.title,
+                    info.description,
+                    creatorId,
+                    info.courseDuration,
+                    info.difficultyId,
+                    coursePhoto,
+                ],
             )
 
             return result.rows[0].id
@@ -49,7 +56,8 @@ class CoursesModel {
                      description = $2, 
                      course_duration = $3, 
                      difficulty_id = $4,
-                     course_photo = $5  
+                     course_photo = $5,
+                     unlock_all = $8   
                  WHERE id = $6 and creator_id = $7`,
                 [
                     info.title,
@@ -59,6 +67,7 @@ class CoursesModel {
                     info.coursePhoto,
                     info.courseId,
                     creatorId,
+                    info.unlockAll,
                 ],
             )
         } catch (error) {
@@ -89,16 +98,17 @@ class CoursesModel {
             const info = await db.query(
                 `SELECT 
                     courses.id, courses.id, courses.title, courses.description, 
-                    CONCAT(users.name, ' ', users.surname) AS creator, 
-                    courses.creation_date, courses.course_duration, difficulties.name AS difficulty, 
-                    ARRAY_AGG(tags.name) AS tags
+                    courses.creator_id as creatorId, 
+                    courses.creation_date as creationDate, courses.course_duration AS duration, difficulties.id AS difficultyId, difficulties.name AS difficulty, 
+                    ARRAY_AGG(tags.name) AS tags,courses.lessons_count as lessonsCount,courses.test_count as testCount,courses.subscribers,
+                    courses.course_photo as coursePhoto, courses.rating , courses.unlock_all as unlockAll
                   FROM courses
                   LEFT JOIN users ON courses.creator_id = users.id
                   LEFT JOIN difficulties ON courses.difficulty_id = difficulties.id
                   LEFT JOIN course_tags ON courses.id = course_tags.course_id
                   LEFT JOIN tags ON course_tags.tag_id = tags.id
                   WHERE courses.id = $1
-                  GROUP BY courses.id, users.name, users.surname, difficulties.name`,
+                  GROUP BY courses.id, users.name, users.surname, difficulties.id, difficulties.name`,
                 [id],
             )
             return info.rows[0]
@@ -289,6 +299,35 @@ class CoursesModel {
                 ueserId,
                 courseId,
             ])
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async courseCheckSubscription(courseId, userId) {
+        try {
+            const info = await db.query(
+                `SELECT * FROM user_courses WHERE course_id = $1 and user_id = $2`,
+                [courseId, userId],
+            )
+            return info
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async deleteAllUserCourses(id) {
+        try {
+            await db.query(`DELETE FROM courses WHERE creator_id = $1`, [id])
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async getUserCreatedCourses(id) {
+        try {
+            const info = await db.query(`SELECT id FROM courses WHERE creator_id = $1`, [id])
+            return info
         } catch (error) {
             throw error
         }

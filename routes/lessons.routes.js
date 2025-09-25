@@ -4,14 +4,16 @@ const router = new Router()
 const lessonsController = require('../controllers/lessons.controllers')
 const checkToken = require('../middlewares/checkToken')
 
-router.post('/v1/lessons/new', checkToken, lessonsController.createLesson)
-router.post('/v1/lessons/end', checkToken, lessonsController.finishLesson)
+router.use('/v1/lessons', checkToken)
 
-router.get('/v1/lessons/list/:id', checkToken, lessonsController.getAllLessonsNames)
-router.get('/v1/lessons/info/:id', checkToken, lessonsController.getLessonById)
+router.post('/v1/lessons/new', lessonsController.createLesson)
+router.post('/v1/lessons/end', lessonsController.finishLesson)
 
-router.put('/v1/lessons/redact', checkToken, lessonsController.updateLesson)
+router.get('/v1/lessons/list/:id', lessonsController.getAllLessonsNames)
+router.get('/v1/lessons/info/:id', lessonsController.getLessonById)
 
-router.delete('/v1/lessons', checkToken, lessonsController.deleteLesson)
+router.put('/v1/lessons/redact', lessonsController.updateLesson)
+
+router.delete('/v1/lessons', lessonsController.deleteLesson)
 
 module.exports = router

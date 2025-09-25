@@ -1,6 +1,5 @@
 const db = require('../config/db').pool
 const mongoDb = require('../config/db').mongoDb
-const { connectMongoDB } = require('../config/db')
 
 class LessonsModel {
     async createLesson(name, sectionId, courseId, info) {
@@ -12,12 +11,12 @@ class LessonsModel {
 
             const newLesson = {
                 _id: lessonId.rows[0].id,
+                name: name,
                 sectionId: sectionId,
                 courseId: courseId,
                 info: info,
             }
 
-            const mongoDb = await connectMongoDB()
             await mongoDb.collection('lessons').insertOne(newLesson)
 
             return newLesson
@@ -49,23 +48,42 @@ class LessonsModel {
         }
     }
 
-    async getAllLessonsNameFromSection(sectionId) {
+    async getAllLessonsNameFromSection(sectionId, userId) {
         try {
-            const lessons = await db.query('SELECT id, name FROM lessons WHERE section_id=$1', [
-                sectionId,
-            ])
+            const lessons = await db.query(
+                `SELECT 
+                    l.id, 
+                    l.name,
+                    CASE 
+                        WHEN ul.lesson_id IS NOT NULL THEN TRUE 
+                        ELSE FALSE 
+                    END AS isCompleted
+                FROM lessons l
+                LEFT JOIN user_lessons ul 
+                    ON l.id = ul.lesson_id AND ul.user_id = $2
+                WHERE l.section_id = $1 and l.is_test=false;`,
+                [sectionId, userId],
+            )
             return lessons.rows
         } catch (error) {
             throw error
         }
     }
 
-    async getLessonById(lessonId) {
+    async getLessonById(lessonId, userId) {
         try {
-            const mongoDb = await connectMongoDB()
+            const isComplete = await db.query(
+                'SELECT * FROM user_lessons WHERE user_id = $1 AND lesson_id = $2',
+                [userId, lessonId],
+            )
+            const isCompleted = isComplete.rowCount > 0 ? true : false
+
+            const info = await db.query(`SELECT name FROM lessons WHERE id = $1`, [lessonId])
+
             const lesson = await mongoDb.collection('lessons').findOne({ _id: Number(lessonId) })
 
-            if (lesson) return lesson
+            if (lesson)
+                return Object.assign({ name: info.rows[0].name, isCompleted: isCompleted }, lesson)
             throw { status: 404, message: 'Урок не найден' }
         } catch (error) {
             throw error
@@ -79,8 +97,6 @@ class LessonsModel {
                 lessonId,
                 sectionId,
             ])
-
-            const mongoDb = await connectMongoDB()
 
             await mongoDb
                 .collection('lessons')
@@ -97,7 +113,6 @@ class LessonsModel {
         try {
             await db.query('DELETE FROM lessons WHERE id=$1', [lessonId])
 
-            const mongoDb = await connectMongoDB()
             await mongoDb.collection('lessons').deleteOne({ _id: Number(lessonId) })
         } catch (error) {
             throw error
@@ -106,9 +121,6 @@ class LessonsModel {
 
     async deleteAllLessonsBySectionId(sectionId) {
         try {
-            await db.query('DELETE FROM lessons WHERE section_id=$1', [sectionId])
-
-            const mongoDb = await connectMongoDB()
             await mongoDb.collection('lessons').deleteMany({ sectionId: Number(sectionId) })
         } catch (error) {
             throw error
@@ -117,7 +129,6 @@ class LessonsModel {
 
     async deleteAllLessonsByCourseId(courseId) {
         try {
-            const mongoDb = await connectMongoDB()
             await mongoDb.collection('lessons').deleteMany({ courseId: Number(courseId) })
         } catch (error) {
             throw error
@@ -150,6 +161,24 @@ class LessonsModel {
             if (error.code === '23505') {
                 throw { status: 409, message: 'Урок уже завершен' }
             }
+            throw error
+        }
+    }
+
+    async checkLessonAccess(lessonId, userId) {
+        try {
+            const lessonOpened = await db.query(
+                'SELECT us.is_unlocked FROM user_sections us LEFT JOIN lessons l ON l.section_id = us.section_id WHERE l.id = $1 AND us.user_id = $2',
+                [lessonId, userId],
+            )
+
+            if (lessonOpened.rowCount === 0) {
+                throw {
+                    status: 423,
+                    message: 'Завершите предыдущую секцию для просмотра содержимого следующей',
+                }
+            }
+        } catch (error) {
             throw error
         }
     }

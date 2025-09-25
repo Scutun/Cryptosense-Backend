@@ -1,11 +1,13 @@
 const coursesService = require('../services/courses.services')
 const tokenUtils = require('../utils/tokens.utils')
+const fs = require('fs')
+const path = require('path')
 
 class CoursesController {
     async createCourse(req, res, next) {
         try {
             const userId = tokenUtils.getIdFromToken(req)
-            const courseId = await coursesService.createCourse(req.body, userId)
+            const courseId = await coursesService.createCourse(req.body, userId, req.file.filename)
             const info = await coursesService.getCourseInfoById(courseId)
             res.json(info)
         } catch (error) {
@@ -27,7 +29,24 @@ class CoursesController {
     async updateCourse(req, res, next) {
         try {
             const userId = tokenUtils.getIdFromToken(req)
-            await coursesService.getCourseInfoById(req.body.courseId)
+            const existingCourse = await coursesService.getCourseInfoById(req.body.courseId)
+
+            if (req.file) {
+                const oldPhotoFileName = existingCourse.coursephoto
+
+                if (oldPhotoFileName && typeof oldPhotoFileName === 'string') {
+                    const oldPhotoPath = path.join('uploads/course', oldPhotoFileName)
+
+                    if (fs.existsSync(oldPhotoPath)) {
+                        fs.unlinkSync(oldPhotoPath)
+                    }
+                }
+
+                req.body.coursePhoto = req.file.filename
+            } else {
+                req.body.coursePhoto = existingCourse.coursephoto || null
+            }
+
             const courseId = await coursesService.updateCourse(req.body, userId)
             const info = await coursesService.getCourseInfoById(courseId)
             res.json(info)
@@ -79,6 +98,16 @@ class CoursesController {
             const userId = tokenUtils.getIdFromToken(req)
             await coursesService.removeCourseSubscriber(req.params.id, userId)
             res.status(200).json({ message: 'Вы отписались от курса' })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async courseCheckSubscription(req, res, next) {
+        try {
+            const userId = tokenUtils.getIdFromToken(req)
+            const isSubscribed = await coursesService.courseCheckSubscription(req.params.id, userId)
+            res.status(200).json(isSubscribed)
         } catch (error) {
             next(error)
         }

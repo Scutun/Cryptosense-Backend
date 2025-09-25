@@ -1,5 +1,5 @@
 const db = require('../config/db').pool
-const { connectMongoDB } = require('../config/db')
+const mongoDb = require('../config/db').mongoDb
 
 class TestsModel {
     async createTest(name, sectionId, courseId, info) {
@@ -13,10 +13,9 @@ class TestsModel {
                 _id: testId.rows[0].id,
                 sectionId: sectionId,
                 courseId: courseId,
-                info: info,
+                questions: info,
             }
 
-            const mongoDb = await connectMongoDB()
             await mongoDb.collection('tests').insertOne(newTest)
 
             return newTest
@@ -28,26 +27,42 @@ class TestsModel {
         }
     }
 
-    async getTestsBySectionId(sectionId) {
+    async getTestsBySectionId(sectionId, userId) {
         try {
-            const mongoDb = await connectMongoDB()
-            const tests = await mongoDb
-                .collection('tests')
-                .find({ sectionId: Number(sectionId) })
-                .toArray()
-            return tests
+            const lessons = await db.query(
+                `SELECT 
+                        l.id, 
+                        l.name,
+                        CASE 
+                            WHEN ul.lesson_id IS NOT NULL THEN TRUE 
+                            ELSE FALSE 
+                        END AS isCompleted
+                    FROM lessons l
+                    LEFT JOIN user_lessons ul 
+                        ON l.id = ul.lesson_id AND ul.user_id = $2
+                    WHERE l.section_id = $1 and l.is_test=true;`,
+                [sectionId, userId],
+            )
+            return lessons.rows
         } catch (error) {
             throw error
         }
     }
 
-    async getTestInfoById(testId) {
+    async getTestInfoById(testId, userId) {
         try {
-            const mongoDb = await connectMongoDB()
+            const isComplete = await db.query(
+                'SELECT * FROM user_lessons WHERE user_id = $1 AND lesson_id = $2',
+                [userId, testId],
+            )
+            const isCompleted = isComplete.rowCount > 0 ? true : false
+
+            const info = await db.query(`SELECT name FROM lessons WHERE id = $1`, [testId])
+
             const test = await mongoDb.collection('tests').findOne({ _id: Number(testId) })
 
             if (!test) throw { status: 404, message: 'Тест не найден' }
-            return test
+            return Object.assign({ name: info.rows[0].name, isCompleted: isCompleted }, test)
         } catch (error) {
             throw error
         }
@@ -61,11 +76,12 @@ class TestsModel {
                 sectionId,
             ])
 
-            const mongoDb = await connectMongoDB()
-
             await mongoDb
                 .collection('tests')
-                .updateOne({ _id: Number(testId) }, { $set: { info: info, sectionId: sectionId } })
+                .updateOne(
+                    { _id: Number(testId) },
+                    { $set: { questions: info, sectionId: sectionId } },
+                )
         } catch (error) {
             throw error
         }
@@ -75,8 +91,23 @@ class TestsModel {
         try {
             await db.query('DELETE FROM lessons WHERE id=$1', [testId])
 
-            const mongoDb = await connectMongoDB()
             await mongoDb.collection('tests').deleteOne({ _id: Number(testId) })
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async deleteAllTestsByCoursesId(courseId) {
+        try {
+            await mongoDb.collection('tests').deleteMany({ sectionId: Number(courseId) })
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async deleteAllTestsBySectionId(sectionId) {
+        try {
+            await mongoDb.collection('tests').deleteMany({ sectionId: Number(sectionId) })
         } catch (error) {
             throw error
         }

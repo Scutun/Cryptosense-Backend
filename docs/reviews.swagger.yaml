@@ -6,7 +6,7 @@ info:
   description: API для получения отзывов о курсе
 
 paths:
-  /v1/reviews/new:
+  /v1/reviews:
     post:
       tags:
         - Reviews
@@ -46,9 +46,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
-                    type: string
-                    example: 'Отзыв создан'
+                  id:
+                    type: integer
+                    description: Уникальный идентификатор отзыва
 
         '400':
           description: Ошибка в передаче данных
@@ -105,85 +105,6 @@ paths:
                     type: string
                     example: 'Ошибка сервера'
 
-  /v1/reviews/course/{id}:
-    get:
-      summary: Получить отзывы о курсе
-      description: Возвращает список отзывов по ID курса.
-      tags:
-        - Reviews
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-          description: Уникальный идентификатор курса.
-      responses:
-        '200':
-          description: Успешный ответ со списком отзывов
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                      description: Уникальный идентификатор отзыва
-                    rating:
-                      type: integer
-                      description: Оценка курса
-                    content:
-                      type: string
-                      description: Содержимое отзыва
-                    nickname:
-                      type: string
-                      description: Никнейм пользователя
-
-        '400':
-          description: Ошибка в передаче ID курса
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 400
-                  message:
-                    type: string
-                    example: 'Id курса не предоставлен'
-
-        '404':
-          description: Курс не найден
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 404
-                  message:
-                    type: string
-                    example: 'Курс не найден'
-
-        '500':
-          description: Внутренняя ошибка сервера
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 500
-                  message:
-                    type: string
-                    example: 'Внутренняя ошибка сервера'
-
-  /v1/reviews/redact:
     put:
       tags:
         - Reviews
@@ -281,7 +202,207 @@ paths:
                     type: string
                     example: 'Ошибка сервера'
 
+  /v1/reviews/course:
+    get:
+      summary: Получить отзывы о курсе
+      description: Возвращает список отзывов по ID курса.
+      tags:
+        - Reviews
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: Уникальный идентификатор курса.
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Номер страницы.
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Количество отзывов на странице.
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Сортировка отзывов (asc, desc).
+      responses:
+        '200':
+          description: Успешный ответ со списком отзывов
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    example: 2
+                    description: Общее количество отзывов
+                  reviews:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: Уникальный идентификатор отзыва
+                        rating:
+                          type: integer
+                          description: Оценка курса
+                        content:
+                          type: string
+                          description: Содержимое отзыва
+                        nickname:
+                          type: string
+                          description: Никнейм пользователя
+                        photo:
+                          type: string
+                          description: Фотография пользователя
+
+        '400':
+          description: Ошибка в передаче ID курса
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 'Id курса не предоставлен'
+
+        '404':
+          description: Курс не найден
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: 'Курс не найден'
+
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 'Внутренняя ошибка сервера'
+
   /v1/reviews/{id}:
+    get:
+      summary: Получить отзыв
+      description: Возвращает отзыв по его уникальному идентификатору.
+      tags:
+        - Reviews
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Уникальный идентификатор отзыва.
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: Bearer your_token_here
+      responses:
+        '200':
+          description: Успешный ответ с отзывом
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: Уникальный идентификатор отзыва
+                  rating:
+                    type: integer
+                    description: Оценка курса
+                  content:
+                    type: string
+                    description: Содержимое отзыва
+                  nickname:
+                    type: string
+                    description: Никнейм пользователя
+                  photo:
+                    type: string
+                    description: Фотография пользователя
+        '400':
+          description: Идентификаторы не переданы
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 'Идентификаторы не переданы'
+        '403':
+          description: Пользователь не авторизован
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 40102
+                  message:
+                    type: string
+                    example: 'Недействительный токен'
+        '404':
+          description: Отзыв не найден
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: 'Отзыв не найден'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 'Внутренняя ошибка сервера' 
+
     delete:
       tags:
         - Reviews
@@ -294,7 +415,7 @@ paths:
             type: string
             example: Bearer your_token_here
         - name: id
-          in: query
+          in: path
           required: true
           schema:
             type: integer
@@ -326,20 +447,6 @@ paths:
                     type: string
                     example: 'Недействительный токен'
 
-        '404':
-          description: Отзыв не найден
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 404
-                  message:
-                    type: string
-                    example: 'Отзыв не найден'
-
         '422':
           description: Идентификаторы не переданы
           content:
@@ -366,7 +473,8 @@ paths:
                     example: 500
                   message:
                     type: string
-                    example: 'Ошибка сервера'
+                    example: 'Ошибка сервера'                 
+
 
 components:
   securitySchemes:

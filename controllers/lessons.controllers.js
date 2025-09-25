@@ -14,7 +14,8 @@ class LessonsController {
 
     async getAllLessonsNames(req, res, next) {
         try {
-            const lessons = await lessonsService.getAllLessonsNameFromSection(req.params.id)
+            const userId = tokenUtils.getIdFromToken(req)
+            const lessons = await lessonsService.getAllLessonsNameFromSection(req.params.id,userId)
             res.status(200).json(lessons)
         } catch (error) {
             next(error)
@@ -23,7 +24,8 @@ class LessonsController {
 
     async getLessonById(req, res, next) {
         try {
-            const lesson = await lessonsService.getLessonById(req.params.id)
+            const userId = tokenUtils.getIdFromToken(req)
+            const lesson = await lessonsService.getLessonById(req.params.id, userId)
             res.status(200).json(lesson)
         } catch (error) {
             next(error)

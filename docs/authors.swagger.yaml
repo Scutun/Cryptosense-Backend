@@ -1,0 +1,193 @@
+#prettier-ignore
+openapi: 3.0.0
+info:
+  title: Authors API
+  version: 1.0.0
+  description: API для получения информации об авторах
+
+paths:
+  /v1/authors/{id}:
+    get:
+      tags:
+        - Authors
+      summary: Получение информации об авторе
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: ID автора, информацию о котором нужно получить
+      responses:
+        200:
+          description: Информация об авторе
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: 'John Doe'
+                  description:
+                    type: string
+                    example: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+                  photo:
+                    type: string
+                    example: 'photo.jpg'
+                  achievements:
+                    type: array
+                    items:
+                      type: string
+                      example: 'Achievement 1'
+        400:
+          description: Не передан id автора
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 'Не передан id автора'
+        404:
+          description: Автор не найден
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: 'Автор не найден'
+        500:
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 'Ошибка сервера'
+
+  /v1/authors:
+    post:
+      tags:
+        - Authors
+      summary: Стать автором
+      description: Стать автором
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Токен авторизации
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                  example: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+      responses:
+        200:
+          description: Успешное стать автором
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: 'John'
+                  surname:
+                    type: string
+                    example: 'Doe'
+                  email:
+                    type: string
+                    example: 'aBx5g@example.com'
+                  nickname:
+                    type: string
+                    example: 'johndoe'
+                  description:
+                    type: string
+                    example: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+                  photo:
+                    type: string
+                    example: 'photo.jpg'
+                  reputation:
+                    type: integer
+                    example: 0
+                  achievements:
+                    type: array
+                    items:
+                      type: string
+                      example: 'Achievement 1'
+                  registrationDate:
+                    type: string
+                    example: '2022-01-01T00:00:00.000Z'
+                  isAuthor:
+                    type: boolean
+                    example: true
+        400:
+          description: Не данные переданы
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 'Не все данные переданы'
+        403:
+          description: Недействительный токен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 40102
+                  message:
+                    type: string
+                    example: 'Недействительный токен'
+        409:
+          description: Пользователь уже является автором
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 409
+                  message:
+                    type: string
+                    example: 'Пользователь уже является автором'
+        500:
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 'Ошибка сервера'

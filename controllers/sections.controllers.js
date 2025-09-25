@@ -22,6 +22,19 @@ class SectionsController {
         }
     }
 
+    async getSectionWithToken(req, res, next) {
+        try {
+            const userId = tokenUtils.getIdFromToken(req)
+            const section = await sectionsService.getSectionByIdWithAuthorization(
+                userId,
+                req.params.id,
+            )
+            res.json(section)
+        } catch (error) {
+            next(error)
+        }
+    }
+
     async updateSection(req, res, next) {
         try {
             const userId = tokenUtils.getIdFromToken(req)

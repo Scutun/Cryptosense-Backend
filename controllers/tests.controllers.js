@@ -15,7 +15,8 @@ class TestsController {
 
     async getTestsBySectionId(req, res, next) {
         try {
-            const tests = await testsService.getTestsBySectionId(req.params.id)
+            const userId = tokenUtils.getIdFromToken(req)
+            const tests = await testsService.getTestsBySectionId(req.params.id, userId)
             res.status(200).json(tests)
         } catch (error) {
             next(error)
@@ -24,7 +25,13 @@ class TestsController {
 
     async getTestInfoById(req, res, next) {
         try {
-            const test = await testsService.getTestInfoById(req.params.id)
+            const userId = tokenUtils.getIdFromToken(req)
+            const test = await testsService.getTestInfoById(
+                req.query.id,
+                parseInt(req.query.page, 10),
+                parseInt(req.query.limit, 10),
+                userId,
+            )
             res.status(200).json(test)
         } catch (error) {
             next(error)

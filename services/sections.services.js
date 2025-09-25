@@ -1,5 +1,7 @@
 const sectionsModel = require('../models/sections.models')
 const coursesModel = require('../models/courses.models')
+const lessonsModel = require('../models/lessons.models')
+const testsModel = require('../models/tests.models')
 
 class SectionsService {
     async createSection(info, user) {
@@ -44,6 +46,23 @@ class SectionsService {
         }
     }
 
+    async getSectionByIdWithAuthorization(userId, courseId) {
+        try {
+            if (courseId.length === 0) {
+                throw { status: 400, message: 'Id курса не предоставлен' }
+            }
+
+            const section = await sectionsModel.getSectionByIdWithAuthorization(userId, courseId)
+
+            if (section.rowCount === 0) {
+                throw { status: 404, message: 'У этого курса пока нет раздела' }
+            }
+            return section.rows
+        } catch (error) {
+            throw error
+        }
+    }
+
     async updateSection(info, user) {
         try {
             const course = await coursesModel.getCourseById(info.courseId)
@@ -73,7 +92,7 @@ class SectionsService {
         try {
             const section = await sectionsModel.getSectionById(id)
 
-            const course = await coursesModel.getCourseById(section.rows[0].courseId)
+            const course = await coursesModel.getCourseById(section.rows[0].courseid)
 
             if (course.rowCount === 0 || section.rowCount === 0) {
                 throw { status: 404, message: 'Курса или раздела с таким id не существует' }
@@ -84,6 +103,8 @@ class SectionsService {
             }
 
             await sectionsModel.deleteSection(id)
+            await lessonsModel.deleteAllLessonsBySectionId(id)
+            await testsModel.deleteAllTestsBySectionId(id)
         } catch (error) {
             throw error
         }

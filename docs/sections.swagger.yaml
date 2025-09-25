@@ -108,7 +108,19 @@ paths:
                   message:
                     type: string
                     example: 'Курса с таким id не существует'
-
+        '409':
+          description: Раздел с таким названием уже существует
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 409
+                  message:
+                    type: string
+                    example: 'Раздел с таким названием уже существует'
         '500':
           description: Внутренняя ошибка сервера
           content:
@@ -197,6 +209,114 @@ paths:
                     type: string
                     example: 'Ошибка сервера'
 
+  /v1/sections/user/list/{id}:
+    get:
+      tags:
+        - Sections
+      summary: Получить список разделов при подписке на курс. Отображаются закрытые и открытые разделы
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: Bearer your_token_here
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Список разделов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    name:
+                      type: string
+                      example: "Раздел 1"
+                    courseId:
+                      type: integer
+                      example: 1
+                    lessonCount:
+                      type: integer
+                      example: 1
+                      description: Количество уроков в секции
+                    lessonCountFin:
+                      type: integer
+                      example: 0
+                      description: Количество выполненных уроков в секции
+                    isUnlocked:
+                      type: boolean
+                      example: false
+                      description: Является ли секция открытой
+                    isCompleted:
+                      type: boolean
+                      example: false
+                      description: Статус выполнения секции
+        
+        '400':
+          description: Id курса не предоставлен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 400
+                  message:
+                    type: string
+                    example: 'Id курса не предоставлен'
+        '403':
+          description: Недействительный токен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 40102
+                  message:
+                    type: string
+                    example: 'Недействительный токен'
+        '404':
+          description: У этого курса пока нет разделов
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 404
+                  message:
+                    type: string
+                    example: 'У этого курса пока нет разделов'
+
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  message:
+                    type: string
+                    example: 'Ошибка сервера'
+
   /v1/sections:
     put:
       tags:
@@ -225,6 +345,9 @@ paths:
                 name:
                   type: string
                   example: "Раздел 1"
+                courseId:
+                  type: integer
+                  example: 1
                 
       responses:
         '200':
@@ -300,7 +423,19 @@ paths:
                   message:
                     type: string
                     example: 'Вы не являетесь создателем этого курса'
-
+        '409':
+          description: Раздел с таким названием уже существует
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 409
+                  message:
+                    type: string
+                    example: 'Раздел с таким названием уже существует'
         '500':
           description: Ошибка сервера
           content:
@@ -334,10 +469,10 @@ paths:
             schema:
               type: object
               required:
-                - reviewId
+                - id
               properties:
                 reviewId:
-                  type: integer
+                  type: id
                   example: 10
       responses:
         '200':
