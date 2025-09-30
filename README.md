@@ -11,7 +11,7 @@
 
 - **Язык**: Node.js
 - **Фреймворк**: Express.js
-- **База данных**: PostgreSQL
+- **База данных**: PostgreSQL, MongoDB
 - **Аутентификация**: JWT
 - **Кэширование**: Redis
 - **Документация API**: Swagger
